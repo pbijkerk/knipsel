@@ -24,8 +24,8 @@ enum Lettertype: String, CaseIterable, Identifiable, Sendable {
     }
 }
 
-/// Leesinstellingen (Aa): lettertype en een extra vergroting bovenop de systeemtekstgrootte.
-/// Voorlezen komt in fase 4 op dit scherm bij.
+/// Leesinstellingen (Aa): lettertype en een extra vergroting bovenop de systeemtekstgrootte, plus
+/// het voorlezen in de kookmodus.
 enum Leesinstellingen {
     static let maximaleExtraGrootte = 4
 
@@ -43,6 +43,7 @@ struct LeesinstellingenView: View {
     @AppStorage(AppConfiguratie.sleutelKookmodusDonker) private var kookmodusDonker = true
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var tekstgrootte
+    @State private var voorlezer = VoorleesService(isAan: true)
 
     var body: some View {
         NavigationStack {
@@ -77,6 +78,7 @@ struct LeesinstellingenView: View {
                         .font(.system(.body, design: lettertype.ontwerp))
                         .dynamicTypeSize(Leesinstellingen.vergroot(tekstgrootte, met: extraGrootte))
                 }
+                VoorleesInstellingenSecties(voorlezer: voorlezer)
             }
             .navigationTitle("Weergave")
             .navigationBarTitleDisplayMode(.inline)

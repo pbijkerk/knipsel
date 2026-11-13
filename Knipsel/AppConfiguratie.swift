@@ -16,6 +16,13 @@ enum AppConfiguratie {
     /// Kookmodus altijd donker (standaard aan): minder verblinding in een schemerige keuken.
     static let sleutelKookmodusDonker = "kookmodusDonker"
 
+    /// Voorlezen (K9): luidspreker in de kookmodus standaard aan, gekozen stem (identifier, leeg =
+    /// automatisch), tempo (0,8–1,2) en de ingrediënten van een stap meelezen.
+    static let sleutelVoorlezenAan = "voorlezenAan"
+    static let sleutelVoorleesStem = "voorleesStem"
+    static let sleutelVoorleesTempo = "voorleesTempo"
+    static let sleutelIngredientenMeelezen = "voorleesIngredienten"
+
     /// Keychain: de eigen Anthropic-sleutel voor indelen met Claude (optioneel, B10).
     static let sleutelClaude = "claudeApiSleutel"
 
