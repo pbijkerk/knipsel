@@ -81,4 +81,22 @@ enum Inrichting {
                 groep.sorted { ($0[keyPath: uuid]?.uuidString ?? "~") < ($1[keyPath: uuid]?.uuidString ?? "~") }
             }
     }
+
+    /// Haalt ingrediënten die nog alleen hun letterlijke regel hebben (recepten uit fase 1) door de
+    /// parser. Idempotent; geeft het aantal bijgewerkte ingrediënten terug.
+    @discardableResult
+    static func structureerIngredienten(in context: NSManagedObjectContext) throws -> Int {
+        let verzoek = Ingredient.verzoek()
+        verzoek.predicate = NSPredicate(
+            format: "ruweTekst != nil AND naam == nil AND hoeveelheid == nil AND eenheid == nil")
+        var aantal = 0
+        for ingredient in try context.fetch(verzoek) {
+            let p = IngredientParser.parse(ingredient.ruweTekst ?? "")
+            guard !p.naam.isEmpty || p.hoeveelheid != nil || p.eenheid != nil else { continue }
+            ingredient.vulGestructureerd()
+            aantal += 1
+        }
+        try context.bewaarIndienNodig()
+        return aantal
+    }
 }

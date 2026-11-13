@@ -1,5 +1,6 @@
 import CoreData
 import Foundation
+import ImageIO
 import SwiftUI
 import Testing
 
@@ -67,7 +68,7 @@ struct ReceptInvoerTests {
         #expect(try context.count(for: Stap.verzoek()) == 1)
     }
 
-    @Test func gewijzigdeRegelVerliestGestructureerdeVelden() throws {
+    @Test func gewijzigdeRegelWordtOpnieuwGeparsed() throws {
         let context = legeOpslag().context
         var invoer = ReceptInvoer()
         invoer.titel = "Test"
@@ -81,8 +82,102 @@ struct ReceptInvoerTests {
         bewerkt.ingredientenTekst = "3 sjalotten"
         try bewerkt.bewaar(in: context, recept: recept)
         #expect(ui.ruweTekst == "3 sjalotten")
-        #expect(ui.hoeveelheid == nil)
-        #expect(ui.naam == nil)
+        // De velden van de oude tekst ("uien") zijn vervangen door die van de nieuwe.
+        #expect(ui.hoeveelheid == 3)
+        #expect(ui.naam == "sjalotten")
+    }
+
+    @Test func bewarenVultGestructureerdeVelden() throws {
+        let context = legeOpslag().context
+        var invoer = ReceptInvoer()
+        invoer.titel = "Test"
+        invoer.ingredientenTekst = "1 flespompoen (ca. 1 kg)\n½ tl kerriepoeder\npeper en zout"
+        let ingredienten = try invoer.bewaar(in: context).gesorteerdeIngredienten
+        #expect(ingredienten.map(\.ruweTekst) == ["1 flespompoen (ca. 1 kg)", "½ tl kerriepoeder", "peper en zout"])
+        #expect(ingredienten[0].hoeveelheid == 1)
+        #expect(ingredienten[0].naam == "flespompoen")
+        #expect(ingredienten[0].toelichting == "ca. 1 kg")
+        #expect(ingredienten[1].hoeveelheid == 0.5)
+        #expect(ingredienten[1].eenheid == "tl")
+        #expect(ingredienten[2].hoeveelheid == nil)
+        #expect(ingredienten[2].naam == "peper en zout")
+    }
+
+    @Test func groepskopWordtGroepEnKomtTerug() throws {
+        let context = legeOpslag().context
+        var invoer = ReceptInvoer()
+        invoer.titel = "Test"
+        invoer.ingredientenTekst = "500 g pasta\nVoor de saus:\n2 el olie\n1 teen knoflook"
+        let recept = try invoer.bewaar(in: context)
+        #expect(recept.gesorteerdeIngredienten.map(\.ruweTekst) == ["500 g pasta", "2 el olie", "1 teen knoflook"])
+        #expect(recept.gesorteerdeIngredienten.map(\.groep) == [nil, "Voor de saus", "Voor de saus"])
+        #expect(ReceptInvoer(recept: recept).ingredientenTekst == invoer.ingredientenTekst)
+    }
+
+    @Test func receptenUitFaseEenWordenGestructureerd() throws {
+        let context = legeOpslag().context
+        let recept = Recept(context: context)
+        recept.titel = "Oud recept"
+        for (index, tekst) in ["2 el olie", "1 ui", ""].enumerated() {
+            let ingredient = Ingredient(context: context)
+            ingredient.ruweTekst = tekst
+            ingredient.volgorde = Int16(index)
+            ingredient.recept = recept
+        }
+        try context.save()
+        #expect(try Inrichting.structureerIngredienten(in: context) == 2)
+        #expect(recept.gesorteerdeIngredienten.map(\.naam) == ["olie", "ui", nil])
+        #expect(recept.gesorteerdeIngredienten[0].eenheid == "el")
+        // Tweede keer: niets meer te doen; een lege regel blijft ongemoeid.
+        #expect(try Inrichting.structureerIngredienten(in: context) == 0)
+    }
+
+    @Test func controleNaarRecept() throws {
+        let context = legeOpslag().context
+        try Inrichting.zaaiStandaard(in: context)
+        let soepen = try categorie("Soepen", in: context)
+        var concept = ReceptOpbouw.bouw(
+            Testpagina.regels,
+            indeling: RegelIndeler.deelIn(
+                Testpagina.regels, categorieen: Testpagina.categorieen, labels: Testpagina.labels))
+        concept.ingredienten[6].tekst = "½ tl kerriepoeder"
+        let controle = ControleInvoer(
+            concept: concept, categorieen: [soepen.objectID], bronNaam: "Het Testblad",
+            bronDatum: Date(timeIntervalSince1970: 1_794_528_000), bronPagina: "52")
+        #expect(controle.twijfelAantal == 0)
+
+        let recept = try controle.receptInvoer.bewaar(in: context)
+        #expect(recept.titel == "Pompoensoep met gember")
+        #expect(recept.porties == 4)
+        #expect(recept.bereidingstijdMinuten == 45)
+        #expect(recept.kookboek == Kookboek.mijn.rawValue)
+        #expect(recept.bronNaam == "Het Testblad")
+        #expect(recept.categorieen == [soepen])
+        #expect(recept.gesorteerdeIngredienten.count == 8)
+        #expect(recept.gesorteerdeIngredienten[4].eenheid == "l")
+        #expect(recept.gesorteerdeStappen.map(\.tekst) == Testpagina.stappen)
+    }
+}
+
+struct FotodatumTests {
+    @Test func datumUitExif() throws {
+        let data = NSMutableData()
+        let doel = try #require(CGImageDestinationCreateWithData(data, "public.jpeg" as CFString, 1, nil))
+        let context = try #require(
+            CGContext(
+                data: nil, width: 8, height: 8, bitsPerComponent: 8, bytesPerRow: 0,
+                space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue))
+        let beeld = try #require(context.makeImage())
+        let eigenschappen: [CFString: Any] = [
+            kCGImagePropertyExifDictionary: [kCGImagePropertyExifDateTimeOriginal: "2026:11:07 09:30:00"]
+        ]
+        CGImageDestinationAddImage(doel, beeld, eigenschappen as CFDictionary)
+        #expect(CGImageDestinationFinalize(doel))
+
+        let datum = try #require(Fotodatum.uit(data as Data))
+        let delen = Calendar.current.dateComponents([.year, .month, .day], from: datum)
+        #expect(delen.year == 2026 && delen.month == 11 && delen.day == 7)
+        #expect(Fotodatum.uit(Data("geen foto".utf8)) == nil)
     }
 }
 

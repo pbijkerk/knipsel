@@ -95,6 +95,7 @@ final class Opslag {
                 defaults.set(true, forKey: AppConfiguratie.sleutelStandaardIngericht)
             }
             try Inrichting.ontdubbel(in: context)
+            try Inrichting.structureerIngredienten(in: context)
         } catch {
             logger.error("Inrichten mislukt: \(error.localizedDescription, privacy: .public)")
         }

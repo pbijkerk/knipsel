@@ -9,6 +9,7 @@ struct BibliotheekSplit: View {
     @State private var gekozenRecept: NSManagedObjectID?
     @State private var toonInstellingen = false
     @State private var toonNieuw = false
+    @State private var toonKnippen = false
     /// Zijbalk standaard zichtbaar, zoals in de schets (tab 2B).
     @State private var kolommen: NavigationSplitViewVisibility = .all
 
@@ -26,6 +27,9 @@ struct BibliotheekSplit: View {
                 .navigationTitle(lijstTitel)
                 .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
                 .toolbar {
+                    ToolbarItem(placement: .primaryAction) {
+                        Button("Knip recept", systemImage: "scissors") { toonKnippen = true }
+                    }
                     ToolbarItem(placement: .primaryAction) {
                         Button("Nieuw recept", systemImage: "plus") { toonNieuw = true }
                     }
@@ -47,6 +51,7 @@ struct BibliotheekSplit: View {
         }
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
+        .sheet(isPresented: $toonKnippen) { KnipStart() }
     }
 
     private var lijstTitel: String {
