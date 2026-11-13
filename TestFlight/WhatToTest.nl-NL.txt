@@ -1,0 +1,14 @@
+Fase 1 — de basis.
+
+Probeer:
+• Een recept zelf invoeren met de +-knop (titel, ingrediënten, stappen, één of meer categorieën en labels).
+• Zoeken, ook op ingrediënt (bijv. "prei").
+• Filteren met de knopjes voor categorieën en labels.
+• Categorieën beheren via het tandwiel: hernoemen, symbool kiezen, verslepen, verbergen, toevoegen, verwijderen.
+• Een recept bekijken; ingrediënten afvinken; Aa voor lettertype en tekstgrootte.
+• Op de iPad: drie kolommen, liggend en staand.
+
+Nog niet in deze versie: recepten fotograferen, kookmodus, voorlezen, spraak, timers, delen.
+Synchronisatie tussen toestellen werkt nog niet in TestFlight.
+
+Iets vreemds gezien? Maak een schermafdruk en tik op "Deel feedback" in TestFlight.
