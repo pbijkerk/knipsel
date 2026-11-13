@@ -128,7 +128,7 @@ enum Voorleestempo {
 
 /// Spreekt met `AVSpeechSynthesizer`. De audiosessie gaat alleen aan tijdens het spreken:
 /// `.playback` + `.spokenAudio` met `.duckOthers` (muziek gaat zachter, niet uit) en
-/// `.interruptSpokenAudioAndMixWithOthers`; daarna uit met `.notifyOthersOnDeactivation`, zodat
+/// bewust zonder `.interruptSpokenAudioAndMixWithOthers` (die laat podcasts pauzeren i.p.v. zachter spelen); daarna uit met `.notifyOthersOnDeactivation`, zodat
 /// muziek weer op volume komt.
 @MainActor
 final class SysteemSpreker: NSObject, Spreker {
@@ -185,7 +185,7 @@ final class SysteemSpreker: NSObject, Spreker {
         let sessie = AVAudioSession.sharedInstance()
         do {
             try sessie.setCategory(
-                .playback, mode: .spokenAudio, options: [.duckOthers, .interruptSpokenAudioAndMixWithOthers])
+                .playback, mode: .spokenAudio, options: [.duckOthers])
             try sessie.setActive(true)
         } catch {
             // Zonder sessie spreekt de synthesizer nog steeds; alleen het zachter zetten van muziek mist.
