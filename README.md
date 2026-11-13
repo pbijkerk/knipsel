@@ -10,6 +10,8 @@ recepttekst, deel hem in, en kook handsfree met voorlezen en spraakbesturing in 
 - Projectbrief: [`docs/projectbrief.md`](docs/projectbrief.md)
 - Proef herkennen en indelen: [`docs/spikes/ocr-en-indeling.md`](docs/spikes/ocr-en-indeling.md)
 - TestFlight instellen: [`docs/testflight-xcode-cloud.md`](docs/testflight-xcode-cloud.md)
+- Testers uitnodigen en testinformatie: [`docs/testflight-testers.md`](docs/testflight-testers.md)
+- Privacybeleid: [`docs/privacy.md`](docs/privacy.md)
 
 **Vereisten:** iOS/iPadOS 26+, Xcode 26+, XcodeGen. Alleen Apple-frameworks, alles on-device.
 

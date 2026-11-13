@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- Privacybeleid (`docs/privacy.md`), testinformatie en uitleg voor externe testers (`docs/testflight-testers.md`), en "Wat te testen" per build via `TestFlight/WhatToTest.nl-NL.txt`
 - Ontwerp v0.1 met eisen K1–K14 en bronnen (`docs/ontwerp.md`), schermschetsen voor iPhone en iPad
   (`docs/ux/schetsen.html`) en een proef met on-device herkennen en indelen van een krantenrecept
   (`docs/spikes/`)
