@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23000" systemVersion="25A000" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithCloudKit="YES" userDefinedModelVersionIdentifier="1">
+    <entity name="Categorie" representedClassName="Categorie" syncable="YES">
+        <attribute name="isStandaard" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="naam" optional="YES" attributeType="String"/>
+        <attribute name="symbool" optional="YES" attributeType="String"/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="verborgen" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
+        <attribute name="volgorde" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="recepten" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Recept" inverseName="categorieen" inverseEntity="Recept"/>
+    </entity>
+    <entity name="Ingredient" representedClassName="Ingredient" syncable="YES">
+        <attribute name="eenheid" optional="YES" attributeType="String"/>
+        <attribute name="groep" optional="YES" attributeType="String"/>
+        <attribute name="hoeveelheid" optional="YES" attributeType="Double" usesScalarValueType="NO"/>
+        <attribute name="hoeveelheidTot" optional="YES" attributeType="Double" usesScalarValueType="NO"/>
+        <attribute name="naam" optional="YES" attributeType="String"/>
+        <attribute name="ruweTekst" optional="YES" attributeType="String"/>
+        <attribute name="toelichting" optional="YES" attributeType="String"/>
+        <attribute name="volgorde" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="recept" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recept" inverseName="ingredienten" inverseEntity="Recept"/>
+    </entity>
+    <entity name="Kooklog" representedClassName="Kooklog" syncable="YES">
+        <attribute name="datum" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="notitie" optional="YES" attributeType="String"/>
+        <relationship name="recept" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recept" inverseName="kooklog" inverseEntity="Recept"/>
+    </entity>
+    <entity name="Label" representedClassName="ReceptLabel" syncable="YES">
+        <attribute name="naam" optional="YES" attributeType="String"/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="recepten" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Recept" inverseName="labels" inverseEntity="Recept"/>
+    </entity>
+    <entity name="Recept" representedClassName="Recept" syncable="YES">
+        <attribute name="aangemaaktOp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="beoordeling" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="bereidingstijdMinuten" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="bronDatum" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="bronNaam" optional="YES" attributeType="String"/>
+        <attribute name="bronPagina" optional="YES" attributeType="String"/>
+        <attribute name="gewijzigdOp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="intro" optional="YES" attributeType="String"/>
+        <attribute name="kookboek" attributeType="String" defaultValueString="mijn"/>
+        <attribute name="laatstGekooktOp" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="notities" optional="YES" attributeType="String"/>
+        <attribute name="porties" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="titel" optional="YES" attributeType="String"/>
+        <attribute name="totaleTijdMinuten" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="uuid" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
+        <relationship name="categorieen" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Categorie" inverseName="recepten" inverseEntity="Categorie"/>
+        <relationship name="ingredienten" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Ingredient" inverseName="recept" inverseEntity="Ingredient"/>
+        <relationship name="kooklog" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Kooklog" inverseName="recept" inverseEntity="Kooklog"/>
+        <relationship name="labels" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Label" inverseName="recepten" inverseEntity="Label"/>
+        <relationship name="stappen" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="Stap" inverseName="recept" inverseEntity="Stap"/>
+    </entity>
+    <entity name="Stap" representedClassName="Stap" syncable="YES">
+        <attribute name="groep" optional="YES" attributeType="String"/>
+        <attribute name="tekst" optional="YES" attributeType="String"/>
+        <attribute name="timerSeconden" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="volgorde" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <relationship name="recept" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Recept" inverseName="stappen" inverseEntity="Recept"/>
+    </entity>
+</model>

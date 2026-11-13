@@ -1,27 +1,14 @@
 import SwiftUI
 
-/// Fase 0: lege schil zodat de TestFlight-straat (Xcode Cloud) staat voordat de functies komen.
-/// De opzet volgt het ontwerp: zijbalk met categorieën (iPad) / lijst (iPhone).
+/// De bibliotheek: op iPhone een lijst met chips, op iPad (brede breedte) drie kolommen.
 struct ContentView: View {
-    @State private var selectie: StandaardCategorie?
+    @Environment(\.horizontalSizeClass) private var breedte
 
     var body: some View {
-        NavigationSplitView {
-            List(StandaardCategorieen.alle, selection: $selectie) { categorie in
-                NavigationLink(value: categorie) {
-                    Label(categorie.naam, systemImage: categorie.symbool)
-                }
-            }
-            .navigationTitle("Knipsel")
-        } detail: {
-            ContentUnavailableView {
-                Label("Nog geen knipsels", systemImage: "scissors")
-            } description: {
-                Text(
-                    "Hier komen je recepten uit kranten en tijdschriften. "
-                        + "Deze testversie (\(Self.versie)) bevat alleen de basis."
-                )
-            }
+        if breedte == .compact {
+            BibliotheekCompact()
+        } else {
+            BibliotheekSplit()
         }
     }
 
@@ -33,6 +20,9 @@ struct ContentView: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
+#if DEBUG
+    #Preview {
+        ContentView()
+            .environment(\.managedObjectContext, Opslag.voorbeeld.context)
+    }
+#endif
