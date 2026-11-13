@@ -54,4 +54,6 @@ nieuw nummer begint.
 3. Spraak: `DictationTranscriber`, niet `SpeechTranscriber`.
 4. Nog te doen: dezelfde proef op 10 echte foto's (lokaal, niet in deze publieke repo) en op een iPhone.
 
+**Aanvulling 13-11:** Peters toestellen (iPhone 14 Plus, 15 Plus, iPad 10) hebben geen Apple Intelligence. Het indelen gebeurt daar met regels, optioneel met Claude (ontwerp B10). Dezelfde testpagina wordt de eerste test voor de regelindeler.
+
 Opnieuw draaien: `swift docs/spikes/2-ai-deelt-in.swift` vanuit `docs/spikes/` (Mac met Apple Intelligence aan).
