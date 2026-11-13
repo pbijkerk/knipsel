@@ -9,9 +9,32 @@
 /* Begin PBXBuildFile section */
 		0CC038C87866B533DE503329 /* StandaardCategorieen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F081E8818D35D9C314D32890 /* StandaardCategorieen.swift */; };
 		0F6D1C64CFB543AA0F7315FF /* KnipselApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F50F041C4CB953D585CFF4 /* KnipselApp.swift */; };
+		0F90ABEB9681DFA057ED0955 /* Knipsel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 505ED222FD53F0E1D9450FE9 /* Knipsel.xcdatamodeld */; };
+		3C2C46FBDC45FF8DF51FF3AA /* ReceptWeergave.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC62418E320151F46A5D662F /* ReceptWeergave.swift */; };
+		56CF8037A5CC90F908E72622 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB79EBDFADD9D84884EA2AA3 /* ModelTests.swift */; };
+		5D8ADC6385AECFDEBE90A11F /* InstellingenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BB7B04DB132CC61614ED998 /* InstellingenView.swift */; };
+		5EB75E63CC2445910674E630 /* Leesinstellingen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790BF937A6F007903FA6296E /* Leesinstellingen.swift */; };
+		63A3A9DDC34069C603FAC723 /* Voorbeeldrecepten.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B57464F0562ED0CD3B7E10D /* Voorbeeldrecepten.swift */; };
+		825658AFB313AB731ADD8E2C /* Inrichting.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9738D6AC28DD8918DF30498 /* Inrichting.swift */; };
+		89662557847966E3755ECFD9 /* BibliotheekbeheerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0971CECD87A1CAEA6333DB7 /* BibliotheekbeheerTests.swift */; };
+		8B2D4D753AF9C4737D8C9893 /* ReceptInvoer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C77E204B0CD43E396197B5FF /* ReceptInvoer.swift */; };
+		92EC088BE4622F64AE5E497A /* ReceptFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035E0626CDC05262823C6028 /* ReceptFilterTests.swift */; };
+		9958265122AC0BC0143D6456 /* BibliotheekSplit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70348AEE499D0174DF2070DD /* BibliotheekSplit.swift */; };
+		9C643EB7A3BDD2C596C5F80C /* InrichtingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60413F059A1031C88D3543B7 /* InrichtingTests.swift */; };
+		A61A610DFC1F0EA4AF7DCF2C /* Onderdelen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A14448637693678765D2F37 /* Onderdelen.swift */; };
+		AC350BC54EF98A58A0D6DA15 /* ReceptBewerken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82315C270362977EC44642F1 /* ReceptBewerken.swift */; };
 		B04DCBB86E573F05D5F7DEC9 /* StandaardCategorieenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D3A65F0AF1A9503628800 /* StandaardCategorieenTests.swift */; };
+		B211156F21975D64BBDD7330 /* BibliotheekCompact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13043F6A124766992A9EC92C /* BibliotheekCompact.swift */; };
+		BE2CCBC8A8140209BF370CC0 /* ReceptLijst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4920C55C5B359D793E921673 /* ReceptLijst.swift */; };
+		C2645324A4B81281C02E3055 /* ReceptFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D5F73E4CA132A999C4584E7 /* ReceptFilter.swift */; };
 		C411FC10E36DBEE66DFEECDC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D27E7F45AE46B4F8472FA56C /* Assets.xcassets */; };
+		C9461080674151D62D98BC2E /* ReceptInvoerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319BEDB91D05615EF3CF9377 /* ReceptInvoerTests.swift */; };
+		DF3C4F1C3C8717F9F53C210E /* Weergave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425CB2FC9C8FE0D0C29E8EBF /* Weergave.swift */; };
+		E12BCD6DA88B3D76A6178416 /* Bibliotheekbeheer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F049FD6FEEBDD9A5DA3A40 /* Bibliotheekbeheer.swift */; };
+		EC848E2C428637C44FEF4FE0 /* Opslag.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D051E99ED2C3EB3C0DD66D /* Opslag.swift */; };
+		F653DCEDB21019311F29A9D1 /* Modelklassen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B819CBA06804B17BA932703 /* Modelklassen.swift */; };
 		F9A9534465BB3FE3E312FE6C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D18DBE8B82454B97537FC3A /* ContentView.swift */; };
+		F9EA9D9AB0097A22D182896C /* AppConfiguratie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F2601E1FF2BB430F5C3CB02 /* AppConfiguratie.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,25 +48,57 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		035E0626CDC05262823C6028 /* ReceptFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptFilterTests.swift; sourceTree = "<group>"; };
+		0BB7B04DB132CC61614ED998 /* InstellingenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstellingenView.swift; sourceTree = "<group>"; };
+		13043F6A124766992A9EC92C /* BibliotheekCompact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibliotheekCompact.swift; sourceTree = "<group>"; };
+		2D5F73E4CA132A999C4584E7 /* ReceptFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptFilter.swift; sourceTree = "<group>"; };
+		2F2601E1FF2BB430F5C3CB02 /* AppConfiguratie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguratie.swift; sourceTree = "<group>"; };
+		319BEDB91D05615EF3CF9377 /* ReceptInvoerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptInvoerTests.swift; sourceTree = "<group>"; };
 		373D3A65F0AF1A9503628800 /* StandaardCategorieenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandaardCategorieenTests.swift; sourceTree = "<group>"; };
 		3D18DBE8B82454B97537FC3A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		3EA097E619203BDB0BC9A209 /* Knipsel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Knipsel.xcdatamodel; sourceTree = "<group>"; };
+		425CB2FC9C8FE0D0C29E8EBF /* Weergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weergave.swift; sourceTree = "<group>"; };
+		4920C55C5B359D793E921673 /* ReceptLijst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptLijst.swift; sourceTree = "<group>"; };
+		4A14448637693678765D2F37 /* Onderdelen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onderdelen.swift; sourceTree = "<group>"; };
+		4B57464F0562ED0CD3B7E10D /* Voorbeeldrecepten.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Voorbeeldrecepten.swift; sourceTree = "<group>"; };
+		60413F059A1031C88D3543B7 /* InrichtingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InrichtingTests.swift; sourceTree = "<group>"; };
 		63D37CDBE41110B502A9896C /* KnipselTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KnipselTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		6B819CBA06804B17BA932703 /* Modelklassen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Modelklassen.swift; sourceTree = "<group>"; };
+		70348AEE499D0174DF2070DD /* BibliotheekSplit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibliotheekSplit.swift; sourceTree = "<group>"; };
+		790BF937A6F007903FA6296E /* Leesinstellingen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Leesinstellingen.swift; sourceTree = "<group>"; };
+		82315C270362977EC44642F1 /* ReceptBewerken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptBewerken.swift; sourceTree = "<group>"; };
 		87F50F041C4CB953D585CFF4 /* KnipselApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipselApp.swift; sourceTree = "<group>"; };
 		A47550B28B74FB224C6205EB /* Knipsel.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Knipsel.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AB79EBDFADD9D84884EA2AA3 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
+		B6D051E99ED2C3EB3C0DD66D /* Opslag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opslag.swift; sourceTree = "<group>"; };
+		C77E204B0CD43E396197B5FF /* ReceptInvoer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptInvoer.swift; sourceTree = "<group>"; };
+		C9738D6AC28DD8918DF30498 /* Inrichting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inrichting.swift; sourceTree = "<group>"; };
+		C97CF0FA72B5D097AC41FAC0 /* Knipsel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Knipsel.entitlements; sourceTree = "<group>"; };
+		CC62418E320151F46A5D662F /* ReceptWeergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptWeergave.swift; sourceTree = "<group>"; };
 		D27E7F45AE46B4F8472FA56C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D7F049FD6FEEBDD9A5DA3A40 /* Bibliotheekbeheer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bibliotheekbeheer.swift; sourceTree = "<group>"; };
 		D80C99AFFC80C26C1CE6B452 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		F081E8818D35D9C314D32890 /* StandaardCategorieen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandaardCategorieen.swift; sourceTree = "<group>"; };
+		F0971CECD87A1CAEA6333DB7 /* BibliotheekbeheerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibliotheekbeheerTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		03FF1F47DAA53B8E4F6AC57E /* Knipsel */ = {
 			isa = PBXGroup;
 			children = (
+				2F2601E1FF2BB430F5C3CB02 /* AppConfiguratie.swift */,
 				D27E7F45AE46B4F8472FA56C /* Assets.xcassets */,
 				3D18DBE8B82454B97537FC3A /* ContentView.swift */,
 				D80C99AFFC80C26C1CE6B452 /* Info.plist */,
+				C97CF0FA72B5D097AC41FAC0 /* Knipsel.entitlements */,
 				87F50F041C4CB953D585CFF4 /* KnipselApp.swift */,
 				F081E8818D35D9C314D32890 /* StandaardCategorieen.swift */,
+				4B57464F0562ED0CD3B7E10D /* Voorbeeldrecepten.swift */,
+				425CB2FC9C8FE0D0C29E8EBF /* Weergave.swift */,
+				D3628BAEB7A87E87A31BA1BF /* Bibliotheek */,
+				4D6EAA208F20B2D2C46ECE69 /* Instellingen */,
+				7A05DB7C890A22F10B950073 /* Opslag */,
+				B0C7A16F5EF8B78C5492516D /* Recept */,
 			);
 			path = Knipsel;
 			sourceTree = "<group>";
@@ -60,9 +115,36 @@
 		44FEA2AEF55108C0C87CC365 /* KnipselTests */ = {
 			isa = PBXGroup;
 			children = (
+				F0971CECD87A1CAEA6333DB7 /* BibliotheekbeheerTests.swift */,
+				60413F059A1031C88D3543B7 /* InrichtingTests.swift */,
+				AB79EBDFADD9D84884EA2AA3 /* ModelTests.swift */,
+				035E0626CDC05262823C6028 /* ReceptFilterTests.swift */,
+				319BEDB91D05615EF3CF9377 /* ReceptInvoerTests.swift */,
 				373D3A65F0AF1A9503628800 /* StandaardCategorieenTests.swift */,
 			);
 			path = KnipselTests;
+			sourceTree = "<group>";
+		};
+		4D6EAA208F20B2D2C46ECE69 /* Instellingen */ = {
+			isa = PBXGroup;
+			children = (
+				0BB7B04DB132CC61614ED998 /* InstellingenView.swift */,
+			);
+			path = Instellingen;
+			sourceTree = "<group>";
+		};
+		7A05DB7C890A22F10B950073 /* Opslag */ = {
+			isa = PBXGroup;
+			children = (
+				D7F049FD6FEEBDD9A5DA3A40 /* Bibliotheekbeheer.swift */,
+				C9738D6AC28DD8918DF30498 /* Inrichting.swift */,
+				6B819CBA06804B17BA932703 /* Modelklassen.swift */,
+				B6D051E99ED2C3EB3C0DD66D /* Opslag.swift */,
+				2D5F73E4CA132A999C4584E7 /* ReceptFilter.swift */,
+				C77E204B0CD43E396197B5FF /* ReceptInvoer.swift */,
+				505ED222FD53F0E1D9450FE9 /* Knipsel.xcdatamodeld */,
+			);
+			path = Opslag;
 			sourceTree = "<group>";
 		};
 		AB05E7C6C3677A4877AF0219 = {
@@ -72,6 +154,27 @@
 				44FEA2AEF55108C0C87CC365 /* KnipselTests */,
 				44DEAABD7DE3A83C8F569D4D /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		B0C7A16F5EF8B78C5492516D /* Recept */ = {
+			isa = PBXGroup;
+			children = (
+				790BF937A6F007903FA6296E /* Leesinstellingen.swift */,
+				82315C270362977EC44642F1 /* ReceptBewerken.swift */,
+				CC62418E320151F46A5D662F /* ReceptWeergave.swift */,
+			);
+			path = Recept;
+			sourceTree = "<group>";
+		};
+		D3628BAEB7A87E87A31BA1BF /* Bibliotheek */ = {
+			isa = PBXGroup;
+			children = (
+				13043F6A124766992A9EC92C /* BibliotheekCompact.swift */,
+				70348AEE499D0174DF2070DD /* BibliotheekSplit.swift */,
+				4A14448637693678765D2F37 /* Onderdelen.swift */,
+				4920C55C5B359D793E921673 /* ReceptLijst.swift */,
+			);
+			path = Bibliotheek;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -168,6 +271,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				89662557847966E3755ECFD9 /* BibliotheekbeheerTests.swift in Sources */,
+				9C643EB7A3BDD2C596C5F80C /* InrichtingTests.swift in Sources */,
+				56CF8037A5CC90F908E72622 /* ModelTests.swift in Sources */,
+				92EC088BE4622F64AE5E497A /* ReceptFilterTests.swift in Sources */,
+				C9461080674151D62D98BC2E /* ReceptInvoerTests.swift in Sources */,
 				B04DCBB86E573F05D5F7DEC9 /* StandaardCategorieenTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -176,9 +284,27 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9EA9D9AB0097A22D182896C /* AppConfiguratie.swift in Sources */,
+				B211156F21975D64BBDD7330 /* BibliotheekCompact.swift in Sources */,
+				9958265122AC0BC0143D6456 /* BibliotheekSplit.swift in Sources */,
+				E12BCD6DA88B3D76A6178416 /* Bibliotheekbeheer.swift in Sources */,
 				F9A9534465BB3FE3E312FE6C /* ContentView.swift in Sources */,
+				825658AFB313AB731ADD8E2C /* Inrichting.swift in Sources */,
+				5D8ADC6385AECFDEBE90A11F /* InstellingenView.swift in Sources */,
+				0F90ABEB9681DFA057ED0955 /* Knipsel.xcdatamodeld in Sources */,
 				0F6D1C64CFB543AA0F7315FF /* KnipselApp.swift in Sources */,
+				5EB75E63CC2445910674E630 /* Leesinstellingen.swift in Sources */,
+				F653DCEDB21019311F29A9D1 /* Modelklassen.swift in Sources */,
+				A61A610DFC1F0EA4AF7DCF2C /* Onderdelen.swift in Sources */,
+				EC848E2C428637C44FEF4FE0 /* Opslag.swift in Sources */,
+				AC350BC54EF98A58A0D6DA15 /* ReceptBewerken.swift in Sources */,
+				C2645324A4B81281C02E3055 /* ReceptFilter.swift in Sources */,
+				8B2D4D753AF9C4737D8C9893 /* ReceptInvoer.swift in Sources */,
+				BE2CCBC8A8140209BF370CC0 /* ReceptLijst.swift in Sources */,
+				3C2C46FBDC45FF8DF51FF3AA /* ReceptWeergave.swift in Sources */,
 				0CC038C87866B533DE503329 /* StandaardCategorieen.swift in Sources */,
+				63A3A9DDC34069C603FAC723 /* Voorbeeldrecepten.swift in Sources */,
+				DF3C4F1C3C8717F9F53C210E /* Weergave.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -198,6 +324,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Knipsel/Knipsel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 68K8BCC3DL;
@@ -241,6 +368,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Knipsel/Knipsel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 68K8BCC3DL;
@@ -435,6 +563,19 @@
 			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		505ED222FD53F0E1D9450FE9 /* Knipsel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				3EA097E619203BDB0BC9A209 /* Knipsel.xcdatamodel */,
+			);
+			currentVersion = 3EA097E619203BDB0BC9A209 /* Knipsel.xcdatamodel */;
+			path = Knipsel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 5AC1CAAF1F30CB28DE356626 /* Project object */;
 }
