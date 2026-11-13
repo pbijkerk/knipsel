@@ -1,14 +1,14 @@
-Fase 2 — recepten knippen.
+Fase 3 — kookmodus.
 
 Probeer:
-• Tik op de schaar en scan een receptpagina uit een krant of tijdschrift (of kies een foto). Loopt het recept door op een tweede pagina? Scan ze allebei.
-• Kijk of de kleuren kloppen: titel en intro rood, ingrediënten groen, bereiding blauw, advertenties grijs. Tik op een blok om de rol te wisselen.
-• Tik op Controleer: oranje regels kunnen een herkenningsfout hebben. Vergelijk ze met de uitsnede uit de foto en verbeter ze.
-• Kies categorie en labels (Knipsel stelt ze voor), vul blad en pagina in en bewaar.
-• Optioneel: vul bij Instellingen een eigen Claude-sleutel in en knip dezelfde pagina nog eens. Alleen de tekst gaat naar Anthropic, nooit de foto.
+• Open een recept en zet met − / + het aantal personen anders. Kloppen de hoeveelheden (½, ¼, ¾, 1½)?
+• Tik op "Kook dit". Je ziet één stap groot in het donker; het scherm gaat niet uit.
+• Tik rechts op het scherm (ook met een knokkel of elleboog) voor de volgende stap, links voor de vorige. Vegen kan ook. Op de iPad met toetsenbord: spatie of pijlen, esc sluit.
+• Staan de ingrediënten van de stap in oranje, in de tekst en eronder (iPad: in de lijst links)? Mist er een, of is er een te veel? Laat het weten.
+• Na de laatste stap: tik op "Gekookt".
+• Wil je de kookmodus licht? Zet bij Weergave (Aa) "Altijd donker" uit.
 
-De foto wordt niet bewaard, alleen de tekst.
-Nog niet in deze versie: kookmodus, voorlezen, spraak, timers, delen.
+Nog niet in deze versie: voorlezen, spraak, timers, delen.
 Synchronisatie tussen toestellen werkt nog niet in TestFlight.
 
 Iets vreemds gezien? Maak een schermafdruk en tik op "Deel feedback" in TestFlight.

@@ -8,6 +8,12 @@ struct ReceptWeergave: View {
     @ObservedObject var recept: Recept
     var naVerwijderen: () -> Void = {}
 
+    init(recept: Recept, porties: Int? = nil, naVerwijderen: @escaping () -> Void = {}) {
+        self.recept = recept
+        self.naVerwijderen = naVerwijderen
+        _gekozenPorties = State(initialValue: porties ?? 0)
+    }
+
     @Environment(\.managedObjectContext) private var context
     @Environment(\.dynamicTypeSize) private var systeemgrootte
     @AppStorage(AppConfiguratie.sleutelLettertype) private var lettertype: Lettertype = .serif
@@ -19,10 +25,16 @@ struct ReceptWeergave: View {
     @State private var toonLeesinstellingen = false
     @State private var bevestigVerwijderen = false
     @State private var beschikbareBreedte: CGFloat = 0
+    /// Gekozen aantal personen; 0 = zoals in het recept.
+    @State private var gekozenPorties = 0
+    @State private var kookSessie: KookSessie?
 
     /// ±60–65 tekens per regel bij bodytekst in New York (Dyson, 2004); schaalt mee met de tekstgrootte.
     @ScaledMetric(relativeTo: .body) private var leesbreedte: CGFloat = 560
     @ScaledMetric(relativeTo: .body) private var ingredientenBreedte: CGFloat = 300
+
+    private var porties: Int { gekozenPorties > 0 ? gekozenPorties : Int(recept.porties) }
+    private var factor: Double { Portieschaling.factor(van: Int(recept.porties), naar: porties) }
 
     private var tekstgrootte: DynamicTypeSize { Leesinstellingen.vergroot(systeemgrootte, met: extraGrootte) }
 
@@ -71,6 +83,9 @@ struct ReceptWeergave: View {
             }
         }
         .sheet(isPresented: $toonBewerken) { ReceptBewerken(recept: recept) }
+        .fullScreenCover(item: $kookSessie) { sessie in
+            KookmodusScherm(sessie: sessie, gekookt: legGekooktVast)
+        }
         .sheet(isPresented: $toonLeesinstellingen) {
             LeesinstellingenView().presentationDetents([.medium, .large])
         }
@@ -101,6 +116,7 @@ struct ReceptWeergave: View {
                 Weergave.porties(Int(recept.porties)).map { ("person.2", $0) },
                 Weergave.tijd(minuten: Int(recept.bereidingstijdMinuten)).map { ("clock", $0) },
                 Weergave.tijd(minuten: Int(recept.totaleTijdMinuten)).map { ("hourglass", "totaal \($0)") },
+                recept.aantalKeerGekookt > 0 ? ("checkmark.circle", "\(recept.aantalKeerGekookt)× gekookt") : nil,
             ].compactMap { $0 }
             if !kenmerken.isEmpty || !(recept.categorieen ?? []).isEmpty || !(recept.labels ?? []).isEmpty {
                 Stroomopmaak {
@@ -123,14 +139,35 @@ struct ReceptWeergave: View {
                     .foregroundStyle(.secondary)
                     .padding(.top, 4)
             }
+            if !recept.gesorteerdeStappen.isEmpty {
+                Button {
+                    kookSessie = KookSessie(recept: recept, porties: porties > 0 ? porties : nil)
+                } label: {
+                    SwiftUI.Label("Kook dit", systemImage: "play.fill")
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 6)
+                }
+                .buttonStyle(.borderedProminent)
+                .padding(.top, 8)
+                .accessibilityHint("Opent de kookmodus: één stap tegelijk, groot, en het scherm blijft aan")
+            }
         }
     }
 
     private var ingredientenBlok: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text(recept.porties > 0 ? "Ingrediënten · voor \(recept.porties)" : "Ingrediënten")
-                .font(lettertype(.title2).bold())
-                .accessibilityAddTraits(.isHeader)
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .firstTextBaseline) {
+                    ingredientenKop
+                    Spacer(minLength: 8)
+                    portiesKnoppen
+                }
+                VStack(alignment: .leading, spacing: 6) {
+                    ingredientenKop
+                    portiesKnoppen
+                }
+            }
             let ingredienten = recept.gesorteerdeIngredienten
             if ingredienten.isEmpty {
                 Text("Geen ingrediënten ingevoerd.").foregroundStyle(.secondary)
@@ -143,6 +180,18 @@ struct ReceptWeergave: View {
                 }
                 ingredientRegel(ingredient)
             }
+        }
+    }
+
+    private var ingredientenKop: some View {
+        Text(recept.porties > 0 ? "Ingrediënten · voor \(porties)" : "Ingrediënten")
+            .font(lettertype(.title2).bold())
+            .accessibilityAddTraits(.isHeader)
+    }
+
+    @ViewBuilder private var portiesKnoppen: some View {
+        if recept.porties > 0 {
+            PortiesKnoppen(porties: porties) { gekozenPorties = min(99, max(1, $0)) }
         }
     }
 
@@ -176,10 +225,12 @@ struct ReceptWeergave: View {
         guard let hoeveelheid = ingredient.hoeveelheid?.doubleValue, let naam = ingredient.naam else {
             return Text(ingredient.ruweTekst ?? "")
         }
-        let maat = [
-            Weergave.hoeveelheid(hoeveelheid, tot: ingredient.hoeveelheidTot?.doubleValue), ingredient.eenheid,
-        ].compactMap { $0 }.joined(separator: " ")
-        let rest = [naam, ingredient.toelichting].compactMap { $0 }.joined(separator: ", ")
+        let maat =
+            Portieschaling.maat(
+                hoeveelheid: hoeveelheid, tot: ingredient.hoeveelheidTot?.doubleValue, eenheid: ingredient.eenheid,
+                factor: factor) ?? ""
+        let toelichting = ingredient.toelichting.map { Portieschaling.schaalToelichting($0, factor: factor) }
+        let rest = [naam, toelichting].compactMap { $0 }.joined(separator: ", ")
         return Text("\(Text(maat).bold()) \(rest)")
     }
 
@@ -236,6 +287,16 @@ struct ReceptWeergave: View {
     private func nieuweGroep(_ groep: String?, vorige: String?) -> String? {
         guard let groep, !groep.isEmpty, groep != vorige else { return nil }
         return groep
+    }
+
+    private func legGekooktVast() {
+        do {
+            try recept.legGekooktVast()
+        } catch {
+            context.rollback()
+            Logger(subsystem: "com.peterbijkerk.knipsel", category: "Recept")
+                .error("Gekookt vastleggen mislukt: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     private func verwijder() {
