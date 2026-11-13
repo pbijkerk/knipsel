@@ -1,0 +1,55 @@
+name: Knipsel
+options:
+  bundleIdPrefix: com.peterbijkerk
+  deploymentTarget:
+    iOS: "26.0"
+  xcodeVersion: "26"
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "26.0"
+    # iPhone én iPad.
+    TARGETED_DEVICE_FAMILY: "1,2"
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+
+targets:
+  Knipsel:
+    type: application
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: Knipsel
+        excludes:
+          - "**/*.md"
+    settings:
+      base:
+        # Nooit wijzigen na de eerste TestFlight-build: een nieuwe ID is voor iOS een andere app.
+        PRODUCT_BUNDLE_IDENTIFIER: com.peterbijkerk.knipsel
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_FILE: Knipsel/Info.plist
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 68K8BCC3DL
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.food-and-drink
+        ENABLE_PREVIEWS: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
+    scheme:
+      testTargets:
+        - KnipselTests
+
+  KnipselTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: KnipselTests
+    dependencies:
+      - target: Knipsel
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.peterbijkerk.knipsel.tests
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 68K8BCC3DL
+        GENERATE_INFOPLIST_FILE: YES

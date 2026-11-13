@@ -1,0 +1,17 @@
+# Xcode build output
+build/
+DerivedData/
+*.xcuserstate
+Knipsel.xcodeproj/xcuserdata/
+Knipsel.xcodeproj/project.xcworkspace/xcuserdata/
+
+# macOS / iCloud
+.DS_Store
+/.git.nosync/
+
+# SourceKit-LSP / xcode-build-server (machine-specifiek)
+buildServer.json
+.sourcekit-lsp/
+
+# Testfoto's van echte krantenpagina's blijven lokaal (auteursrecht)
+docs/spikes/fotos/

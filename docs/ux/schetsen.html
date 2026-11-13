@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="nl"><head><meta charset="utf-8">
+<title>Knipsel — schermschetsen v0.1</title>
+<style>
+/* Bord: neemt de kleuren van de Hermes-app over als die er zijn, met eigen terugval. */
+.wrap{max-width:940px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color:var(--foreground,#222)}
+.wrap h1{font:600 18px/1.3 "Iowan Old Style","Charter",Georgia,serif;margin:0 0 4px}
+.intro{font-size:13px;color:var(--muted-foreground,#666);margin:0 0 12px;line-height:1.5;max-width:760px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.tabs label{border:1px solid var(--border,#ccc);color:var(--foreground,#222);padding:6px 12px;border-radius:999px;cursor:pointer;font-size:13px}
+input[name=scr]{position:absolute;opacity:0;pointer-events:none}
+.screen{display:none}
+#r1:checked~.tabs .l1,#r2:checked~.tabs .l2,#r3:checked~.tabs .l3,#r4:checked~.tabs .l4,#r5:checked~.tabs .l5{background:#D9613C;color:#fff;border-color:#D9613C}
+#r1:checked~#s1,#r2:checked~#s2,#r3:checked~#s3,#r4:checked~#s4,#r5:checked~#s5{display:block}
+.grid{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.card{width:262px}.card.wide{width:560px}
+.card h3{font-size:14px;margin:10px 0 4px}
+.card p{font-size:12px;margin:0 0 6px;color:var(--muted-foreground,#666);line-height:1.45}
+.card p b{color:var(--foreground,#222);font-weight:600}
+.tags{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0 8px}
+.tag{font-size:10.5px;border:1px solid var(--border,#ccc);border-radius:6px;padding:1px 6px}
+.go{font:inherit;font-size:12px;border:1px solid #D9613C;color:#D9613C;background:transparent;border-radius:8px;padding:4px 10px;cursor:pointer}
+.note{font-size:11.5px;color:var(--muted-foreground,#666);margin:18px 0 0;line-height:1.5}
+
+/* ---------- toestel ---------- */
+.ph,.pad{border:7px solid #1c1c1e;background:#FBF7F0;overflow:hidden;position:relative;color:#2B2622;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;font-size:11px;line-height:1.3;box-sizing:border-box}
+.ph{width:246px;height:500px;border-radius:38px}
+.pad{width:560px;height:400px;border-radius:22px}
+.ph *,.pad *{box-sizing:border-box}
+.sb{height:26px;display:flex;justify-content:space-between;align-items:center;padding:0 18px;font-size:10px;font-weight:600}
+.pad .sb{height:18px;padding:0 14px;font-size:8.5px}
+.isl{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:70px;height:18px;background:#000;border-radius:12px}
+.ser{font-family:"Iowan Old Style","New York","Charter",Georgia,serif}
+.lt{font:700 22px/1.15 "Iowan Old Style","New York",Georgia,serif;padding:2px 14px 4px;letter-spacing:-.2px}
+.mut{color:#7d746a}.tom{color:#D9613C}
+.chips{display:flex;gap:5px;padding:0 14px 8px;overflow:hidden;white-space:nowrap}
+.chip{font-size:9.5px;padding:3px 8px;border-radius:999px;background:#EFE7DA;color:#5b5249;flex:none}
+.chip.on{background:#2B2622;color:#FBF7F0}
+.search{margin:0 14px 8px;background:#EFE7DA;border-radius:9px;padding:6px 9px;font-size:10.5px;color:#8f857a}
+.row{display:flex;gap:9px;padding:7px 14px;border-bottom:.5px solid #E6DccD;align-items:center}
+.th{width:44px;height:44px;border-radius:8px;flex:none;background:#EFE7DA;position:relative;overflow:hidden}
+.th.k:before{content:"";position:absolute;inset:6px;border:1.5px dashed #b9ad9c;border-radius:4px}
+.th.k:after{content:"";position:absolute;left:12px;right:12px;top:14px;height:3px;background:#b9ad9c;box-shadow:0 7px 0 #cfc5b7,0 14px 0 #cfc5b7}
+.th.f1{background:linear-gradient(150deg,#f3c486,#d9733c 60%,#8a3c1c)}
+.th.f2{background:linear-gradient(150deg,#d9e8c6,#78a865 55%,#355d2c)}
+.th.f3{background:linear-gradient(150deg,#f2d6d0,#c97b6b 55%,#7a3a32)}
+.t{font:600 12px/1.25 "Iowan Old Style","New York",Georgia,serif}
+.meta{font-size:9px;color:#8f857a;margin-top:1px}
+.fab{position:absolute;bottom:52px;right:14px;background:#D9613C;color:#fff;border-radius:999px;padding:9px 14px;font-weight:600;font-size:11px;box-shadow:0 4px 12px rgba(217,97,60,.4)}
+.tabbar{position:absolute;bottom:8px;left:14px;right:14px;height:36px;border-radius:999px;background:rgba(255,255,255,.85);box-shadow:0 2px 10px rgba(0,0,0,.08);display:flex;justify-content:space-around;align-items:center;font-size:9px;color:#8f857a}
+.tabbar b{color:#D9613C;font-weight:600}
+
+/* knipselscherm */
+.photo{margin:4px 10px;height:300px;border-radius:10px;background:#E9E2D4;position:relative;overflow:hidden;
+  background-image:repeating-linear-gradient(0deg,transparent 0 9px,rgba(0,0,0,.035) 9px 10px)}
+.blk{position:absolute;border-radius:4px;border:1.5px solid;font-size:7.5px;padding:2px 3px;}
+.blk.lb{padding-top:10px}
+.blk{line-height:1.25;overflow:hidden}
+.b-titel{border-color:#D9613C;background:rgba(217,97,60,.14)}
+.b-ingr{border-color:#4E7D4A;background:rgba(78,125,74,.14)}
+.b-ber{border-color:#3C6E9A;background:rgba(60,110,154,.13)}
+.b-weg{border-color:#b3aa9e;background:repeating-linear-gradient(45deg,rgba(0,0,0,.05) 0 4px,transparent 4px 8px);color:#9a9085}
+.lbl{position:absolute;top:-1px;right:-1px;font-size:6.5px;font-weight:700;color:#fff;padding:1px 4px;border-radius:0 3px 0 4px}
+.b-titel .lbl{background:#D9613C}.b-ingr .lbl{background:#4E7D4A}.b-ber .lbl{background:#3C6E9A}.b-weg .lbl{background:#b3aa9e}
+.legend{display:flex;gap:8px;padding:2px 12px;font-size:8.5px;flex-wrap:wrap}
+.legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:3px;vertical-align:-1px}
+.bar{position:absolute;bottom:10px;left:10px;right:10px;display:flex;gap:6px}
+.btn{flex:1;text-align:center;padding:9px;border-radius:11px;font-weight:600;font-size:10.5px;background:#EFE7DA}
+.btn.p{background:#D9613C;color:#fff}
+.hint{margin:4px 12px;font-size:9px;color:#7d746a}
+
+/* controle */
+.sec{font-size:8.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8f857a;padding:8px 14px 3px}
+.fld{margin:0 10px;background:#fff;border-radius:10px;padding:2px 0}
+.li{padding:5px 10px;border-bottom:.5px solid #EEE6DA;font-size:10.5px;display:flex;gap:6px}
+.li:last-child{border-bottom:0}
+.q{font-weight:600;min-width:46px;color:#4E7D4A}
+.unsure{text-decoration:underline wavy #E39A2B;text-underline-offset:2px}
+.warn{margin:6px 10px;padding:6px 8px;border-radius:8px;background:#FFF1DC;color:#8a5a12;font-size:9px}
+.sug{display:inline-block;font-size:9px;padding:3px 8px;border-radius:999px;border:1px dashed #D9613C;color:#D9613C;margin:2px 2px 0 0}
+.sug.on{border-style:solid;background:#D9613C;color:#fff}
+
+/* recept */
+.hero{padding:2px 14px 6px}
+.hero .lt{padding:0;font-size:21px}
+.srcl{font-size:9px;color:#8f857a;margin-top:3px}
+.metar{display:flex;gap:6px;padding:4px 14px 6px;align-items:center}
+.pill{font-size:9.5px;background:#EFE7DA;border-radius:999px;padding:3px 8px}
+.step{display:flex;align-items:center;gap:0;background:#EFE7DA;border-radius:999px;font-size:10px}
+.step span{padding:2px 7px}.step b{padding:2px 6px;background:#fff;border-radius:999px}
+.ing{display:flex;gap:7px;padding:4px 14px;font-size:11px;align-items:flex-start}
+.cb{width:12px;height:12px;border-radius:50%;border:1.3px solid #b9ad9c;flex:none;margin-top:1px}
+.cb.x{background:#4E7D4A;border-color:#4E7D4A}
+.ing.done{color:#b0a698;text-decoration:line-through}
+.ing b{font-weight:600}
+.stp{display:flex;gap:8px;padding:5px 14px;font:11.5px/1.45 "Iowan Old Style","New York",Georgia,serif}
+.stp .n{font:700 11px/1.45 -apple-system,system-ui;color:#D9613C;min-width:10px}
+.tmr{display:inline-block;font:600 9px -apple-system,system-ui;background:#FCE6DD;color:#B24B2A;border-radius:999px;padding:1px 6px;margin-left:2px}
+.cook{position:absolute;bottom:12px;left:14px;right:14px;background:#2B2622;color:#FBF7F0;border-radius:14px;padding:11px;text-align:center;font-weight:600;font-size:11.5px}
+
+/* kookmodus */
+.km{background:#1F1B18;color:#F6EFE4}
+.km .sb{color:#F6EFE4}
+.prog{display:flex;gap:4px;padding:6px 14px}
+.prog i{flex:1;height:4px;border-radius:2px;background:#4a423b}.prog i.d{background:#D9613C}.prog i.c{background:#F6EFE4}
+.kmh{padding:4px 14px;font-size:10px;color:#b7ab9c;display:flex;justify-content:space-between}
+.big{padding:10px 16px;font:400 21px/1.38 "Iowan Old Style","New York",Georgia,serif}
+.big mark{background:none;color:#F2A27F;font-weight:600}
+.kmi{margin:4px 14px;padding:8px 10px;border-radius:12px;background:#2c2622;font-size:10px;color:#d9cdbd;line-height:1.6}
+.kmi b{color:#F6EFE4}
+.tchip{margin:8px 14px;display:flex;justify-content:space-between;align-items:center;background:#D9613C;color:#fff;border-radius:12px;padding:9px 11px;font-weight:600}
+.mic{position:absolute;left:14px;right:14px;bottom:12px;border-radius:14px;background:#2c2622;padding:8px 11px;display:flex;gap:8px;align-items:center;font-size:10px;color:#d9cdbd}
+.dot{width:9px;height:9px;border-radius:50%;background:#5fd07a;box-shadow:0 0 0 4px rgba(95,208,122,.18);flex:none}
+.wave{display:flex;gap:2px;align-items:center;height:14px}.wave i{width:2px;background:#5fd07a;border-radius:1px}
+.toast{position:absolute;top:30px;left:50%;transform:translateX(-50%);background:#F6EFE4;color:#1F1B18;border-radius:999px;padding:4px 10px;font-size:10px;font-weight:600;white-space:nowrap}
+.zones{position:absolute;top:62px;bottom:58px;left:0;right:0;display:flex;pointer-events:none}
+.zones div{border:1px dashed rgba(246,239,228,.18);display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-size:8px;color:rgba(246,239,228,.35)}
+
+/* ipad */
+.cols{display:flex;height:calc(100% - 18px)}
+.side{width:120px;background:#F3ECE1;border-right:.5px solid #E2D8C9;padding:6px 0;font-size:9.5px}
+.side .h{font:700 13px "Iowan Old Style",Georgia,serif;padding:2px 10px 6px}
+.side .it{padding:4px 10px;display:flex;justify-content:space-between}
+.side .it.on{background:#E6DACA;border-radius:6px;margin:0 4px;padding:4px 6px}
+.lst{width:150px;border-right:.5px solid #E2D8C9;padding-top:6px}
+.lst .row{padding:6px 8px;gap:6px}.lst .th{width:30px;height:30px}.lst .t{font-size:10px}
+.lst .row.on{background:#EFE7DA}
+.det{flex:1;padding:6px 0;overflow:hidden}
+.two{display:flex;gap:0}
+.two>div{flex:1}
+.pad .ing{font-size:10px;padding:3px 12px}.pad .stp{font-size:10.5px;padding:4px 12px}
+.pad .sec{padding:6px 12px 3px}
+.kmpad{display:flex;height:calc(100% - 18px)}
+.kmpad .l{width:190px;border-right:.5px solid #3a332d;padding:8px 0}
+.kmpad .l .ing{color:#d9cdbd;font-size:10px;padding:3px 12px}.kmpad .l .ing.done{color:#6f665c}
+.kmpad .l .ing.hl{color:#F2A27F;font-weight:600}
+.kmpad .r{flex:1;position:relative;padding:6px 0}
+.dim{opacity:.32;font:13px/1.4 "Iowan Old Style",Georgia,serif;padding:4px 18px}
+.kmpad .big{font-size:22px;padding:6px 18px}
+
+/* vergrendelscherm */
+.lock{background:linear-gradient(170deg,#3b4a5e,#1d2430);color:#fff}
+.clock{text-align:center;font:200 54px/1 -apple-system,system-ui;margin-top:26px}
+.date{text-align:center;font-size:11px;opacity:.85;margin-top:30px}
+.la{position:absolute;left:10px;right:10px;bottom:72px;border-radius:18px;background:rgba(30,26,24,.82);padding:10px 12px}
+.la .tp{display:flex;justify-content:space-between;font-size:9.5px;color:#d9cdbd}
+.la .tm{font:600 26px -apple-system,system-ui;color:#F2A27F;font-variant-numeric:tabular-nums}
+.la .bt{display:flex;gap:6px;margin-top:6px}.la .bt span{flex:1;text-align:center;padding:6px;border-radius:9px;background:#3a332d;font-size:9.5px;font-weight:600}
+.di{position:absolute;top:6px;left:50%;transform:translateX(-50%);height:20px;width:120px;background:#000;border-radius:12px;display:flex;justify-content:space-between;align-items:center;padding:0 8px;font-size:8.5px;color:#F2A27F;font-weight:600}
+
+/* categorieën */
+.cat{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:.5px solid #EEE6DA;font-size:11px;background:#fff}
+.cat .ic{width:22px;height:22px;border-radius:6px;background:#FCE6DD;color:#D9613C;display:flex;align-items:center;justify-content:center;font-size:10px}
+.cat .cnt{margin-left:auto;color:#8f857a;font-size:10px}
+.cat .hd{color:#c0b6a8;font-size:12px;letter-spacing:-1px}
+.cat.hid{opacity:.45}
+.grp{margin:0 10px;border-radius:10px;overflow:hidden}
+.add{margin:8px 10px;padding:8px 12px;border-radius:10px;background:#fff;color:#D9613C;font-weight:600;font-size:11px}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:150px;background:#fff;border-radius:16px 16px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.12);padding:10px 12px}
+.sheet .gr{width:30px;height:4px;border-radius:2px;background:#ddd;margin:0 auto 8px}
+.syms{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.syms span{width:26px;height:26px;border-radius:7px;background:#EFE7DA;display:flex;align-items:center;justify-content:center;font-size:11px}
+.syms span.on{background:#D9613C;color:#fff}
+</style></head><body>
+<div class="wrap">
+<h1>Knipsel — schermschetsen v0.1</h1>
+<p class="intro">Ontwerp voor iPhone en iPad. Per scherm: het idee, de onderbouwing en de eisen (K1–K14 uit <code>docs/ontwerp.md</code>). Recepten, bladen en aantallen zijn verzonnen. Kleur: papier en inkt, tomaat als enige accent; groen = ingrediënten, blauw = bereiding.</p>
+
+<input type="radio" name="scr" id="r1" checked><input type="radio" name="scr" id="r2"><input type="radio" name="scr" id="r3"><input type="radio" name="scr" id="r4"><input type="radio" name="scr" id="r5">
+<div class="tabs">
+ <label for="r1" class="l1">1 · Knippen</label>
+ <label for="r2" class="l2">2 · Bibliotheek</label>
+ <label for="r3" class="l3">3 · Recept</label>
+ <label for="r4" class="l4">4 · Kookmodus</label>
+ <label for="r5" class="l5">5 · Categorieën</label>
+</div>
+
+<!-- ================= 1 KNIPPEN ================= -->
+<div class="screen" id="s1"><div class="grid">
+
+<div class="card">
+ <div class="ph"><div class="isl"></div><div class="sb"><span>9:41</span><span>●●●</span></div>
+  <div style="display:flex;justify-content:space-between;padding:0 14px;font-size:11px"><span class="tom">Annuleer</span><b>Kies het recept</b><span class="tom">Pagina +</span></div>
+  <div class="legend"><span><i style="background:#D9613C"></i>Titel/intro</span><span><i style="background:#4E7D4A"></i>Ingrediënten</span><span><i style="background:#3C6E9A"></i>Bereiding</span><span><i style="background:#b3aa9e"></i>Weg</span></div>
+  <div class="photo">
+   <div class="blk b-titel ser" style="left:8px;top:10px;width:205px;height:22px;font-size:11px;font-weight:700">Pompoensoep met gember<span class="lbl">TITEL</span></div>
+   <div class="blk b-titel" style="left:8px;top:36px;width:205px;height:15px;border-style:dashed">Een warme soep voor koude dagen. 4 pers.<span class="lbl">INTRO</span></div>
+   <div class="blk lb b-ingr" style="left:8px;top:56px;width:62px;height:118px">1 pompoen<br>2 uien<br>3 cm gember<br>2 el olijfolie<br>1 l bouillon<br>200 ml kokos<br>½ tl kerrie<span class="lbl">INGR</span></div>
+   <div class="blk lb b-ber" style="left:76px;top:56px;width:80px;height:150px">1. Schil de pompoen…<br><br>2. Verhit de olie…<br><br>3. Voeg de pompoen…<br><br>4. Pureer de soep…<span class="lbl">BEREIDING</span></div>
+   <div class="blk b-weg" style="left:162px;top:56px;width:51px;height:150px;font-weight:700">NU 2 HALEN 1 BETALEN!</div>
+   <div class="blk b-weg" style="left:8px;top:214px;width:205px;height:40px">Lezersbrief: Mijn buurman heeft al weken last van zijn heg…</div>
+  </div>
+  <div class="hint">Tik op een blok om de rol te wisselen · sleep om blokken samen te pakken</div>
+  <div class="bar"><div class="btn">Opnieuw</div><div class="btn p">Controleer →</div></div>
+ </div>
+ <h3>A · Knipselscherm</h3>
+ <p><b>Idee:</b> na de foto (rechtgezet, meerdere pagina's mogelijk) kleurt Knipsel elk tekstblok. De advertentie en de lezersbrief zijn al grijs: weggeknipt.</p>
+ <p><b>Basis:</b> blokken toewijzen is de bewezen aanpak (Mela). In de proef deelde het on-device model deze pagina 100 % goed in.</p>
+ <div class="tags"><span class="tag">K1</span><span class="tag">K12</span></div>
+ <button class="go" data-hermes-send="Werk het knipselscherm van Knipsel verder uit (meerdere pagina's, slepen, terugval zonder AI).">Uitwerken</button>
+</div>
+
+<div class="card">
+ <div class="ph"><div class="isl"></div><div class="sb"><span>9:41</span><span>●●●</span></div>
+  <div style="display:flex;justify-content:space-between;padding:0 14px 4px;font-size:11px"><span class="tom">‹ Foto</span><b>Controle</b><span class="tom" style="font-weight:600">Bewaar</span></div>
+  <div class="lt" style="font-size:18px">Pompoensoep met gember</div>
+  <div style="padding:0 14px;font-size:9.5px" class="mut">4 personen · 45 min · <span class="tom">Volkskrant Magazine, 13 nov</span></div>
+  <div class="warn">⚠︎ 1 regel lijkt een eenheid te missen. Tik om te vergelijken met de foto.</div>
+  <div class="sec">Ingrediënten</div>
+  <div class="fld">
+   <div class="li"><span class="q">1</span>flespompoen (ca. 1 kg)</div>
+   <div class="li"><span class="q">2</span>uien, gesnipperd</div>
+   <div class="li"><span class="q">2 el</span>olijfolie</div>
+   <div class="li" style="background:#FFF7EA"><span class="q unsure">1 ?</span><span class="unsure">groentebouillon</span></div>
+   <div class="li"><span class="q">½ tl</span>kerriepoeder</div>
+  </div>
+  <div class="sec">Categorie (voorstel)</div>
+  <div style="padding:0 12px"><span class="sug on">Soepen</span><span class="sug">Voorgerechten</span></div>
+  <div class="sec">Labels (voorstel)</div>
+  <div style="padding:0 12px"><span class="sug on">Vegetarisch</span><span class="sug on">Voorbereiden</span><span class="sug">+</span></div>
+ </div>
+ <h3>B · Controle vóór bewaren</h3>
+ <p><b>Idee:</b> de tekst is letterlijk wat er stond. Twijfel is oranje: hier viel de "l" van "1 l groentebouillon" weg — echt gebeurd in de proef.</p>
+ <p><b>Basis:</b> mensen vertrouwen automatisering te snel (Parasuraman &amp; Manzey, 2010); dus twijfel zichtbaar maken. Categorie en labels zijn voorstellen, één tik.</p>
+ <div class="tags"><span class="tag">K2</span><span class="tag">K3</span><span class="tag">K4</span><span class="tag">K14</span></div>
+ <button class="go" data-hermes-send="Werk het controlescherm van Knipsel verder uit (iPad naast de foto, bron invullen).">Uitwerken</button>
+</div>
+
+<div class="card">
+ <div class="ph" style="background:#111;color:#fff"><div class="isl"></div><div class="sb" style="color:#fff"><span>9:41</span><span>●●●</span></div>
+  <div style="margin:30px 18px 0;height:300px;border-radius:6px;background:#E9E2D4;transform:rotate(-3deg);position:relative;
+   background-image:repeating-linear-gradient(0deg,transparent 0 9px,rgba(0,0,0,.05) 9px 10px)">
+   <div style="position:absolute;inset:-6px;border:2.5px solid #5fd07a;border-radius:8px;background:rgba(95,208,122,.12)"></div>
+  </div>
+  <div style="text-align:center;font-size:10px;margin-top:16px;opacity:.85">Pagina gevonden · houd stil</div>
+  <div style="display:flex;justify-content:space-around;align-items:center;position:absolute;bottom:26px;left:0;right:0;font-size:10px">
+   <span>Foto's</span><span style="width:52px;height:52px;border-radius:50%;border:4px solid #fff;background:#fff;box-shadow:inset 0 0 0 3px #111"></span><span>Auto</span></div>
+ </div>
+ <h3>C · Vastleggen</h3>
+ <p><b>Idee:</b> de systeemscanner van iOS: vindt de pagina, rechtzet hem, en kan meerdere pagina's in één keer (recept loopt door op de volgende bladzijde). Of kies een foto die je al hebt.</p>
+ <p><b>Basis:</b> VisionKit-documentscanner; vertrouwd uit Notities en Bestanden, dus niets te leren.</p>
+ <div class="tags"><span class="tag">K1</span></div>
+</div>
+
+</div></div>
+
+<!-- ================= 2 BIBLIOTHEEK ================= -->
+<div class="screen" id="s2"><div class="grid">
+
+<div class="card">
+ <div class="ph"><div class="isl"></div><div class="sb"><span>9:41</span><span>●●●</span></div>
+  <div class="lt">Recepten</div>
+  <div class="search">⌕ Zoek op recept of ingrediënt — "prei"</div>
+  <div class="chips"><span class="chip on">Alles 86</span><span class="chip">Soepen 9</span><span class="chip">Hoofdgerechten 31</span><span class="chip">Nagerechten</span></div>
+  <div class="chips" style="padding-top:0"><span class="chip" style="background:#E3EEDF;color:#3d6b39">Vegetarisch</span><span class="chip" style="background:#E3EEDF;color:#3d6b39">Snel</span><span class="chip">Thuis 👥</span></div>
+  <div class="row"><div class="th f1"></div><div><div class="t">Pompoensoep met gember</div><div class="meta">Soepen · 45 min · Volkskrant Magazine</div></div></div>
+  <div class="row"><div class="th k"></div><div><div class="t">Stoofpot met rode wijn en paddenstoelen</div><div class="meta">Hoofdgerechten · 3 u · Allerhande · 👥</div></div></div>
+  <div class="row"><div class="th f2"></div><div><div class="t">Lauwwarme linzensalade</div><div class="meta">Salades · 25 min · NRC</div></div></div>
+  <div class="row"><div class="th f3"></div><div><div class="t">Rabarbercrumble</div><div class="meta">Nagerechten · 50 min · Libelle</div></div></div>
+  <div class="row"><div class="th k"></div><div><div class="t">Prei-quiche met oude kaas</div><div class="meta">Lunch · 1 u · Trouw</div></div></div>
+  <div class="fab">✂︎ Knip recept</div>
+  <div class="tabbar"><b>Recepten</b><span>Gekookt</span><span>Instellingen</span></div>
+ </div>
+ <h3>A · Bibliotheek (iPhone)</h3>
+ <p><b>Idee:</b> categorie (gang) en labels zijn twee rijen chips die je combineert: "Hoofdgerechten + Vegetarisch + Snel". Zoeken werkt ook op ingrediënt. Zonder eigen foto toont een recept een knipsel-icoon, geen nepfoto.</p>
+ <p><b>Basis:</b> facetten vinden beter dan één diepe boom (Hearst, 2006). 👥 = in het gedeelde kookboek.</p>
+ <div class="tags"><span class="tag">K4</span><span class="tag">K13</span></div>
+ <button class="go" data-hermes-send="Werk de bibliotheek van Knipsel verder uit (zoeken, sorteren, gedeeld kookboek).">Uitwerken</button>
+</div>
+
+<div class="card wide">
+ <div class="pad"><div class="sb"><span>9:41 vr 13 nov</span><span>●●●</span></div>
+  <div class="cols">
+   <div class="side"><div class="h">Knipsel</div>
+    <div class="it">Alles<span class="mut">86</span></div><div class="it">Thuis 👥<span class="mut">22</span></div>
+    <div class="sec" style="padding:6px 10px 2px">Categorieën</div>
+    <div class="it">Ontbijt &amp; brunch<span class="mut">4</span></div><div class="it on">Soepen<span class="mut">9</span></div><div class="it">Voorgerechten<span class="mut">6</span></div><div class="it">Salades<span class="mut">8</span></div><div class="it">Hoofdgerechten<span class="mut">31</span></div><div class="it">Nagerechten<span class="mut">12</span></div><div class="it">Gebak &amp; taarten<span class="mut">7</span></div>
+    <div class="sec" style="padding:6px 10px 2px">Labels</div><div class="it">Vegetarisch</div><div class="it">Snel</div>
+   </div>
+   <div class="lst">
+    <div class="row on"><div class="th f1"></div><div><div class="t">Pompoensoep met gember</div><div class="meta">45 min</div></div></div>
+    <div class="row"><div class="th k"></div><div><div class="t">Erwtensoep</div><div class="meta">3 u · 👥</div></div></div>
+    <div class="row"><div class="th k"></div><div><div class="t">Tomatensoep met venkel</div><div class="meta">40 min</div></div></div>
+    <div class="row"><div class="th f2"></div><div><div class="t">Groene minestrone</div><div class="meta">35 min</div></div></div>
+   </div>
+   <div class="det">
+    <div class="hero"><div class="lt" style="font-size:19px">Pompoensoep met gember</div><div class="srcl">Volkskrant Magazine · 13 nov 2026 · p. 52</div></div>
+    <div class="metar"><div class="step"><span>−</span><b>4 pers.</b><span>+</span></div><span class="pill">45 min</span><span class="pill">Vegetarisch</span></div>
+    <div class="two">
+     <div><div class="sec">Ingrediënten</div>
+      <div class="ing"><span class="cb"></span><span><b>1</b> flespompoen</span></div><div class="ing"><span class="cb"></span><span><b>2</b> uien</span></div><div class="ing"><span class="cb"></span><span><b>3 cm</b> gember</span></div><div class="ing"><span class="cb"></span><span><b>1 l</b> bouillon</span></div><div class="ing"><span class="cb"></span><span><b>200 ml</b> kokosmelk</span></div></div>
+     <div><div class="sec">Bereiding</div>
+      <div class="stp"><span class="n">1</span><span>Schil de pompoen en snijd in blokjes van 2 cm.</span></div>
+      <div class="stp"><span class="n">2</span><span>Fruit ui en gember <span class="tmr">⏱ 5 min</span></span></div>
+      <div class="stp"><span class="n">3</span><span>Bouillon erbij, zacht koken <span class="tmr">⏱ 20 min</span></span></div></div>
+    </div>
+   </div>
+  </div>
+ </div>
+ <h3>B · iPad: drie kolommen</h3>
+ <p><b>Idee:</b> zijbalk met kookboeken, categorieën en labels; lijst; recept met ingrediënten en bereiding naast elkaar. Liggend en staand bruikbaar.</p>
+ <p><b>Basis:</b> <i>spatial contiguity</i> — wat bij elkaar hoort, staat bij elkaar (Mayer, 2009).</p>
+ <div class="tags"><span class="tag">K4</span><span class="tag">K6</span></div>
+</div>
+
+</div></div>
+
+<!-- ================= 3 RECEPT ================= -->
+<div class="screen" id="s3"><div class="grid">
+
+<div class="card">
+ <div class="ph"><div class="isl"></div><div class="sb"><span>9:41</span><span>●●●</span></div>
+  <div style="display:flex;justify-content:space-between;padding:0 14px;font-size:11px" class="tom"><span>‹ Soepen</span><span>Aa  ⋯</span></div>
+  <div class="hero"><div class="lt">Pompoensoep met gember</div><div class="srcl">Volkskrant Magazine · 13 nov 2026 · p. 52 · 🗎 origineel</div></div>
+  <div class="metar"><div class="step"><span>−</span><b>6 pers.</b><span>+</span></div><span class="pill">45 min</span><span class="pill">2× gekookt</span></div>
+  <div class="sec">Ingrediënten · voor 6</div>
+  <div class="ing done"><span class="cb x"></span><span><b>1½</b> flespompoen (ca. 1½ kg)</span></div>
+  <div class="ing"><span class="cb"></span><span><b>3</b> uien, gesnipperd</span></div>
+  <div class="ing"><span class="cb"></span><span><b>4½ cm</b> verse gember</span></div>
+  <div class="ing"><span class="cb"></span><span><b>1½ l</b> groentebouillon</span></div>
+  <div class="sec">Bereiding</div>
+  <div class="stp"><span class="n">1</span><span>Schil de pompoen, verwijder de pitten en snijd het vruchtvlees in blokjes van 2 cm.</span></div>
+  <div class="stp"><span class="n">2</span><span>Verhit de olie en fruit ui en gember <span class="tmr">⏱ 5 min</span></span></div>
+  <div class="cook">▶︎  Kook dit  ·  of zeg "Hé Siri, kook pompoensoep met Knipsel"</div>
+ </div>
+ <h3>A · Recept lezen</h3>
+ <p><b>Idee:</b> serif-tekst, hoeveelheden vet, porties schalen met − / + (ook ½ en ¼ blijven netjes). Tijden in de tekst worden timerknopjes. "🗎 origineel" toont de krantenuitsnede.</p>
+ <p><b>Basis:</b> Dynamic Type; regellengte 55–70 tekens op iPad (Dyson, 2004); afvinken voorkomt dat je de lijst steeds opnieuw moet nalopen.</p>
+ <div class="tags"><span class="tag">K3</span><span class="tag">K5</span><span class="tag">K11</span></div>
+ <button class="go" data-hermes-send="Werk het receptscherm van Knipsel verder uit (porties schalen, eenheden, notities, gekookt-logboek).">Uitwerken</button>
+</div>
+
+<div class="card">
+ <div class="ph"><div class="isl"></div><div class="sb"><span>9:41</span><span>●●●</span></div>
+  <div style="display:flex;justify-content:space-between;padding:0 14px;font-size:11px" class="tom"><span>‹ Recept</span><b style="color:#2B2622">Weergave</b><span>Klaar</span></div>
+  <div class="sec">Tekstgrootte</div>
+  <div style="margin:0 12px;background:#fff;border-radius:10px;padding:10px;display:flex;align-items:center;gap:8px"><span style="font-size:10px">A</span><div style="flex:1;height:4px;border-radius:2px;background:linear-gradient(90deg,#D9613C 62%,#E6DccD 62%)"></div><span style="font-size:17px">A</span></div>
+  <div class="sec">Lettertype</div>
+  <div style="margin:0 12px;background:#fff;border-radius:10px;overflow:hidden">
+   <div class="li ser" style="justify-content:space-between">New York (serif)<span class="tom">✓</span></div><div class="li">SF Pro</div><div class="li" style="font-family:Verdana">Extra leesbaar</div></div>
+  <div class="sec">Voorlezen</div>
+  <div style="margin:0 12px;background:#fff;border-radius:10px;overflow:hidden">
+   <div class="li" style="justify-content:space-between">Stem<span class="mut">Xander (verbeterd) ›</span></div>
+   <div class="li" style="justify-content:space-between">Tempo<span class="mut">0,9×</span></div>
+   <div class="li" style="justify-content:space-between">Ingrediënten per stap meelezen<span style="color:#4E7D4A">●</span></div>
+   <div class="li" style="justify-content:space-between">"Oké" en "klaar" = volgende<span style="color:#4E7D4A">●</span></div></div>
+  <div class="sec">Kookmodus</div>
+  <div style="margin:0 12px;background:#fff;border-radius:10px;overflow:hidden">
+   <div class="li" style="justify-content:space-between">Altijd donker<span style="color:#4E7D4A">●</span></div>
+   <div class="li" style="justify-content:space-between">Wekwoord "Knipsel"<span class="mut">uit</span></div></div>
+ </div>
+ <h3>B · Leesinstellingen (Aa)</h3>
+ <p><b>Idee:</b> alles wat leesbaarheid en voorlezen bepaalt op één plek, ook vanuit het recept bereikbaar.</p>
+ <p><b>Basis:</b> mensen verschillen in zicht en voorkeur; Apple HIG: respecteer de systeemtekstgrootte en bied meer.</p>
+ <div class="tags"><span class="tag">K5</span><span class="tag">K8</span><span class="tag">K9</span></div>
+</div>
+
+</div></div>
+
+<!-- ================= 4 KOOKMODUS ================= -->
+<div class="screen" id="s4"><div class="grid">
+
+<div class="card">
+ <div class="ph km"><div class="isl"></div><div class="sb"><span>18:12</span><span>●●●</span></div>
+  <div class="toast">✓ volgende</div>
+  <div class="prog" style="margin-top:30px"><i class="d"></i><i class="d"></i><i class="c"></i><i></i></div>
+  <div class="kmh"><span>Stap 3 van 4</span><span>Pompoensoep</span></div>
+  <div class="big">Voeg de <mark>pompoen</mark> en <mark>kerriepoeder</mark> toe en bak 2 minuten mee. Schenk de <mark>bouillon</mark> erbij en laat 20 minuten zachtjes koken.</div>
+  <div class="tchip"><span>⏱ 20 minuten</span><span>Zeg "ja" of tik</span></div>
+  <div class="zones"><div style="width:33%">vorige</div><div style="flex:1">volgende</div></div>
+  <div class="mic"><span class="dot"></span><span style="flex:1">Luistert · "volgende", "herhaal", "hoeveel …?"</span><span class="wave"><i style="height:5px"></i><i style="height:11px"></i><i style="height:7px"></i><i style="height:13px"></i><i style="height:4px"></i></span></div>
+ </div>
+ <h3>A · Kookmodus (iPhone)</h3>
+ <p><b>Idee:</b> één stap, groot (≥ 30 pt), donker, scherm blijft aan. Na het voorlezen wacht Knipsel tot jij "volgende" of "oké" zegt. Ingrediënten van deze stap licht op. Tikken mag ook: rechts = verder, links = terug, met knokkel of elleboog.</p>
+ <p><b>Basis:</b> leesbaar op 70–80 cm (Legge &amp; Bigelow, 2011); zelfgekozen tempo (<i>segmenting</i>, Mayer &amp; Pilegard, 2014); impliciete "oké" (Vtyurina &amp; Fourney, 2018); ±6 aanrakingen per half uur vermijden (safefood, 2024).</p>
+ <div class="tags"><span class="tag">K5</span><span class="tag">K7</span><span class="tag">K8</span><span class="tag">K9</span><span class="tag">K11</span></div>
+ <button class="go" data-hermes-send="Werk de kookmodus van Knipsel verder uit: spraakcommando's, voorlezen en foutherstel.">Uitwerken</button>
+</div>
+
+<div class="card">
+ <div class="ph lock"><div class="di"><span>Stap 3/4</span><span>18:42</span></div>
+  <div class="date">vrijdag 13 november</div><div class="clock">18:23</div>
+  <div class="la"><div class="tp"><span>✂︎ Knipsel · Pompoensoep</span><span>Stap 3 van 4</span></div>
+   <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:4px"><div style="font-size:10.5px;max-width:110px;line-height:1.3">Zachtjes koken met de bouillon</div><div class="tm">18:42</div></div>
+   <div class="bt"><span>‹ Vorige</span><span>Herhaal</span><span>Volgende ›</span></div></div>
+  <div style="position:absolute;bottom:16px;left:0;right:0;display:flex;justify-content:space-between;padding:0 26px"><span style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18)"></span><span style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.18)"></span></div>
+ </div>
+ <h3>B · Vergrendelscherm en Dynamic Island</h3>
+ <p><b>Idee:</b> telefoon op slot of andere app open: de stap en de timer staan op het vergrendelscherm. Het alarm gaat ook af in stille modus. Knoppen werken zonder ontgrendelen.</p>
+ <p><b>Basis:</b> AlarmKit en Live Activities (iOS 26). AirPods en Apple Watch krijgen dezelfde bediening via "Nu speelt" (eerst proef S3).</p>
+ <div class="tags"><span class="tag">K10</span><span class="tag">K11</span></div>
+</div>
+
+<div class="card wide">
+ <div class="pad km"><div class="sb"><span>18:12 vr 13 nov</span><span>●●●</span></div>
+  <div class="kmpad">
+   <div class="l"><div class="sec" style="color:#8f857a">Ingrediënten · 4 pers.</div>
+    <div class="ing done"><span class="cb x"></span><span>1 flespompoen</span></div>
+    <div class="ing done"><span class="cb x"></span><span>2 uien</span></div>
+    <div class="ing done"><span class="cb x"></span><span>3 cm gember</span></div>
+    <div class="ing done"><span class="cb x"></span><span>2 el olijfolie</span></div>
+    <div class="ing hl"><span class="cb" style="border-color:#F2A27F"></span><span>1 l groentebouillon</span></div>
+    <div class="ing"><span class="cb" style="border-color:#6f665c"></span><span>200 ml kokosmelk</span></div>
+    <div class="ing hl"><span class="cb" style="border-color:#F2A27F"></span><span>½ tl kerriepoeder</span></div>
+    <div class="ing"><span class="cb" style="border-color:#6f665c"></span><span>peper en zout</span></div>
+    <div class="tchip" style="margin:10px 12px;font-size:10px"><span>⏱ Ui fruiten</span><span>klaar ✓</span></div>
+   </div>
+   <div class="r">
+    <div class="prog"><i class="d"></i><i class="d"></i><i class="c"></i><i></i></div>
+    <div class="dim">2 · Verhit de olie en fruit de ui en gember 5 minuten op middelhoog vuur.</div>
+    <div class="big">3 · Voeg de <mark>pompoen</mark> en <mark>kerriepoeder</mark> toe en bak 2 minuten mee. Schenk de <mark>bouillon</mark> erbij en laat 20 minuten zachtjes koken.</div>
+    <div class="dim">4 · Pureer de soep met een staafmixer…</div>
+    <div class="mic" style="left:18px;right:18px;bottom:10px"><span class="dot"></span><span style="flex:1">"Hoeveel bouillon?" → <b style="color:#F6EFE4">"1 liter groentebouillon"</b></span></div>
+   </div>
+  </div>
+ </div>
+ <h3>C · Kookmodus (iPad liggend)</h3>
+ <p><b>Idee:</b> links de afvinklijst (afgevinkt grijs, nodig in deze stap oranje), rechts de huidige stap groot met de vorige en volgende gedimd. Vragen als "hoeveel bouillon?" krijgen antwoord in beeld én hardop, met de geschaalde hoeveelheid.</p>
+ <p><b>Basis:</b> ingrediënten en stap naast elkaar (<i>spatial contiguity</i>); gedimde context houdt je oriëntatie zonder af te leiden (praktijk: Mela-kookmodus).</p>
+ <div class="tags"><span class="tag">K6</span><span class="tag">K8</span><span class="tag">K9</span></div>
+</div>
+
+</div></div>
+
+<!-- ================= 5 CATEGORIEËN ================= -->
+<div class="screen" id="s5"><div class="grid">
+
+<div class="card">
+ <div class="ph"><div class="isl"></div><div class="sb"><span>9:41</span><span>●●●</span></div>
+  <div style="display:flex;justify-content:space-between;padding:0 14px;font-size:11px" class="tom"><span>‹ Instellingen</span><span>Wijzig</span></div>
+  <div class="lt">Categorieën</div>
+  <div class="hint" style="margin:0 14px 8px">Sleep om de volgorde te wijzigen. Verborgen categorieën blijven bestaan.</div>
+  <div class="grp">
+   <div class="cat"><span class="ic">O</span>Ontbijt &amp; brunch<span class="cnt">4</span><span class="hd">≡</span></div>
+   <div class="cat"><span class="ic">S</span>Soepen<span class="cnt">9</span><span class="hd">≡</span></div>
+   <div class="cat"><span class="ic">Sa</span>Salades<span class="cnt">8</span><span class="hd">≡</span></div>
+   <div class="cat"><span class="ic">H</span>Hoofdgerechten<span class="cnt">31</span><span class="hd">≡</span></div>
+   <div class="cat"><span class="ic">N</span>Nagerechten<span class="cnt">12</span><span class="hd">≡</span></div>
+   <div class="cat"><span class="ic">I</span>Indonesisch<span class="cnt" style="color:#D9613C">nieuw</span><span class="hd">≡</span></div>
+   <div class="cat hid"><span class="ic">D</span>Dranken · verborgen<span class="cnt">0</span><span class="hd">≡</span></div>
+  </div>
+  <div class="add">＋ Nieuwe categorie</div>
+  <div class="sec">Labels</div>
+  <div style="padding:0 12px"><span class="sug on">Vegetarisch</span><span class="sug on">Snel</span><span class="sug on">Feestelijk</span><span class="sug">＋ label</span></div>
+ </div>
+ <h3>A · Beheren</h3>
+ <p><b>Idee:</b> 13 gebruikelijke categorieën om mee te beginnen; hernoemen, symbool kiezen, slepen, verbergen, toevoegen. Verwijderen vraagt bevestiging en zet de recepten in "Zonder categorie".</p>
+ <p><b>Basis:</b> vaste startset scheelt nadenken; eigen indeling blijft mogelijk (keuken, gelegenheid).</p>
+ <div class="tags"><span class="tag">K4</span></div>
+ <button class="go" data-hermes-send="Werk categoriebeheer van Knipsel verder uit (één of meer categorieën per recept, labels).">Uitwerken</button>
+</div>
+
+<div class="card">
+ <div class="ph"><div class="isl"></div><div class="sb"><span>9:41</span><span>●●●</span></div>
+  <div class="lt" style="opacity:.35">Categorieën</div>
+  <div class="grp" style="opacity:.35"><div class="cat">Soepen</div><div class="cat">Salades</div><div class="cat">Hoofdgerechten</div></div>
+  <div class="sheet" style="height:260px"><div class="gr"></div>
+   <div style="display:flex;justify-content:space-between;font-size:11px"><span class="tom">Annuleer</span><b>Nieuwe categorie</b><span class="tom" style="font-weight:600">Bewaar</span></div>
+   <div style="margin-top:10px;background:#F3ECE1;border-radius:9px;padding:8px 10px;font-size:12px">Indonesisch<span style="color:#D9613C">|</span></div>
+   <div class="sec" style="padding:10px 0 2px">Symbool (in de app: SF Symbols)</div>
+   <div class="syms"><span>S</span><span>Sa</span><span class="on">I</span><span>N</span><span>O</span><span>H</span><span>B</span><span>V</span><span>K</span><span>G</span></div>
+   <div class="warn" style="margin:12px 0 0">Knipsel stelt deze categorie voortaan ook voor bij het knippen.</div>
+  </div>
+ </div>
+ <h3>B · Nieuwe categorie</h3>
+ <p><b>Idee:</b> naam en symbool; daarna doet de AI-indeling er automatisch mee bij nieuwe knipsels.</p>
+ <p><b>Basis:</b> de categorielijst is invoer voor het indelingsmodel (keuze uit bestaande namen, nooit vrij verzonnen).</p>
+ <div class="tags"><span class="tag">K4</span><span class="tag">K1</span></div>
+</div>
+
+</div></div>
+
+<p class="note">Bronnen en volledige eisen: <code>docs/ontwerp.md</code>. Proef herkennen/indelen: <code>docs/spikes/ocr-en-indeling.md</code>.</p>
+</div>
+</body></html>
