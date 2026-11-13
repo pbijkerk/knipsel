@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="nl"><head><meta charset="utf-8">
-<title>Knipsel — schermschetsen v0.1</title>
+<title>Knipsel — schermschetsen v0.2</title>
 <style>
 /* Bord: neemt de kleuren van de Hermes-app over als die er zijn, met eigen terugval. */
 .wrap{max-width:940px;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,sans-serif;color:var(--foreground,#222)}
@@ -163,7 +163,7 @@ input[name=scr]{position:absolute;opacity:0;pointer-events:none}
 .syms span.on{background:#D9613C;color:#fff}
 </style></head><body>
 <div class="wrap">
-<h1>Knipsel — schermschetsen v0.1</h1>
+<h1>Knipsel — schermschetsen v0.2</h1>
 <p class="intro">Ontwerp voor iPhone en iPad. Per scherm: het idee, de onderbouwing en de eisen (K1–K14 uit <code>docs/ontwerp.md</code>). Recepten, bladen en aantallen zijn verzonnen. Kleur: papier en inkt, tomaat als enige accent; groen = ingrediënten, blauw = bereiding.</p>
 
 <input type="radio" name="scr" id="r1" checked><input type="radio" name="scr" id="r2"><input type="radio" name="scr" id="r3"><input type="radio" name="scr" id="r4"><input type="radio" name="scr" id="r5">
@@ -195,8 +195,8 @@ input[name=scr]{position:absolute;opacity:0;pointer-events:none}
  </div>
  <h3>A · Knipselscherm</h3>
  <p><b>Idee:</b> na de foto (rechtgezet, meerdere pagina's mogelijk) kleurt Knipsel elk tekstblok. De advertentie en de lezersbrief zijn al grijs: weggeknipt.</p>
- <p><b>Basis:</b> blokken toewijzen is de bewezen aanpak (Mela). In de proef deelde het on-device model deze pagina 100 % goed in.</p>
- <div class="tags"><span class="tag">K1</span><span class="tag">K12</span></div>
+ <p><b>Basis:</b> blokken toewijzen is de bewezen aanpak (Mela). Op jouw toestellen deelt Knipsel in met regels, of met Claude als je een sleutel instelt; in de proef deelde een taalmodel deze pagina 100 % goed in.</p>
+ <div class="tags"><span class="tag">K1</span><span class="tag">K12</span><span class="tag">B10</span></div>
  <button class="go" data-hermes-send="Werk het knipselscherm van Knipsel verder uit (meerdere pagina's, slepen, terugval zonder AI).">Uitwerken</button>
 </div>
 
@@ -221,7 +221,7 @@ input[name=scr]{position:absolute;opacity:0;pointer-events:none}
  </div>
  <h3>B · Controle vóór bewaren</h3>
  <p><b>Idee:</b> de tekst is letterlijk wat er stond. Twijfel is oranje: hier viel de "l" van "1 l groentebouillon" weg — echt gebeurd in de proef.</p>
- <p><b>Basis:</b> mensen vertrouwen automatisering te snel (Parasuraman &amp; Manzey, 2010); dus twijfel zichtbaar maken. Categorie en labels zijn voorstellen, één tik.</p>
+ <p><b>Basis:</b> mensen vertrouwen automatisering te snel (Parasuraman &amp; Manzey, 2010); dus twijfel zichtbaar maken. Categorieën (meerdere mogelijk) en labels zijn voorstellen, één tik.</p>
  <div class="tags"><span class="tag">K2</span><span class="tag">K3</span><span class="tag">K4</span><span class="tag">K14</span></div>
  <button class="go" data-hermes-send="Werk het controlescherm van Knipsel verder uit (iPad naast de foto, bron invullen).">Uitwerken</button>
 </div>
@@ -311,7 +311,7 @@ input[name=scr]{position:absolute;opacity:0;pointer-events:none}
 <div class="card">
  <div class="ph"><div class="isl"></div><div class="sb"><span>9:41</span><span>●●●</span></div>
   <div style="display:flex;justify-content:space-between;padding:0 14px;font-size:11px" class="tom"><span>‹ Soepen</span><span>Aa  ⋯</span></div>
-  <div class="hero"><div class="lt">Pompoensoep met gember</div><div class="srcl">Volkskrant Magazine · 13 nov 2026 · p. 52 · 🗎 origineel</div></div>
+  <div class="hero"><div class="lt">Pompoensoep met gember</div><div class="srcl">Volkskrant Magazine · 13 nov 2026 · p. 52</div></div>
   <div class="metar"><div class="step"><span>−</span><b>6 pers.</b><span>+</span></div><span class="pill">45 min</span><span class="pill">2× gekookt</span></div>
   <div class="sec">Ingrediënten · voor 6</div>
   <div class="ing done"><span class="cb x"></span><span><b>1½</b> flespompoen (ca. 1½ kg)</span></div>
@@ -324,7 +324,7 @@ input[name=scr]{position:absolute;opacity:0;pointer-events:none}
   <div class="cook">▶︎  Kook dit  ·  of zeg "Hé Siri, kook pompoensoep met Knipsel"</div>
  </div>
  <h3>A · Recept lezen</h3>
- <p><b>Idee:</b> serif-tekst, hoeveelheden vet, porties schalen met − / + (ook ½ en ¼ blijven netjes). Tijden in de tekst worden timerknopjes. "🗎 origineel" toont de krantenuitsnede.</p>
+ <p><b>Idee:</b> serif-tekst, hoeveelheden vet, porties schalen met − / + (ook ½ en ¼ blijven netjes). Tijden in de tekst worden timerknopjes. De krantenfoto wordt niet bewaard, alleen de tekst.</p>
  <p><b>Basis:</b> Dynamic Type; regellengte 55–70 tekens op iPad (Dyson, 2004); afvinken voorkomt dat je de lijst steeds opnieuw moet nalopen.</p>
  <div class="tags"><span class="tag">K3</span><span class="tag">K5</span><span class="tag">K11</span></div>
  <button class="go" data-hermes-send="Werk het receptscherm van Knipsel verder uit (porties schalen, eenheden, notities, gekookt-logboek).">Uitwerken</button>

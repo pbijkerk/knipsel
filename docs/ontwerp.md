@@ -1,4 +1,4 @@
-# Knipsel — ontwerp v0.1 (concept)
+# Knipsel — ontwerp v0.2 (concept)
 
 Recepten-app voor iPhone en iPad. Je fotografeert een recept uit een krant of tijdschrift; Knipsel bewaart
 alleen de recepttekst, deelt hem in en helpt je in de keuken: groot leesbaar, voorlezen in jouw tempo en
@@ -17,6 +17,12 @@ bediening met je stem, zodat je het scherm met vieze handen niet hoeft aan te ra
 | B3 | Minimale versie | iOS/iPadOS 26 |
 | B4 | Synchronisatie | iCloud tussen eigen toestellen **en** delen met een huisgenoot |
 | B5 | Testen | TestFlight via Xcode Cloud, interne groep (zoals FableFlux) |
+| B6 | Categorieën (V1) | Een recept kan in **meerdere** categorieën staan |
+| B7 | Paginafoto (V2) | **Alleen de tekst** bewaren; de foto verdwijnt na het knippen |
+| B8 | Delen (V3) | **Per recept kiezen**: "Mijn recepten" (privé) of "Thuis" (gedeeld) |
+| B9 | Toestellen (V4) | iPhone 14 Plus, iPhone 15 Plus, iPad (10e generatie). **Geen van drieën heeft Apple Intelligence**, dus geen on-device taalmodel |
+| B10 | Indelen | Regels op het toestel als basis, **optioneel Claude** (eigen API-sleutel in de Keychain; alleen de herkende tekst gaat naar Anthropic, nooit de foto), zoals FableFlux |
+| B11 | Impliciete commando's (V5) | **Standaard aan**: "oké", "klaar", "gedaan" = volgende stap, met zichtbare melding en "terug" om te herstellen |
 
 ## 2. Eisen (K1–K14) met onderbouwing
 
@@ -24,10 +30,10 @@ Elke eis heeft een wetenschappelijke of praktijkbasis. De nummers keren terug in
 
 | Eis | Wat | Basis |
 |---|---|---|
-| **K1** Alleen de recepttekst | Na de foto kiest Knipsel zelf welke tekstblokken bij het recept horen; advertenties, lezersbrieven en kolommen van andere artikelen vallen weg. De gebruiker corrigeert met een tik per blok. | Praktijk: Mela laat gescande blokken toewijzen aan titel/ingrediënten/bereiding (Mela Help; MacStories). Proef: on-device model wees advertentie en lezersbrief correct af (spike). |
+| **K1** Alleen de recepttekst | Na de foto kiest Knipsel zelf welke tekstblokken bij het recept horen; advertenties, lezersbrieven en kolommen van andere artikelen vallen weg. De gebruiker corrigeert met een tik per blok. | Praktijk: Mela laat gescande blokken toewijzen aan titel/ingrediënten/bereiding (Mela Help; MacStories). Proef: een taalmodel wees advertentie en lezersbrief correct af (spike). Op Peters toestellen: regels + optioneel Claude (B10). |
 | **K2** Letterlijke tekst, eerst controleren | De tekst blijft letterlijk de herkende tekst; AI deelt alleen in, herschrijft niet. Onzekere woorden worden oranje onderstreept. | Proef: de AI die zelf herschreef, liet hoeveelheden weg en maakte "olifolie" (spike). Mensen gaan automatisering te snel vertrouwen (*automation bias*, Parasuraman & Manzey, 2010): dus zichtbaar maken wat onzeker is. |
 | **K3** Vaste structuur | Titel, intro, porties, tijd, ingrediënten (hoeveelheid · eenheid · naam, met groepen als "Voor de saus"), genummerde stappen, notities, bron (blad, datum, pagina). | Nodig voor schalen, voorlezen per stap en "hoeveel …?". |
-| **K4** Categorieën en labels | Eén indeling naar gang (13 standaardcategorieën, zie §5) plus vrije labels (vegetarisch, snel, …). Alles hernoemen, verbergen, verplaatsen, toevoegen en verwijderen. AI stelt categorie en labels voor. | Facetclassificatie: meerdere onafhankelijke kenmerken vinden beter dan één diepe boom (Hearst, 2006). |
+| **K4** Categorieën en labels | Indeling naar gang (13 standaardcategorieën, zie §5; een recept kan in meerdere, B6) plus vrije labels (vegetarisch, snel, …). Alles hernoemen, verbergen, verplaatsen, toevoegen en verwijderen. AI stelt categorie en labels voor. | Facetclassificatie: meerdere onafhankelijke kenmerken vinden beter dan één diepe boom (Hearst, 2006). |
 | **K5** Goed leesbaar | Dynamic Type; leesweergave in serif (New York) met ±60 tekens per regel; kookmodus ≥ 30 pt op iPhone (≥ 28 pt op iPad) zodat het op 70–80 cm vlot leesbaar blijft; contrast ≥ 4,5:1; donkere modus. | Leessnelheid daalt onder de *critical print size* (≈ 0,2° x-hoogte, Legge & Bigelow, 2011): op 70–80 cm is dat 2,4–2,8 mm x-hoogte, ±30–34 pt op een iPhone (x-hoogte ≈ halve korps). Regellengte 55–70 tekens (Dyson, 2004). WCAG 2.2 (1.4.3). |
 | **K6** iPad naast elkaar | Op iPad staan ingrediënten en bereiding naast elkaar; in de kookmodus de huidige stap groot, de rest gedimd. | *Spatial contiguity*: samenhangende informatie dicht bij elkaar (Mayer, 2009). Praktijk: Mela, Paprika. |
 | **K7** Aanraakloos koken | Na "Kook dit" hoeft niemand het scherm nog aan te raken; aanraken mag wel (hele scherm = grote tikzone, ook met knokkel of elleboog). Scherm blijft aan. | Gemiddeld 5,8 aanrakingen van de tablet per half uur koken; 34 % waste na rauwe kip de handen niet voor ze de tablet aanraakten; *Salmonella* overleeft > 24 uur op het scherm (safefood, 2024). FDA-survey: maar ⅓ wast handen na aanraken van het toestel (Lando e.a., 2018). |
@@ -35,9 +41,9 @@ Elke eis heeft een wetenschappelijke of praktijkbasis. De nummers keren terug in
 | **K9** Voorlezen in jouw tempo | Voorlezen per stap; daarna wacht Knipsel tot jij verder wilt. Nooit automatisch doorlezen. "Stop" werkt ook midden in een zin. | *Segmenting principle*: mensen leren en volgen beter met instructie in zelfgekozen stukken dan als doorlopend geheel (Mayer & Pilegard, 2014). |
 | **K10** Siri en snelkoppelingen | "Hé Siri, kook pompoensoep met Knipsel", en stappen besturen vanaf het vergrendelscherm, de Actieknop, AirPods. | Praktijk: Siri eist de appnaam in elke zin; daarom is Siri voor starten en "buiten de app", K8 voor tijdens het koken. |
 | **K11** Timers uit de tekst | "laat 20 minuten zachtjes koken" wordt een timerknop; Knipsel vraagt na het voorlezen "Zal ik een timer van 20 minuten zetten?". Alarm ook bij vergrendeld scherm of stille modus. | Proef: tijden werden correct uit de stappen gehaald (spike). AlarmKit (iOS 26). |
-| **K12** Privé en offline | Herkennen, indelen, spraak en voorlezen gebeuren op het toestel. Geen account, geen server; alleen iCloud. | Apple Vision, Foundation Models, Speech draaien on-device (proef op deze Mac). |
+| **K12** Privé en offline | Herkennen, spraak en voorlezen gebeuren op het toestel. Geen account, geen eigen server; alleen iCloud. Uitzondering die je zelf aanzet: indelen met Claude stuurt alleen de herkende tekst naar Anthropic. | Vision en Speech draaien on-device (proef op deze Mac); B10. |
 | **K13** Delen met huisgenoot | Een gedeeld kookboek "Thuis" dat beide gebruikers zien en aanvullen. | Besluit B4. |
-| **K14** Bron en auteursrecht | Bron blijft bij elk recept staan. Fotos van de pagina zijn optioneel en alleen privé. | Kopiëren voor eigen gebruik valt onder de thuiskopie (art. 16b Auteurswet); publiek delen niet. Echte krantenfoto's komen dus ook niet in deze publieke repo. |
+| **K14** Bron en auteursrecht | Bron blijft bij elk recept staan. De paginafoto wordt niet bewaard (B7). | Kopiëren voor eigen gebruik valt onder de thuiskopie (art. 16b Auteurswet); publiek delen niet. Echte krantenfoto's komen dus ook niet in deze publieke repo. |
 
 ## 3. De belangrijkste stromen
 
@@ -47,17 +53,24 @@ Elke eis heeft een wetenschappelijke of praktijkbasis. De nummers keren terug in
    (recept op twee pagina's). Of kies een bestaande foto (PhotosPicker).
 2. **Herkennen** — Vision `RecognizeTextRequest`, taal `nl-NL` (ondersteund, gecontroleerd), met
    taalcorrectie en per regel een betrouwbaarheid en kader.
-3. **Indelen** — Foundation Models (on-device, Nederlands ondersteund) krijgt de genummerde regels en geeft
-   alleen terug: welk blok is titel / intro / ingrediënt / stap / niet-recept, plus categorie en labels.
+3. **Indelen** — welk blok is titel / intro / ingrediënt / stap / niet-recept, plus voorstel voor
+   categorieën en labels. Drie uitvoerders achter één `Indeler`-protocol, met dezelfde uitvoer
+   (alleen bloknummers per rol; de tekst blijft letterlijk):
+   - **Regels (altijd, basis):** grootste letter = titel; regel die begint met getal + eenheid of een
+     bekend ingrediënt = ingrediënt; genummerde of lange alinea's = bereiding; blokken buiten de kolommen
+     van titel/ingrediënten/bereiding of met reclamewoorden ("halen", "betalen", "geldig t/m", "€") = weg.
+     Vision levert per regel het kader, dus kolommen en lettergrootte zijn bekend.
+   - **Claude (optioneel, B10):** zelfde opdracht als in de proef (`claude-haiku-4-5`, sleutel in de
+     Keychain, alleen tekst + bloknummers). Gebruikt als er een sleutel en internet is; anders de regels.
+   - **On-device model:** vanzelf gebruikt op een toekomstig toestel met Apple Intelligence; niet op
+     Peters huidige toestellen (B9).
    *Code voegt daarna samen*: stapregels aan elkaar tot een nieuw nummer begint, ingrediëntregels via een
    Nederlandse hoeveelheidsparser (`½ tl`, `2 el`, `1 l`, `ca. 1 kg`, `snufje`, `teen`, `blik`).
-   - Toestel zonder Apple Intelligence: regelgebaseerde terugval (grootste letter = titel; regel die met
-     getal + eenheid begint = ingrediënt; genummerde alinea = stap). Daarna gewoon handmatig bijsturen.
 4. **Knipselscherm** — de foto met gekleurde kaders per blok: titel (tomaat), ingrediënten (groen),
    bereiding (blauw), weggelaten (grijs gearceerd). Tik = rol wisselen, sleep = blokken samen selecteren.
 5. **Controle** — het gestructureerde recept naast (iPad) of onder (iPhone) de uitsnede; onzekere woorden
    oranje; categorie- en labelvoorstellen als knopjes; bron vooraf ingevuld (datum uit de foto).
-6. **Bewaren** — tekst + (optioneel, instelbaar) de uitsnede als controlebeeld.
+6. **Bewaren** — alleen de tekst; de foto wordt na het knippen weggegooid (B7).
 
 ### 3.2 Koken (aanraakloos)
 
@@ -73,7 +86,7 @@ Elke eis heeft een wetenschappelijke of praktijkbasis. De nummers keren terug in
 ```
 
 - Scherm blijft aan (`isIdleTimerDisabled`) zolang de kookmodus open is.
-- Live Activity op vergrendelscherm en Dynamic Island: "Stap 3 van 4 · ⏱ 18:42".
+- Live Activity op het vergrendelscherm (alle toestellen) en in het Dynamic Island (alleen iPhone 15 Plus): "Stap 3 van 4 · ⏱ 18:42".
 - Ingrediënten die in de huidige stap voorkomen worden in de lijst uitgelicht; afvinken kan met "gedaan".
 
 ## 4. Bediening zonder handen — lagen
@@ -82,7 +95,7 @@ Elke eis heeft een wetenschappelijke of praktijkbasis. De nummers keren terug in
 |---|---|---|---|
 | 1. Stem in de app (primair) | Tijdens koken, app open | `SpeechAnalyzer` + `DictationTranscriber` (`nl_NL` on-device, gecontroleerd); terugval `SFSpeechRecognizer` on-device. `AVAudioEngine` met *voice processing* (echo-onderdrukking), zodat Knipsel zijn eigen stem niet hoort en "stop" midden in het voorlezen werkt. | Kern, fase 5 |
 | 2. Siri / App Shortcuts | Starten, of app op achtergrond / vergrendeld | App Intents: `KookReceptIntent` (met `AppEntity` Recept), `VolgendeStap`, `VorigeStap`, `HerhaalStap`, `LeesIngredienten`, `ZetTimer`. Verschijnen vanzelf in Siri, Spotlight en Opdrachten. | Fase 6 |
-| 3. Actieknop (iPhone 15 Pro+) | Eén knop met knokkel = volgende stap | Snelkoppeling "Volgende stap" aan de Actieknop koppelen | Fase 6, alleen instructie |
+| 3. Actieknop | Eén knop met knokkel = volgende stap | Snelkoppeling "Volgende stap" aan de Actieknop | Alleen iPhone 15 Pro en nieuwer; niet op Peters toestellen, geparkeerd |
 | 4. AirPods / Apple Watch | Steeltje indrukken = volgende, dubbel = vorige | `MPRemoteCommandCenter` + Nu speelt; de Watch toont dan vanzelf de bediening | Fase 6, eerst proef (S3) |
 | 5. Grote tikzones | Altijd | Rechter ⅔ van het scherm = volgende, linker ⅓ = vorige; werkt met knokkel/elleboog; toetsenbord (spatie/pijlen) op iPad | Fase 3 |
 | 6. Zwaaien (experiment) | Hand voor de camera = volgende | Vision hand-pose via voorcamera | Geparkeerd; batterij en privacy afwegen |
@@ -103,7 +116,7 @@ Elke eis heeft een wetenschappelijke of praktijkbasis. De nummers keren terug in
 | "timer ‹n› minuten", "zet de timer", "hoe lang nog?" | timer zetten / resterende tijd |
 | "stoppen met koken" | kookmodus sluiten |
 
-¹ Impliciete signalen ("oké", "klaar") zijn instelbaar, want ze kunnen ook in een gesprek vallen.
+¹ Impliciete signalen ("oké", "klaar", "gedaan") staan standaard aan (B11), met melding en "terug" om te herstellen; uit te zetten in Instellingen.
 
 Regels tegen vals alarm (afzuigkap, radio, gesprek):
 - Alleen korte uitingen (≤ 4 woorden) die een commando zijn tellen; een lange zin met "volgende" erin niet.
@@ -132,7 +145,7 @@ Dranken. Plus de vaste bak "Zonder categorie".
 
 Beheer (Instellingen › Categorieën): hernoemen, SF-symbool kiezen, volgorde slepen, verbergen,
 toevoegen, verwijderen (recepten gaan dan naar "Zonder categorie", met bevestiging en aantal).
-Een recept heeft één categorie en nul of meer labels. *Open vraag V1: mag een recept in meer categorieën?*
+Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 
 ## 6. Schermen (zie schetsen)
 
@@ -156,28 +169,29 @@ Een recept heeft één categorie en nul of meer labels. *Open vraag V1: mag een 
     relaties met inverse.
 - **Model (eerste versie):**
   - `Recept`: titel, intro, porties, bereidingstijd, totale tijd, notities, bronNaam, bronDatum, bronPagina,
-    beoordeling, laatstGekooktOp, aangemaaktOp, uitsnede (extern opgeslagen, optioneel)
+    beoordeling, laatstGekooktOp, aangemaaktOp, kookboek (Mijn recepten / Thuis); veel-op-veel met `Categorie`
   - `Ingredient`: volgorde, groep, ruweTekst, hoeveelheid, hoeveelheidTot, eenheid, naam, toelichting
   - `Stap`: volgorde, groep, tekst, timerSeconden
   - `Categorie`: naam, symbool, volgorde, verborgen, isStandaard
   - `Label`: naam
   - `Kooklog`: datum, notitie
-- **Diensten:** `ScanService` (VisionKit/Vision), `IndelingService` (Foundation Models + terugval),
+- **Diensten:** `ScanService` (VisionKit/Vision), `Indeler`-protocol met `RegelIndeler`, `ClaudeIndeler` en `ModelIndeler`, `KeychainService`,
   `IngredientParser` (puur, goed testbaar), `VoorleesService` (AVSpeechSynthesizer + uitspraakregels),
   `LuisterService` (AVAudioEngine + SpeechAnalyzer), `CommandoHerkenner` (puur, testbaar),
   `KookSessie` (toestandsmachine stap/voorlezen/luisteren/timers), `TimerService` (AlarmKit),
   `KookActivity` (ActivityKit), App Intents.
-- **Rechten (Info.plist):** camera, microfoon, spraakherkenning, foto's (alleen kiezen), AlarmKit.
+- **Rechten (Info.plist):** camera, microfoon, spraakherkenning, foto's (alleen kiezen), AlarmKit. Netwerk alleen voor Claude (optioneel) en iCloud.
 
 ## 8. Risico's en proeven
 
 | # | Risico | Proef | Status |
 |---|---|---|---|
 | S1 | OCR op echte krantenfoto's: kolommen, glanzend papier, krom blad, `l`/`1` | 10 echte pagina's (blijven lokaal) | Synthetisch gedaan: `1 l groentebouillon` → `1 groentebouillon`, `ë` verdween. Echte foto's nog doen |
-| S2 | Indeling door Foundation Models op wisselende layouts | Zelfde 10 pagina's | Synthetisch: 100 % juiste indeling in 6 s (Mac) |
+| S2 | Indeling op wisselende layouts: regels vs. Claude | Zelfde 10 pagina's | Synthetisch met on-device model: 100 % juist. Regels en Claude nog te meten |
 | S3 | AirPods/Watch-bediening vraagt "Nu speelt"; telt spraaksynthese daarvoor mee? | Klein testproject | Open |
 | S4 | Altijd luisteren: batterij, warmte, valse commando's bij afzuigkap | 30 min koken met meting | Open |
-| S5 | Apple Intelligence alleen op iPhone 15 Pro+ / iPad met M-chip | Terugval regelgebaseerd | Ontworpen |
+| S5 | Geen Apple Intelligence op Peters toestellen (B9) | Regelindeler als basis, Claude optioneel | Ontworpen |
+| S6 | Spraakherkenning en voorlezen op iPhone 14 Plus (A15) en iPad 10 (A14): beschikbaar en snel genoeg? | Testscherm in een vroege TestFlight-build | Open |
 
 ## 9. Fasering (issues)
 
@@ -196,7 +210,7 @@ Een recept heeft één categorie en nul of meer labels. *Open vraag V1: mag een 
 ## 10. Eigen suggesties (nog niet ingepland)
 
 1. **"Vraag de chef"** — vrije vraag tijdens het koken ("kan ik ook crème fraîche gebruiken?"), beantwoord
-   door het on-device model, alleen met het recept als context en met een zichtbaar "suggestie"-label.
+   door Claude (of later het on-device model), alleen met het recept als context en met een zichtbaar "suggestie"-label.
 2. **Boodschappenlijst** — ingrediënten (geschaald) naar Herinneringen, op winkelvolgorde gegroepeerd.
 3. **"Wat kan ik maken met …"** — zoeken op wat je in huis hebt ("prei, ei, kaas").
 4. **Menu koken** — twee of drie recepten tegelijk in de kookmodus, met wisselen per stem ("naar de saus").
@@ -211,11 +225,7 @@ Een recept heeft één categorie en nul of meer labels. *Open vraag V1: mag een 
 
 ## 11. Open vragen
 
-- **V1** Eén categorie per recept (voorstel) of meerdere?
-- **V2** De pagina-uitsnede standaard bewaren (handig om fouten te controleren) of alleen de tekst?
-- **V3** Gedeeld kookboek: alles delen met de huisgenoot, of per recept kiezen ("Mijn recepten" / "Thuis")?
-- **V4** Welke iPhone en iPad gebruik je? Bepaalt of de AI-indeling werkt of de terugval.
-- **V5** Impliciete commando's ("oké", "klaar") standaard aan of uit?
+V1–V5 beantwoord op 13-11-2026, zie B6–B11 in §1.
 
 ## Bronnen
 
