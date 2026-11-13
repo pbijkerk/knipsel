@@ -76,6 +76,13 @@ struct ModelTests {
         #expect(opslag.container.persistentStoreDescriptions.first?.cloudKitContainerOptions == nil)
     }
 
+    @Test func iCloudContainerIsIngesteld() {
+        #expect(AppConfiguratie.cloudKitContainer == "iCloud.com.peterbijkerk.knipsel")
+        // De testhost draait zelf ook zonder iCloud.
+        #expect(Opslag.draaitOnderTests)
+        #expect(!Opslag.gedeeld.synchroniseert)
+    }
+
     @Test func historyTrackingEnWijzigingsmeldingenStaanAan() throws {
         let beschrijving = try #require(legeOpslag().container.persistentStoreDescriptions.first)
         #expect(beschrijving.options[NSPersistentHistoryTrackingKey] as? NSNumber == true)

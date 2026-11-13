@@ -73,6 +73,7 @@
 		B6D051E99ED2C3EB3C0DD66D /* Opslag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opslag.swift; sourceTree = "<group>"; };
 		C77E204B0CD43E396197B5FF /* ReceptInvoer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptInvoer.swift; sourceTree = "<group>"; };
 		C9738D6AC28DD8918DF30498 /* Inrichting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inrichting.swift; sourceTree = "<group>"; };
+		C97CF0FA72B5D097AC41FAC0 /* Knipsel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Knipsel.entitlements; sourceTree = "<group>"; };
 		CC62418E320151F46A5D662F /* ReceptWeergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptWeergave.swift; sourceTree = "<group>"; };
 		D27E7F45AE46B4F8472FA56C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D7F049FD6FEEBDD9A5DA3A40 /* Bibliotheekbeheer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bibliotheekbeheer.swift; sourceTree = "<group>"; };
@@ -89,6 +90,7 @@
 				D27E7F45AE46B4F8472FA56C /* Assets.xcassets */,
 				3D18DBE8B82454B97537FC3A /* ContentView.swift */,
 				D80C99AFFC80C26C1CE6B452 /* Info.plist */,
+				C97CF0FA72B5D097AC41FAC0 /* Knipsel.entitlements */,
 				87F50F041C4CB953D585CFF4 /* KnipselApp.swift */,
 				F081E8818D35D9C314D32890 /* StandaardCategorieen.swift */,
 				4B57464F0562ED0CD3B7E10D /* Voorbeeldrecepten.swift */,
@@ -322,6 +324,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Knipsel/Knipsel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 68K8BCC3DL;
@@ -365,6 +368,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Knipsel/Knipsel.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 68K8BCC3DL;

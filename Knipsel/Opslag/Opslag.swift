@@ -5,11 +5,16 @@ import OSLog
 ///
 /// `NSPersistentCloudKitContainer` (niet SwiftData), omdat alleen Core Data later een gedeelde
 /// CloudKit-database met een andere Apple ID ondersteunt (fase 8, docs/ontwerp.md §7). Sync met
-/// iCloud gaat pas aan als `AppConfiguratie.cloudKitContainer` gezet is én er een iCloud-account
-/// op het toestel is; anders werkt de container als gewone lokale store.
+/// iCloud gaat aan als `AppConfiguratie.cloudKitContainer` gezet is én er een iCloud-account op het
+/// toestel is; anders (en altijd in het geheugen) werkt de container als gewone lokale store.
 @MainActor
 final class Opslag {
-    static let gedeeld = Opslag()
+    /// Onder unit-tests start de app (testhost) met een lege opslag in het geheugen, zonder iCloud.
+    static let gedeeld = Opslag(inGeheugen: draaitOnderTests)
+
+    static var draaitOnderTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
 
     /// Eén modelinstantie per proces: meerdere kopieën van hetzelfde model laten Core Data twijfelen
     /// welke entiteit bij een klasse hoort.

@@ -28,11 +28,13 @@ struct InstellingenView: View {
                 }
                 Section {
                     LabeledContent("Versie", value: ContentView.versie)
-                    LabeledContent("iCloud-sync", value: Opslag.gedeeld.synchroniseert ? "Aan" : "Nog niet ingesteld")
+                    LabeledContent("iCloud-sync", value: Opslag.gedeeld.synchroniseert ? "Aan" : "Uit")
                 } header: {
                     Text("Over Knipsel")
                 } footer: {
-                    Text("Zolang iCloud-sync niet is ingesteld, staan je recepten alleen op dit toestel.")
+                    Text(
+                        "Met iCloud staan je recepten op al je toestellen. Is iCloud-sync uit (geen iCloud-account), dan staan ze alleen op dit toestel."
+                    )
                 }
             }
             .navigationTitle("Instellingen")

@@ -13,4 +13,4 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
   (`docs/spikes/`)
 - Ontwerp v0.2: besluiten over meerdere categorieën, alleen tekst bewaren, delen per recept, indelen met regels + optioneel Claude (toestellen zonder Apple Intelligence) en impliciete commando's standaard aan
 - Basis-app voor TestFlight: iPhone en iPad, iOS 26, lijst met standaardcategorieën, CI op GitHub Actions
-- Fase 1: recepten bewaren (Core Data, klaar voor iCloud), bibliotheek met zoeken op titel en ingrediënt, categorie- en labelfilters, categorie- en labelbeheer, recept invoeren en leesbare receptweergave (#2)
+- Fase 1: recepten bewaren met iCloud-sync (Core Data + CloudKit), bibliotheek met zoeken op titel en ingrediënt, categorie- en labelfilters, categorie- en labelbeheer, recept invoeren en leesbare receptweergave (#2)
