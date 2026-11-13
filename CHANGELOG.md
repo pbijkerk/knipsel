@@ -16,3 +16,4 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - Basis-app voor TestFlight: iPhone en iPad, iOS 26, lijst met standaardcategorieën, CI op GitHub Actions
 - Fase 1: recepten bewaren met iCloud-sync (Core Data + CloudKit), bibliotheek met zoeken op titel en ingrediënt, categorie- en labelfilters, categorie- en labelbeheer, recept invoeren en leesbare receptweergave (#2)
 - Fase 2: recept knippen — pagina scannen of foto kiezen, tekst herkennen op het toestel, indelen met regels (optioneel Claude met eigen sleutel), knipselscherm met gekleurde blokken en controlescherm met twijfel in oranje; ingrediënten krijgen hoeveelheid, eenheid en naam (#3)
+- Fase 3: kookmodus — één stap groot (≥ 30 pt), donker, scherm blijft aan, tikzones (rechts ⅔ verder, links ⅓ terug), vegen en toetsenbord, ingrediënten van de stap oranje, afvinklijst naast de stap op iPad, "Gekookt" in het kooklog; porties schalen met nette breuken, ook in de receptweergave (#4)

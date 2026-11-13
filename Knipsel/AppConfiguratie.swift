@@ -13,6 +13,8 @@ enum AppConfiguratie {
     /// Leesinstellingen (Aa).
     static let sleutelLettertype = "leesLettertype"
     static let sleutelExtraGrootte = "leesExtraGrootte"
+    /// Kookmodus altijd donker (standaard aan): minder verblinding in een schemerige keuken.
+    static let sleutelKookmodusDonker = "kookmodusDonker"
 
     /// Keychain: de eigen Anthropic-sleutel voor indelen met Claude (optioneel, B10).
     static let sleutelClaude = "claudeApiSleutel"

@@ -25,7 +25,7 @@ enum Lettertype: String, CaseIterable, Identifiable, Sendable {
 }
 
 /// Leesinstellingen (Aa): lettertype en een extra vergroting bovenop de systeemtekstgrootte.
-/// Voorlezen en kookmodus komen in fase 3–5 op dit scherm bij.
+/// Voorlezen komt in fase 4 op dit scherm bij.
 enum Leesinstellingen {
     static let maximaleExtraGrootte = 4
 
@@ -40,6 +40,7 @@ enum Leesinstellingen {
 struct LeesinstellingenView: View {
     @AppStorage(AppConfiguratie.sleutelLettertype) private var lettertype: Lettertype = .serif
     @AppStorage(AppConfiguratie.sleutelExtraGrootte) private var extraGrootte = 0
+    @AppStorage(AppConfiguratie.sleutelKookmodusDonker) private var kookmodusDonker = true
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var tekstgrootte
 
@@ -63,6 +64,13 @@ struct LeesinstellingenView: View {
                     }
                     .pickerStyle(.inline)
                     .labelsHidden()
+                }
+                Section {
+                    Toggle("Altijd donker", isOn: $kookmodusDonker)
+                } header: {
+                    Text("Kookmodus")
+                } footer: {
+                    Text("Uit: de kookmodus volgt de licht/donker-instelling van je toestel.")
                 }
                 Section("Voorbeeld") {
                     Text("Verhit de olie en fruit de ui in 5 minuten glazig.")

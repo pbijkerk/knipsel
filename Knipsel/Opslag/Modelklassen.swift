@@ -153,6 +153,26 @@ extension Recept {
     }
 }
 
+extension Recept {
+    /// "Gekookt" na de kookmodus: een regel in het kooklog en `laatstGekooktOp` bijgewerkt. Bewaart.
+    @discardableResult
+    func legGekooktVast(op datum: Date = .now) throws -> Kooklog {
+        guard let context = managedObjectContext else {
+            throw CocoaError(.validationMissingMandatoryProperty)
+        }
+        let log = Kooklog(context: context)
+        log.datum = datum
+        log.recept = self
+        if laatstGekooktOp.map({ $0 < datum }) ?? true {
+            laatstGekooktOp = datum
+        }
+        try context.save()
+        return log
+    }
+
+    var aantalKeerGekookt: Int { kooklog?.count ?? 0 }
+}
+
 extension Ingredient {
     /// Heeft de parser deze regel al uit elkaar gehaald? (Recepten uit fase 1 nog niet.)
     var isGestructureerd: Bool {
