@@ -1,8 +1,9 @@
 import CoreData
 
 /// Het invoerformulier van een recept, los van Core Data: wijzigingen gaan pas naar de opslag bij
-/// "Bewaar". Ingrediënten zijn één regel per ingrediënt, stappen één per alinea. In fase 1 wordt
-/// alleen de ruwe tekst bewaard; de ingrediëntparser (fase 2) vult later hoeveelheid, eenheid en naam.
+/// "Bewaar". Ingrediënten zijn één regel per ingrediënt, stappen één per alinea. Naast de letterlijke
+/// regel vult `IngredientParser` hoeveelheid, eenheid, naam en toelichting; een regel als
+/// "Voor de saus:" wordt de groep van de ingrediënten eronder.
 struct ReceptInvoer: Equatable {
     var titel = ""
     var intro = ""
@@ -32,7 +33,17 @@ struct ReceptInvoer: Equatable {
         notities = recept.notities ?? ""
         categorieen = Set((recept.categorieen ?? []).map(\.objectID))
         labels = Set((recept.labels ?? []).map(\.objectID))
-        ingredientenTekst = recept.gesorteerdeIngredienten.compactMap(\.ruweTekst).joined(separator: "\n")
+        // Groepen terug als kopregel ("Voor de saus:"), zodat bewaren ze weer herkent.
+        var regels: [String] = []
+        var groep: String?
+        for ingredient in recept.gesorteerdeIngredienten {
+            if let nieuw = ingredient.groep, !nieuw.isEmpty, nieuw != groep {
+                regels.append(nieuw + ":")
+            }
+            groep = ingredient.groep
+            if let tekst = ingredient.ruweTekst { regels.append(tekst) }
+        }
+        ingredientenTekst = regels.joined(separator: "\n")
         // Lege regel tussen stappen: leest prettiger in het invoerveld; `regels(_:)` slaat hem over.
         stappenTekst = recept.gesorteerdeStappen.compactMap(\.tekst).joined(separator: "\n\n")
     }
@@ -62,19 +73,24 @@ struct ReceptInvoer: Equatable {
         recept.gewijzigdOp = .now
 
         // Bestaande objecten op dezelfde plek hergebruiken: minder wijzigingen om te synchroniseren.
-        let ingredientRegels = Self.regels(ingredientenTekst)
+        // Kopregels ("Voor de saus:") worden de groep van de regels eronder, geen eigen ingrediënt.
+        var ingredientRegels: [(tekst: String, groep: String?)] = []
+        var groep: String?
+        for regel in Self.regels(ingredientenTekst) {
+            if let kop = IngredientParser.groepskop(regel) {
+                groep = kop
+            } else {
+                ingredientRegels.append((regel, groep))
+            }
+        }
         let ingredienten = recept.gesorteerdeIngredienten
         for (index, regel) in ingredientRegels.enumerated() {
             let ingredient = index < ingredienten.count ? ingredienten[index] : Ingredient(context: context)
-            if ingredient.ruweTekst != regel {
-                ingredient.ruweTekst = regel
-                // De gestructureerde velden horen bij de oude tekst.
-                ingredient.hoeveelheid = nil
-                ingredient.hoeveelheidTot = nil
-                ingredient.eenheid = nil
-                ingredient.naam = nil
-                ingredient.toelichting = nil
+            if ingredient.ruweTekst != regel.tekst || !ingredient.isGestructureerd {
+                ingredient.ruweTekst = regel.tekst
+                ingredient.vulGestructureerd()
             }
+            if ingredient.groep != regel.groep { ingredient.groep = regel.groep }
             ingredient.volgorde = Int16(clamping: index)
             ingredient.recept = recept
         }

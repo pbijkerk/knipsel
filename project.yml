@@ -47,6 +47,11 @@ targets:
     deploymentTarget: "26.0"
     sources:
       - path: KnipselTests
+        excludes:
+          - "Resources/**"
+      # Testpagina uit docs/spikes (verzonnen): de eind-tot-eindtest van herkennen en indelen.
+      - path: KnipselTests/Resources
+        buildPhase: resources
     dependencies:
       - target: Knipsel
     settings:

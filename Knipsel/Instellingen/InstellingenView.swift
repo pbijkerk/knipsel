@@ -26,6 +26,7 @@ struct InstellingenView: View {
                         SwiftUI.Label("Lettertype en tekstgrootte", systemImage: "textformat.size")
                     }
                 }
+                ClaudeInstellingen()
                 Section {
                     LabeledContent("Versie", value: ContentView.versie)
                     LabeledContent("iCloud-sync", value: Opslag.gedeeld.synchroniseert ? "Aan" : "Uit")
@@ -43,6 +44,57 @@ struct InstellingenView: View {
                     Button("Klaar") { dismiss() }
                 }
             }
+        }
+    }
+}
+
+// MARK: - Indelen met Claude
+
+/// Eigen Anthropic-sleutel invullen of verwijderen (B10). De sleutel staat in de Keychain van dit
+/// toestel; zonder sleutel deelt Knipsel in met regels op het toestel.
+struct ClaudeInstellingen: View {
+    @State private var heeftSleutel = KeychainService.load(forKey: AppConfiguratie.sleutelClaude) != nil
+    @State private var invoer = ""
+    @State private var foutmelding: String?
+
+    var body: some View {
+        Section {
+            if heeftSleutel {
+                LabeledContent("API-sleutel", value: "Ingesteld")
+                Button("Verwijder sleutel", role: .destructive) {
+                    KeychainService.delete(forKey: AppConfiguratie.sleutelClaude)
+                    heeftSleutel = false
+                }
+            } else {
+                SecureField("API-sleutel (sk-ant-…)", text: $invoer)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                Button("Bewaar sleutel", action: bewaar)
+                    .disabled(invoer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+            }
+        } header: {
+            Text("Indelen met Claude")
+        } footer: {
+            VStack(alignment: .leading, spacing: 6) {
+                Text(
+                    "Optioneel. Met een eigen sleutel van Anthropic deelt Claude het recept in (titel, ingrediënten, bereiding). Alleen de herkende tekst gaat naar Anthropic, nooit de foto. Zonder sleutel of zonder internet deelt Knipsel in op dit toestel."
+                )
+                if let foutmelding {
+                    Text(foutmelding).foregroundStyle(.red)
+                }
+                Link("Privacybeleid", destination: AppConfiguratie.privacyURL)
+            }
+        }
+    }
+
+    private func bewaar() {
+        let sleutel = invoer.trimmingCharacters(in: .whitespacesAndNewlines)
+        if KeychainService.save(sleutel, forKey: AppConfiguratie.sleutelClaude) {
+            invoer = ""
+            foutmelding = nil
+            heeftSleutel = true
+        } else {
+            foutmelding = "De sleutel kon niet worden bewaard."
         }
     }
 }

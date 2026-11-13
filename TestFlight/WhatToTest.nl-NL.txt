@@ -1,14 +1,14 @@
-Fase 1 — de basis.
+Fase 2 — recepten knippen.
 
 Probeer:
-• Een recept zelf invoeren met de +-knop (titel, ingrediënten, stappen, één of meer categorieën en labels).
-• Zoeken, ook op ingrediënt (bijv. "prei").
-• Filteren met de knopjes voor categorieën en labels.
-• Categorieën beheren via het tandwiel: hernoemen, symbool kiezen, verslepen, verbergen, toevoegen, verwijderen.
-• Een recept bekijken; ingrediënten afvinken; Aa voor lettertype en tekstgrootte.
-• Op de iPad: drie kolommen, liggend en staand.
+• Tik op de schaar en scan een receptpagina uit een krant of tijdschrift (of kies een foto). Loopt het recept door op een tweede pagina? Scan ze allebei.
+• Kijk of de kleuren kloppen: titel en intro rood, ingrediënten groen, bereiding blauw, advertenties grijs. Tik op een blok om de rol te wisselen.
+• Tik op Controleer: oranje regels kunnen een herkenningsfout hebben. Vergelijk ze met de uitsnede uit de foto en verbeter ze.
+• Kies categorie en labels (Knipsel stelt ze voor), vul blad en pagina in en bewaar.
+• Optioneel: vul bij Instellingen een eigen Claude-sleutel in en knip dezelfde pagina nog eens. Alleen de tekst gaat naar Anthropic, nooit de foto.
 
-Nog niet in deze versie: recepten fotograferen, kookmodus, voorlezen, spraak, timers, delen.
+De foto wordt niet bewaard, alleen de tekst.
+Nog niet in deze versie: kookmodus, voorlezen, spraak, timers, delen.
 Synchronisatie tussen toestellen werkt nog niet in TestFlight.
 
 Iets vreemds gezien? Maak een schermafdruk en tik op "Deel feedback" in TestFlight.

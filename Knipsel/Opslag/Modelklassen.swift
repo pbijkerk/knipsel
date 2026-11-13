@@ -153,6 +153,23 @@ extension Recept {
     }
 }
 
+extension Ingredient {
+    /// Heeft de parser deze regel al uit elkaar gehaald? (Recepten uit fase 1 nog niet.)
+    var isGestructureerd: Bool {
+        naam != nil || hoeveelheid != nil || eenheid != nil
+    }
+
+    /// Vult hoeveelheid, eenheid, naam en toelichting uit de letterlijke regel (`IngredientParser`).
+    func vulGestructureerd() {
+        let p = IngredientParser.parse(ruweTekst ?? "")
+        hoeveelheid = p.hoeveelheid.map { NSNumber(value: $0) }
+        hoeveelheidTot = p.hoeveelheidTot.map { NSNumber(value: $0) }
+        eenheid = p.eenheid
+        naam = p.naam.isEmpty ? nil : p.naam
+        toelichting = p.toelichting
+    }
+}
+
 extension Categorie {
     var naamOfStandaard: String { naam ?? "Naamloos" }
     var symboolOfStandaard: String { symbool ?? "fork.knife" }

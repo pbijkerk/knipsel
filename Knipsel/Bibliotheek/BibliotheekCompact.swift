@@ -7,6 +7,7 @@ struct BibliotheekCompact: View {
     @State private var pad: [NSManagedObjectID] = []
     @State private var toonInstellingen = false
     @State private var toonNieuw = false
+    @State private var toonKnippen = false
 
     var body: some View {
         NavigationStack(path: $pad) {
@@ -21,12 +22,16 @@ struct BibliotheekCompact: View {
                         Button("Instellingen", systemImage: "gearshape") { toonInstellingen = true }
                     }
                     ToolbarItem(placement: .primaryAction) {
+                        Button("Knip recept", systemImage: "scissors") { toonKnippen = true }
+                    }
+                    ToolbarItem(placement: .primaryAction) {
                         Button("Nieuw recept", systemImage: "plus") { toonNieuw = true }
                     }
                 }
         }
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
+        .sheet(isPresented: $toonKnippen) { KnipStart() }
     }
 }
 
