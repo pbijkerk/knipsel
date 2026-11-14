@@ -115,3 +115,15 @@ struct ReceptFilterTests {
         #expect(!filter.isLeeg)
     }
 }
+
+@MainActor
+struct ChiprijTests {
+    @Test func legeCategorieStaatNietInDeRij() {
+        #expect(!FilterChips.toonInRij(aantal: 0, gekozen: false))
+        #expect(FilterChips.toonInRij(aantal: 1, gekozen: false))
+    }
+
+    @Test func gekozenCategorieBlijftStaanAlsHijLeegIs() {
+        #expect(FilterChips.toonInRij(aantal: 0, gekozen: true))
+    }
+}

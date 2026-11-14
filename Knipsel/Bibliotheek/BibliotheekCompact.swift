@@ -70,7 +70,7 @@ struct FilterChips: View {
                     Chip(titel: "Alles", aantal: recepten.count, gekozen: filter.categorie == .alles) {
                         filter.categorie = .alles
                     }
-                    ForEach(categorieen, id: \.objectID) { categorie in
+                    ForEach(zichtbareCategorieen, id: \.objectID) { categorie in
                         let keuze = CategorieKeuze.categorie(categorie.objectID)
                         Chip(
                             titel: categorie.naamOfStandaard, symbool: categorie.symboolOfStandaard,
@@ -114,6 +114,15 @@ struct FilterChips: View {
             }
         }
     }
+
+    /// Lege categorieën staan niet in de rij; de gekozen categorie blijft staan, ook als hij leeg raakt.
+    private var zichtbareCategorieen: [Categorie] {
+        categorieen.filter {
+            Self.toonInRij(aantal: $0.aantalRecepten, gekozen: filter.categorie == .categorie($0.objectID))
+        }
+    }
+
+    static func toonInRij(aantal: Int, gekozen: Bool) -> Bool { aantal > 0 || gekozen }
 
     private var aantalZonderCategorie: Int {
         recepten.filter { ($0.categorieen ?? []).isEmpty }.count
