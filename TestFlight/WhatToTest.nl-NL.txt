@@ -1,14 +1,19 @@
-Fase 4 — voorlezen.
+Fase 5 — praten met Knipsel in de kookmodus.
 
 Probeer:
-• Tik op "Kook dit". Knipsel leest stap 1 voor en wacht dan. Tik rechts voor de volgende stap: die wordt voorgelezen, nooit vanzelf.
-• Tik midden in een zin op "Stop": stopt het direct? "Herhaal" leest de stap opnieuw, "Ingrediënten" leest de hele lijst.
-• Zet muziek of een podcast aan en kook: gaat de muziek zachter tijdens het voorlezen en daarna weer harder?
-• De luidspreker rechtsboven zet voorlezen aan of uit; Knipsel onthoudt dat.
-• Instellingen › Voorlezen: kies een stem en tempo (tik op "Probeer"), en zet "Ingrediënten van de stap meelezen" aan. Klinkt de stem robotachtig? Download een verbeterde stem (uitleg staat erbij).
-• Klinken hoeveelheden goed ("twee eetlepels", "anderhalve liter", "180 graden")? Laat weten wat raar klinkt.
+• Tik op "Kook dit". De eerste keer legt Knipsel uit waarom hij de microfoon wil; tik op "Doorgaan" en sta microfoon en spraakherkenning toe. Onderin staat dan een groen bolletje: "Luistert".
+• Zeg "volgende", "terug", "herhaal", "stop" (ook midden in het voorlezen), "lees voor", "langzamer" of "sneller", "wat heb ik nodig?", "stap drie" en "stoppen met koken".
+• Vraag "hoeveel bouillon?" of "hoeveel boter heb ik nodig?": het antwoord verschijnt in beeld en wordt voorgelezen, voor jouw aantal personen.
+• Zeg gewoon "oké" of "klaar": Knipsel gaat naar de volgende stap. Was dat niet de bedoeling, zeg dan "terug".
+• Een lange zin als "ik pak even de volgende pan" hoort niet als opdracht te tellen.
+• De microfoon bovenin zet luisteren aan of uit. Instellingen › Spraakbediening: "oké" uitzetten, of alleen reageren als je begint met "Knipsel".
 
-Nog niet in deze versie: spraakbesturing, Siri, timers, delen.
+Graag horen:
+• Hoe gaat het met de afzuigkap aan, de radio aan, of als er iemand praat? Reageert Knipsel op dingen die niet voor hem bedoeld waren, of mist hij opdrachten?
+• Hoe snel reageert hij, vooral op "stop"? Op welk toestel kook je?
+• Muziek of podcast wordt zachter zolang Knipsel luistert. Is dat hinderlijk?
+
+Nog niet in deze versie: Siri, timers, delen.
 Synchronisatie tussen toestellen werkt nog niet in TestFlight.
 
 Iets vreemds gezien? Maak een schermafdruk en tik op "Deel feedback" in TestFlight.

@@ -23,6 +23,14 @@ enum AppConfiguratie {
     static let sleutelVoorleesTempo = "voorleesTempo"
     static let sleutelIngredientenMeelezen = "voorleesIngredienten"
 
+    /// Spraakbediening (K8): luisteren in de kookmodus (standaard aan, ook de microfoonknop daar),
+    /// impliciete commando's als "oké" = volgende (standaard aan, B11), en alleen met het wekwoord
+    /// "Knipsel" (standaard uit). Plus: is de uitleg vóór de toestemmingsvraag al getoond?
+    static let sleutelSpraakAan = "spraakAan"
+    static let sleutelSpraakImpliciet = "spraakImpliciet"
+    static let sleutelSpraakWekwoord = "spraakAlleenMetWekwoord"
+    static let sleutelSpraakUitlegGezien = "spraakUitlegGezien"
+
     /// Keychain: de eigen Anthropic-sleutel voor indelen met Claude (optioneel, B10).
     static let sleutelClaude = "claudeApiSleutel"
 

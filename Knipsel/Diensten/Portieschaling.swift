@@ -39,9 +39,37 @@ enum Portieschaling {
         guard let hoeveelheid, let naam, !naam.isEmpty,
             let maat = maat(hoeveelheid: hoeveelheid, tot: tot, eenheid: eenheid, factor: factor)
         else { return ruweTekst }
-        let rest = [naam, toelichting.map { schaalToelichting($0, factor: factor) }].compactMap { $0 }
+        let geteld = Self.naam(naam, hoeveelheid: hoeveelheid, tot: tot, eenheid: eenheid, factor: factor)
+        let rest = [geteld, toelichting.map { schaalToelichting($0, factor: factor) }].compactMap { $0 }
             .joined(separator: ", ")
         return "\(maat) \(rest)"
+    }
+
+    /// De ingrediëntnaam in enkelvoud of meervoud bij de geschaalde hoeveelheid: 2 uien voor 4 → "1 ui"
+    /// voor 2, en 1 ei → "2 eieren". Alleen zonder eenheid ("500 g uien" blijft uien) en alleen voor
+    /// bekende woorden; de rest blijft zoals hij er staat.
+    static func naam(_ naam: String, hoeveelheid: Double?, tot: Double? = nil, eenheid: String?, factor: Double)
+        -> String
+    {
+        guard let hoeveelheid, eenheid?.isEmpty ?? true else { return naam }
+        let geschaald = schaal(hoeveelheid, tot: tot, eenheid: eenheid, factor: factor)
+        return getal(naam, voor: geschaald.tot ?? geschaald.hoeveelheid)
+    }
+
+    /// Het eerste bekende woord in `naam` naar enkelvoud (≤ 1) of meervoud (> 1); hoofdletter blijft.
+    static func getal(_ naam: String, voor waarde: Double) -> String {
+        var woorden = naam.components(separatedBy: " ")
+        for (index, woord) in woorden.enumerated() {
+            let klein = woord.lowercased()
+            let vervanging: String? =
+                waarde > 1 ? naamMeervouden[klein] : naamEnkelvouden[klein]
+            guard naamMeervouden[klein] != nil || naamEnkelvouden[klein] != nil else { continue }
+            guard let vervanging else { return naam }
+            let eerste = woord.first.map { $0.isUppercase } ?? false
+            woorden[index] = eerste ? vervanging.prefix(1).uppercased() + vervanging.dropFirst() : vervanging
+            return woorden.joined(separator: " ")
+        }
+        return naam
     }
 
     /// Een maat in de toelichting schaalt mee: "ca. 1 kg" → "ca. 1½ kg". Andere tekst blijft staan.
@@ -118,6 +146,23 @@ enum Portieschaling {
         "doosje": "doosjes", "fles": "flessen", "flesje": "flesjes", "rol": "rollen", "bol": "bollen",
     ]
     private static let enkelvouden = Dictionary(uniqueKeysWithValues: meervouden.map { ($1, $0) })
+
+    /// Veelvoorkomende ingrediënten die als stuks geteld worden.
+    private static let naamMeervouden: [String: String] = [
+        "ui": "uien", "ei": "eieren", "tomaat": "tomaten", "wortel": "wortels", "aardappel": "aardappelen",
+        "sjalot": "sjalotten", "citroen": "citroenen", "limoen": "limoenen", "paprika": "paprika's",
+        "courgette": "courgettes", "aubergine": "aubergines", "avocado": "avocado's", "appel": "appels",
+        "banaan": "bananen", "teen": "tenen", "teentje": "teentjes",
+    ]
+    private static let naamEnkelvouden: [String: String] = {
+        var tabel = Dictionary(uniqueKeysWithValues: naamMeervouden.map { ($1, $0) })
+        // Ook gangbare tweede meervoudsvormen.
+        tabel["aardappels"] = "aardappel"
+        tabel["wortelen"] = "wortel"
+        tabel["paprikas"] = "paprika"
+        tabel["avocados"] = "avocado"
+        return tabel
+    }()
 
     /// "teen" bij 3 → "tenen", "tenen" bij 1 → "teen". Maten (el, g) veranderen niet.
     static func eenheid(_ eenheid: String, voor waarde: Double) -> String {

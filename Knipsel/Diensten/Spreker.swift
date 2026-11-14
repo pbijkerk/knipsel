@@ -146,15 +146,21 @@ final class SysteemSpreker: NSObject, Spreker {
     func spreek(_ tekst: String, stem: String?, tempo: Double) {
         huidige = nil
         if synthesizer.isSpeaking || synthesizer.isPaused { synthesizer.stopSpeaking(at: .immediate) }
+        let uiting = Self.uiting(tekst, stem: stem, tempo: tempo)
+        activeerAudiosessie()
+        huidige = ObjectIdentifier(uiting)
+        synthesizer.speak(uiting)
+    }
+
+    /// Een uitspraak met de gekozen (of beste Nederlandse) stem en het tempo; ook voor `MotorSpreker`.
+    static func uiting(_ tekst: String, stem: String?, tempo: Double) -> AVSpeechUtterance {
         let uiting = AVSpeechUtterance(string: tekst)
         let gekozen = Stemkeuze.kies(uit: Stemkeuze.geinstalleerd(), voorkeur: stem)
         uiting.voice =
             gekozen.flatMap { AVSpeechSynthesisVoice(identifier: $0.id) } ?? AVSpeechSynthesisVoice(language: "nl-NL")
         uiting.rate = Voorleestempo.snelheid(tempo)
         uiting.postUtteranceDelay = 0.1
-        activeerAudiosessie()
-        huidige = ObjectIdentifier(uiting)
-        synthesizer.speak(uiting)
+        return uiting
     }
 
     func stop() {
@@ -182,6 +188,8 @@ final class SysteemSpreker: NSObject, Spreker {
     }
 
     private func activeerAudiosessie() {
+        // Luistert Knipsel (fase 5), dan beheert de audiomotor de sessie.
+        guard !Audiomotor.inGebruik else { return }
         let sessie = AVAudioSession.sharedInstance()
         do {
             try sessie.setCategory(
@@ -193,6 +201,7 @@ final class SysteemSpreker: NSObject, Spreker {
     }
 
     private func deactiveerAudiosessie() {
+        guard !Audiomotor.inGebruik else { return }
         try? AVAudioSession.sharedInstance().setActive(false, options: .notifyOthersOnDeactivation)
     }
 }

@@ -22,6 +22,10 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Knipsel gebruikt de camera om een receptpagina uit een krant of tijdschrift te scannen. Alleen de herkende tekst wordt bewaard, de foto niet.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>In de kookmodus luistert Knipsel naar korte opdrachten als "volgende", "herhaal" of "hoeveel boter?", zodat je het scherm niet hoeft aan te raken. Knipsel luistert alleen zolang de kookmodus open is; er wordt niets opgenomen of bewaard.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Knipsel zet wat je in de kookmodus zegt op dit toestel om in tekst om je opdrachten te herkennen. Er gaat geen geluid naar internet.</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>

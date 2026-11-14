@@ -30,6 +30,11 @@ struct InstellingenView: View {
                     } label: {
                         SwiftUI.Label("Voorlezen", systemImage: "speaker.wave.2")
                     }
+                    NavigationLink {
+                        SpraakInstellingenView()
+                    } label: {
+                        SwiftUI.Label("Spraakbediening", systemImage: "mic")
+                    }
                 }
                 ClaudeInstellingen()
                 Section {
