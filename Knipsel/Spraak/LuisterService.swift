@@ -223,10 +223,10 @@ final class LuisterService {
 
         let resultaten = Task { [weak self] in
             do {
+                var teller = Uitingteller()
                 for try await resultaat in transcriber.results {
                     let tekst = String(resultaat.text.characters)
-                    // Een uiting houdt hetzelfde begin zolang hij voorlopig is: dat is het segment.
-                    let segment = Int((resultaat.range.start.seconds * 100).rounded())
+                    let segment = teller.segment(definitief: resultaat.isFinal)
                     self?.resultaat(tekst, segment, resultaat.isFinal, ProcessInfo.processInfo.systemUptime)
                 }
             } catch {

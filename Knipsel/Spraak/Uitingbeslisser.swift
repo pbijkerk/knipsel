@@ -95,6 +95,19 @@ struct Uitingbeslisser: Sendable {
     }
 }
 
+/// Nummert de uitingen van de herkenner: alle voorlopige resultaten tot en met het eindresultaat zijn
+/// één segment. Niet het begin van het tijdbereik gebruiken: het eindresultaat knipt de stilte vooraf
+/// weg en krijgt dan een ander begin dan zijn voorlopige resultaten, waardoor een commando twee keer
+/// werd uitgevoerd (eerst voorlopig, ± 2 s later nog eens bij het eindresultaat).
+struct Uitingteller: Sendable {
+    private var volgende = 0
+
+    mutating func segment(definitief: Bool) -> Int {
+        defer { if definitief { volgende += 1 } }
+        return volgende
+    }
+}
+
 /// Is een transcript (vrijwel) een stuk van wat Knipsel zelf voorleest? Vangnet naast de
 /// echo-onderdrukking van de microfoon: anders hoort Knipsel bij "Stap 2." zichzelf "stap twee" zeggen.
 ///

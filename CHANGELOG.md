@@ -26,4 +26,5 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - Indelen met Claude (en Apple Intelligence): het antwoord geeft per stap de regelnummers en de eerste woorden; Knipsel knipt de letterlijke tekst daarop en valt terug op de regels als dat niet klopt. De opdracht noemt de column vooraf en de bereiding zonder kopje (#17)
 
 ### Opgelost
+- Spraakbediening: "volgende", "vorige" en "herhaal" werden twee keer uitgevoerd (eerst bij het voorlopige resultaat, ± 2 s later nog eens bij het eindresultaat van dezelfde uiting)
 - Porties schalen geeft "1 ui" en "2 eieren" in plaats van "1 uien" en "2 ei" (enkelvoud/meervoud voor veelvoorkomende ingrediënten)
