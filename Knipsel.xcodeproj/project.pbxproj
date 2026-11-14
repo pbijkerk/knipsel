@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		04D69F4EEBC95458623E127C /* KaartkleurenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129BF70483D327699E4C49C0 /* KaartkleurenTests.swift */; };
 		0B0429404EFF7C1862F6714F /* Portieschaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5080A8C816A2DC91ED20E4C3 /* Portieschaling.swift */; };
 		0CC038C87866B533DE503329 /* StandaardCategorieen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F081E8818D35D9C314D32890 /* StandaardCategorieen.swift */; };
 		0F6D1C64CFB543AA0F7315FF /* KnipselApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F50F041C4CB953D585CFF4 /* KnipselApp.swift */; };
@@ -18,6 +19,7 @@
 		2776CB8B6DDEA346CE3E150B /* RegelIndeler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4AC70FA2ED8B187CB519B0B /* RegelIndeler.swift */; };
 		2D34BE6F79FE645833F62FE7 /* IngredientParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C158ED0975594A23CD77C5AD /* IngredientParserTests.swift */; };
 		2E893AC04BD4D1FDFB9B2BD0 /* Spreker.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC543CE3052A7954077AEEF4 /* Spreker.swift */; };
+		2F15F647504C5CEAAAC0D9B2 /* Kaartkleuren.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A7D4DD69F793B8E9F64B853 /* Kaartkleuren.swift */; };
 		2F74FF537884906693105C90 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8579C78469AD96BD3CD5D529 /* KeychainService.swift */; };
 		34AFD6F178602A420C7F0695 /* StapSplitser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD32DDA41BF7995385751615 /* StapSplitser.swift */; };
 		3C2C46FBDC45FF8DF51FF3AA /* ReceptWeergave.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC62418E320151F46A5D662F /* ReceptWeergave.swift */; };
@@ -37,6 +39,7 @@
 		62A4B7FEF78084C7D58BC135 /* UitspraakregelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B54162573059F6F84A4F70A /* UitspraakregelsTests.swift */; };
 		63A3A9DDC34069C603FAC723 /* Voorbeeldrecepten.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B57464F0562ED0CD3B7E10D /* Voorbeeldrecepten.swift */; };
 		63E13378C0B8DF653EAC89C5 /* ClaudeIndeler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AE93C8783545508E21C7C37 /* ClaudeIndeler.swift */; };
+		64AC9997276A571AEE2DCBF9 /* Kaartenbak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A1EA27EE30E578BAF348892 /* Kaartenbak.swift */; };
 		6EE3F87BE59578B724013FA4 /* Uitingbeslisser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC14DDC5B266DCB2B81DC4F /* Uitingbeslisser.swift */; };
 		6F601ABB2A179A0EED71F3CE /* Audiomotor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D6BF471F700505878E222C /* Audiomotor.swift */; };
 		75FB7E829A9C0A22AC5684FA /* KookmodusScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = F668CB4EF71739D016404873 /* KookmodusScherm.swift */; };
@@ -99,6 +102,7 @@
 		0610FBAD74DF1C4D24580715 /* testpagina.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = testpagina.png; sourceTree = "<group>"; };
 		0BB7B04DB132CC61614ED998 /* InstellingenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstellingenView.swift; sourceTree = "<group>"; };
 		11CB265982A24C2A3B0302B3 /* StappenEnClaudeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StappenEnClaudeTests.swift; sourceTree = "<group>"; };
+		129BF70483D327699E4C49C0 /* KaartkleurenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaartkleurenTests.swift; sourceTree = "<group>"; };
 		13043F6A124766992A9EC92C /* BibliotheekCompact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibliotheekCompact.swift; sourceTree = "<group>"; };
 		171A25B1BCB38B52FB9ABA51 /* KnipselScherm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipselScherm.swift; sourceTree = "<group>"; };
 		1800D3286A33FA25D0CDB692 /* Uitspraakregels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uitspraakregels.swift; sourceTree = "<group>"; };
@@ -112,11 +116,13 @@
 		319BEDB91D05615EF3CF9377 /* ReceptInvoerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptInvoerTests.swift; sourceTree = "<group>"; };
 		36AD665D6024011409607AEF /* PortieschalingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortieschalingTests.swift; sourceTree = "<group>"; };
 		373D3A65F0AF1A9503628800 /* StandaardCategorieenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandaardCategorieenTests.swift; sourceTree = "<group>"; };
+		3A7D4DD69F793B8E9F64B853 /* Kaartkleuren.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kaartkleuren.swift; sourceTree = "<group>"; };
 		3D18DBE8B82454B97537FC3A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3EA097E619203BDB0BC9A209 /* Knipsel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Knipsel.xcdatamodel; sourceTree = "<group>"; };
 		425CB2FC9C8FE0D0C29E8EBF /* Weergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weergave.swift; sourceTree = "<group>"; };
 		4920C55C5B359D793E921673 /* ReceptLijst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptLijst.swift; sourceTree = "<group>"; };
 		4A14448637693678765D2F37 /* Onderdelen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onderdelen.swift; sourceTree = "<group>"; };
+		4A1EA27EE30E578BAF348892 /* Kaartenbak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kaartenbak.swift; sourceTree = "<group>"; };
 		4B57464F0562ED0CD3B7E10D /* Voorbeeldrecepten.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Voorbeeldrecepten.swift; sourceTree = "<group>"; };
 		4BE9C8B7966041B2EE3CBE9A /* ControleScherm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControleScherm.swift; sourceTree = "<group>"; };
 		4CC14DDC5B266DCB2B81DC4F /* Uitingbeslisser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uitingbeslisser.swift; sourceTree = "<group>"; };
@@ -246,6 +252,7 @@
 				C809330EC1D9D40DB9EA0701 /* IndelenTests.swift */,
 				C158ED0975594A23CD77C5AD /* IngredientParserTests.swift */,
 				60413F059A1031C88D3543B7 /* InrichtingTests.swift */,
+				129BF70483D327699E4C49C0 /* KaartkleurenTests.swift */,
 				3019367133896088877E6FEB /* KookSessieTests.swift */,
 				AB79EBDFADD9D84884EA2AA3 /* ModelTests.swift */,
 				6F13650094C100D28D45EBD5 /* PerenInRodeWijn.swift */,
@@ -347,6 +354,8 @@
 			children = (
 				13043F6A124766992A9EC92C /* BibliotheekCompact.swift */,
 				70348AEE499D0174DF2070DD /* BibliotheekSplit.swift */,
+				4A1EA27EE30E578BAF348892 /* Kaartenbak.swift */,
+				3A7D4DD69F793B8E9F64B853 /* Kaartkleuren.swift */,
 				4A14448637693678765D2F37 /* Onderdelen.swift */,
 				4920C55C5B359D793E921673 /* ReceptLijst.swift */,
 			);
@@ -462,6 +471,7 @@
 				E1C576E48FC2F71B05A39B32 /* IndelenTests.swift in Sources */,
 				2D34BE6F79FE645833F62FE7 /* IngredientParserTests.swift in Sources */,
 				9C643EB7A3BDD2C596C5F80C /* InrichtingTests.swift in Sources */,
+				04D69F4EEBC95458623E127C /* KaartkleurenTests.swift in Sources */,
 				F8CE6C632744CE804247E030 /* KookSessieTests.swift in Sources */,
 				56CF8037A5CC90F908E72622 /* ModelTests.swift in Sources */,
 				BCB99531A5CA1B10C7B5A7EA /* PerenInRodeWijn.swift in Sources */,
@@ -495,6 +505,8 @@
 				D500E8261F43F354A466E5AD /* Ingredientkoppeling.swift in Sources */,
 				825658AFB313AB731ADD8E2C /* Inrichting.swift in Sources */,
 				5D8ADC6385AECFDEBE90A11F /* InstellingenView.swift in Sources */,
+				64AC9997276A571AEE2DCBF9 /* Kaartenbak.swift in Sources */,
+				2F15F647504C5CEAAAC0D9B2 /* Kaartkleuren.swift in Sources */,
 				2F74FF537884906693105C90 /* KeychainService.swift in Sources */,
 				5A413D5D05D22D1D25A32931 /* KnipSessie.swift in Sources */,
 				8616A16FC0D21940EE908634 /* KnipStart.swift in Sources */,

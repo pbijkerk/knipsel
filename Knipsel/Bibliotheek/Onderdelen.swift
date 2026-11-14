@@ -55,23 +55,6 @@ struct Kenmerk: View {
     }
 }
 
-/// Plaatshouder voor een recept zonder eigen foto: een knipsel-icoon, nooit een nepfoto.
-struct KnipselIcoon: View {
-    @ScaledMetric(relativeTo: .body) private var maat: CGFloat = 44
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: maat * 0.22, style: .continuous)
-            .fill(Color.accentColor.opacity(0.12))
-            .frame(width: maat, height: maat)
-            .overlay {
-                Image(systemName: "scissors")
-                    .font(.system(size: maat * 0.42, weight: .medium))
-                    .foregroundStyle(Color.accentColor)
-            }
-            .accessibilityHidden(true)
-    }
-}
-
 /// Zet elementen naast elkaar en breekt af naar een nieuwe regel als het niet past (chips bij een
 /// recept, ook bij de grootste tekstgroottes).
 struct Stroomopmaak: Layout {

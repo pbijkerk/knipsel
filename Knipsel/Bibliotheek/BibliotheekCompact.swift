@@ -1,57 +1,70 @@
 import CoreData
 import SwiftUI
 
-/// iPhone: lijst met zoekveld en twee rijen chips (categorie en labels) die je combineert.
+/// iPhone: kaarten (of een lijst) met zoekveld, één chiprij met categorieën, de labels achter
+/// "Filter" en een zwevende knop "Knip" onderin (U1, U2, U5).
 struct BibliotheekCompact: View {
     @State private var filter = ReceptFilter()
     @State private var pad: [NSManagedObjectID] = []
     @State private var toonInstellingen = false
     @State private var toonNieuw = false
     @State private var toonKnippen = false
+    @State private var toonLabels = false
+    @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
 
     var body: some View {
         NavigationStack(path: $pad) {
-            ReceptLijst(filter: filter, kop: AnyView(FilterChips(filter: $filter).padding(.vertical, 8)))
-                .navigationTitle("Recepten")
-                .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
-                .navigationDestination(for: NSManagedObjectID.self) { id in
-                    ReceptScherm(id: id) { pad.removeAll { $0 == id } }
+            ReceptLijst(
+                filter: filter, weergave: weergave,
+                kop: AnyView(FilterChips(filter: $filter, toonLabels: $toonLabels).padding(.vertical, 8))
+            )
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                HStack {
+                    Spacer()
+                    KnipKnop { toonKnippen = true }
                 }
-                .toolbar {
-                    ToolbarItem(placement: .topBarLeading) {
-                        Button("Instellingen", systemImage: "gearshape") { toonInstellingen = true }
-                    }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button("Knip recept", systemImage: "scissors") { toonKnippen = true }
-                    }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button("Nieuw recept", systemImage: "plus") { toonNieuw = true }
-                    }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 8)
+            }
+            .navigationTitle("Recepten")
+            .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
+            .navigationDestination(for: NSManagedObjectID.self) { id in
+                ReceptScherm(id: id) { pad.removeAll { $0 == id } }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Instellingen", systemImage: "gearshape") { toonInstellingen = true }
                 }
+                ToolbarItem(placement: .primaryAction) {
+                    Button("Nieuw recept", systemImage: "plus") { toonNieuw = true }
+                }
+            }
         }
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
         .sheet(isPresented: $toonKnippen) { KnipStart() }
+        .sheet(isPresented: $toonLabels) {
+            LabelFilter(labels: $filter.labels)
+                .presentationDetents([.medium, .large])
+        }
     }
 }
 
-/// Twee horizontale rijen chips: één categorie (of Alles / Zonder categorie) en nul of meer labels.
+/// Eén horizontale rij chips met categorieën (of Alles / Zonder categorie), en rechts vast de chip
+/// "Filter" die de labels opent; het aantal gekozen labels staat erop.
 struct FilterChips: View {
     @Binding var filter: ReceptFilter
+    @Binding var toonLabels: Bool
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(key: "volgorde", ascending: true)],
         predicate: NSPredicate(format: "verborgen == NO"))
     private var categorieen: FetchedResults<Categorie>
-    @FetchRequest(sortDescriptors: [
-        NSSortDescriptor(
-            key: "naam", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare(_:)))
-    ])
-    private var labels: FetchedResults<ReceptLabel>
+    @FetchRequest(sortDescriptors: []) private var labels: FetchedResults<ReceptLabel>
     @FetchRequest(sortDescriptors: []) private var recepten: FetchedResults<Recept>
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        HStack(spacing: 0) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     Chip(titel: "Alles", aantal: recepten.count, gekozen: filter.categorie == .alles) {
@@ -75,24 +88,29 @@ struct FilterChips: View {
                         }
                     }
                 }
-                .padding(.horizontal)
+                .padding(.leading)
+                .padding(.trailing, 8)
             }
-            if !labels.isEmpty {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(labels, id: \.objectID) { label in
-                            let gekozen = filter.labels.contains(label.objectID)
-                            Chip(titel: label.naamOfStandaard, symbool: gekozen ? "checkmark" : nil, gekozen: gekozen) {
-                                if gekozen {
-                                    filter.labels.remove(label.objectID)
-                                } else {
-                                    filter.labels.insert(label.objectID)
-                                }
-                            }
-                        }
-                    }
-                    .padding(.horizontal)
+            .mask {
+                // Zachte rand vóór de vaste chip "Filter": je ziet dat de rij verder scrolt.
+                HStack(spacing: 0) {
+                    Rectangle()
+                    LinearGradient(colors: [.black, .clear], startPoint: .leading, endPoint: .trailing)
+                        .frame(width: 20)
                 }
+            }
+            if !labels.isEmpty || !filter.labels.isEmpty {
+                Chip(
+                    titel: "Filter", symbool: "line.3.horizontal.decrease",
+                    aantal: filter.labels.isEmpty ? nil : filter.labels.count, gekozen: !filter.labels.isEmpty
+                ) {
+                    toonLabels = true
+                }
+                .accessibilityLabel(
+                    filter.labels.isEmpty ? "Filter op labels" : "Filter op labels, \(filter.labels.count) gekozen"
+                )
+                .padding(.leading, 4)
+                .padding(.trailing)
             }
         }
     }

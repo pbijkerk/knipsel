@@ -10,6 +10,9 @@ enum AppConfiguratie {
     /// UserDefaults: zijn de standaardcategorieën en -labels op dit toestel al eens aangemaakt?
     static let sleutelStandaardIngericht = "standaardIngericht"
 
+    /// Bibliotheek op de iPhone: "kaarten" (standaard) of "lijst" (`BibliotheekWeergave`).
+    static let sleutelBibliotheekWeergave = "bibliotheekWeergave"
+
     /// Leesinstellingen (Aa).
     static let sleutelLettertype = "leesLettertype"
     static let sleutelExtraGrootte = "leesExtraGrootte"
