@@ -3,6 +3,8 @@ import SwiftUI
 
 struct InstellingenView: View {
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var bibliotheekWeergave =
+        BibliotheekWeergave.kaarten
 
     var body: some View {
         NavigationStack {
@@ -19,7 +21,14 @@ struct InstellingenView: View {
                         SwiftUI.Label("Labels", systemImage: "tag")
                     }
                 }
-                Section("Weergave") {
+                Section {
+                    Picker(selection: $bibliotheekWeergave) {
+                        ForEach(BibliotheekWeergave.allCases) { keuze in
+                            Text(keuze.titel).tag(keuze)
+                        }
+                    } label: {
+                        SwiftUI.Label("Recepten tonen als", systemImage: "rectangle.grid.2x2")
+                    }
                     NavigationLink {
                         LeesinstellingenView()
                     } label: {
@@ -35,6 +44,12 @@ struct InstellingenView: View {
                     } label: {
                         SwiftUI.Label("Spraakbediening", systemImage: "mic")
                     }
+                } header: {
+                    Text("Weergave")
+                } footer: {
+                    Text(
+                        "Kaarten tonen elk recept in de kleur en met het symbool van zijn categorie; een lijst toont meer recepten tegelijk. Geldt voor de iPhone."
+                    )
                 }
                 ClaudeInstellingen()
                 Section {
