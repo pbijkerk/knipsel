@@ -35,6 +35,15 @@ struct VerderMetKaart: View {
     let keuze: VerderKeuze
     let verder: () -> Void
     let vergeet: () -> Void
+    /// Titel of foto kan intussen wijzigen.
+    @ObservedObject private var recept: Recept
+
+    init(keuze: VerderKeuze, verder: @escaping () -> Void, vergeet: @escaping () -> Void) {
+        self.keuze = keuze
+        self.verder = verder
+        self.vergeet = vergeet
+        recept = keuze.recept
+    }
 
     @ScaledMetric(relativeTo: .headline) private var knophoogte: CGFloat = 44
     @Environment(\.dynamicTypeSize) private var tekstgrootte
@@ -44,7 +53,7 @@ struct VerderMetKaart: View {
     var body: some View {
         ViewThatFits(in: .horizontal) {
             HStack(spacing: 14) {
-                CategorieIcoon(recept: keuze.recept)
+                CategorieIcoon(recept: recept)
                 tekst
                 Spacer(minLength: 8)
                 verderKnop
@@ -54,7 +63,7 @@ struct VerderMetKaart: View {
                 HStack(alignment: .top, spacing: 14) {
                     // Bij de grootste tekstmaten krijgt de titel de ruimte van het symbool.
                     if !tekstgrootte.isAccessibilitySize {
-                        CategorieIcoon(recept: keuze.recept)
+                        CategorieIcoon(recept: recept)
                     }
                     tekst
                     Spacer(minLength: 0)
@@ -77,7 +86,7 @@ struct VerderMetKaart: View {
                 .textCase(.uppercase)
                 .kerning(0.4)
                 .foregroundStyle(Kaartkleuren.ondertekst.kleur)
-            Text(keuze.recept.titelOfStandaard)
+            Text(recept.titelOfStandaard)
                 .font(.system(.headline, design: .serif).weight(.bold))
                 .foregroundStyle(Kaartkleuren.titel.kleur)
                 .lineLimit(tekstgrootte.isAccessibilitySize ? 4 : 2)
@@ -101,7 +110,7 @@ struct VerderMetKaart: View {
                 .contentShape(Capsule())
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Verder met \(keuze.recept.titelOfStandaard)")
+        .accessibilityLabel("Verder met \(recept.titelOfStandaard)")
         .accessibilityHint("Opent de kookmodus bij stap \(keuze.stand.stapNummer)")
     }
 
@@ -138,11 +147,16 @@ struct VerderMet: ViewModifier {
         content
             .task(id: opslag) {
                 KookVoortgang().ruimOp()
-                keuze = VerderKeuze.huidige(in: context)
+                let nieuw = VerderKeuze.huidige(in: context)
+                if nieuw?.id != keuze?.id || nieuw?.stand != keuze?.stand { keuze = nieuw }
             }
-            .onReceive(NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange)) { _ in
-                // Recept verwijderd, of titel of foto gewijzigd.
-                keuze = VerderKeuze.huidige(in: context)
+            .onReceive(
+                NotificationCenter.default.publisher(for: .NSManagedObjectContextObjectsDidChange, object: context)
+            ) { _ in
+                // Alleen een ander resultaat (bijv. recept verwijderd) zet de staat; titel en foto
+                // volgt de kaart zelf.
+                let nieuw = VerderKeuze.huidige(in: context)
+                if nieuw?.id != keuze?.id || nieuw?.stand != keuze?.stand { keuze = nieuw }
             }
             .onChange(of: gestart?.id) {
                 if let gestart { fotoRecept = gestart.recept }
