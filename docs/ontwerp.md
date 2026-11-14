@@ -185,7 +185,9 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
     relaties met inverse.
 - **Model (eerste versie):**
   - `Recept`: titel, intro, porties, bereidingstijd, totale tijd, notities, bronNaam, bronDatum, bronPagina,
-    beoordeling, laatstGekooktOp, aangemaaktOp, kookboek (Mijn recepten / Thuis); veel-op-veel met `Categorie`
+    beoordeling, laatstGekooktOp, aangemaaktOp, kookboek (Mijn recepten / Thuis); veel-op-veel met `Categorie`.
+    Modelversie 2 (#23, 3b): `fotoData` (eigen gerechtfoto, JPEG 4:3 ≤ 1600 px, *Allows External Storage*,
+    in CloudKit een asset) en `fotoGewijzigdOp` (`nil` = geen foto). Nooit de krantenfoto (B7).
   - `Ingredient`: volgorde, groep, ruweTekst, hoeveelheid, hoeveelheidTot, eenheid, naam, toelichting
   - `Stap`: volgorde, groep, tekst, timerSeconden
   - `Categorie`: naam, symbool, volgorde, verborgen, isStandaard
