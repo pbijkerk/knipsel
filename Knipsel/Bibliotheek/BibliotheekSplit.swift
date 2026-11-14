@@ -109,7 +109,7 @@ struct Zijbalk: View {
                     .tag(CategorieKeuze.alles)
             }
             Section("Categorieën") {
-                ForEach(categorieen, id: \.objectID) { categorie in
+                ForEach(zichtbareCategorieen, id: \.objectID) { categorie in
                     SwiftUI.Label(categorie.naamOfStandaard, systemImage: categorie.symboolOfStandaard)
                         .badge(categorie.aantalRecepten)
                         .tag(CategorieKeuze.categorie(categorie.objectID))
@@ -142,6 +142,13 @@ struct Zijbalk: View {
                     }
                 }
             }
+        }
+    }
+
+    /// Zoals de chiprij op de iPhone: lege categorieën niet tonen, de gekozen categorie wel.
+    private var zichtbareCategorieen: [Categorie] {
+        categorieen.filter {
+            FilterChips.toonInRij(aantal: $0.aantalRecepten, gekozen: keuze == .categorie($0.objectID))
         }
     }
 
