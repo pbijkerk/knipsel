@@ -13,6 +13,33 @@ struct SpraakbedieningTests {
         Uitingbeslisser(herkenner: CommandoHerkennerTests.herkenner(impliciet: impliciet))
     }
 
+    /// Zoals de herkenner het echt aanlevert: voorlopig resultaat, ± 2 s later het eindresultaat van
+    /// dezelfde uiting (met een ander tijdbereik). Elk commando telt één keer.
+    @Test func eindresultaatNaVoorlopigVoertNietNogEensUit() {
+        var b = beslisser()
+        var teller = Uitingteller()
+        var nu: TimeInterval = 0
+        for (gezegd, verwacht) in [("Volgende", Commando.volgende), ("Vorige", .vorige), ("Herhaal", .herhaal)] {
+            #expect(b.verwerk(gezegd, segment: teller.segment(definitief: false), definitief: false, nu: nu) == nil)
+            #expect(b.controleer(nu: nu + 0.6) == verwacht)
+            #expect(b.verwerk(gezegd, segment: teller.segment(definitief: true), definitief: true, nu: nu + 2) == nil)
+            #expect(b.controleer(nu: nu + 2.2) == nil)
+            nu += 5
+        }
+        // Dezelfde opdracht opnieuw, in een nieuwe uiting, telt wel.
+        #expect(b.verwerk("Volgende", segment: teller.segment(definitief: true), definitief: true, nu: nu) == .volgende)
+    }
+
+    @Test func uitingtellerNummertPerEindresultaat() {
+        var teller = Uitingteller()
+        #expect(teller.segment(definitief: false) == 0)
+        #expect(teller.segment(definitief: false) == 0)
+        #expect(teller.segment(definitief: true) == 0)
+        #expect(teller.segment(definitief: false) == 1)
+        #expect(teller.segment(definitief: true) == 1)
+        #expect(teller.segment(definitief: true) == 2)
+    }
+
     @Test func eindresultaatVoertDirectUit() {
         var b = beslisser()
         #expect(b.verwerk("volgende", segment: 1, definitief: true, nu: 0) == .volgende)
