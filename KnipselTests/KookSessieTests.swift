@@ -242,6 +242,72 @@ struct KookmatenTests {
         #expect(Kookmaten.stapGrootte(breed: false, tekstgrootte: .xSmall) >= 30)
         #expect(Kookmaten.stapGrootte(breed: false, tekstgrootte: .accessibility5) <= Kookmaten.stapMaximum)
     }
+
+    /// U7: op iPad een korte stap op 40 pt, een lange krimpt tot minimaal 32 pt, en Dynamic Type
+    /// schaalt mee tot `stapMaximum`.
+    @Test func ipadStapPastZichAanAanDeLengte() {
+        let ruimte = CGSize(width: 640, height: 420)
+        let kort = Kookmaten.stapGrootte(breed: true, tekstgrootte: .large, tekens: 90, ruimte: ruimte)
+        let middel = Kookmaten.stapGrootte(breed: true, tekstgrootte: .large, tekens: 200, ruimte: ruimte)
+        let lang = Kookmaten.stapGrootte(breed: true, tekstgrootte: .large, tekens: 900, ruimte: ruimte)
+        #expect(kort == 40)
+        #expect(middel < 40 && middel > 32)
+        #expect(lang == 32)
+        // Zonder meting (eerste frame) of zonder tekst: de basismaat.
+        #expect(Kookmaten.stapGrootte(breed: true, tekstgrootte: .large) == 40)
+        #expect(Kookmaten.stapGrootte(breed: true, tekstgrootte: .large, tekens: 0, ruimte: ruimte) == 40)
+        // Dynamic Type schaalt mee, ook bij een lange stap, maar nooit boven het maximum.
+        let langGroot = Kookmaten.stapGrootte(breed: true, tekstgrootte: .xxxLarge, tekens: 900, ruimte: ruimte)
+        #expect(langGroot > lang)
+        #expect(Kookmaten.stapGrootte(breed: true, tekstgrootte: .xxxLarge, tekens: 90, ruimte: ruimte) > 40)
+        #expect(
+            Kookmaten.stapGrootte(breed: true, tekstgrootte: .accessibility5, tekens: 90, ruimte: ruimte)
+                == Kookmaten.stapMaximum)
+        // De iPhone krijgt geen lengtecorrectie: K5 blijft ≥ 30 pt.
+        #expect(Kookmaten.stapGrootte(breed: false, tekstgrootte: .large, tekens: 900, ruimte: ruimte) == 30)
+    }
+
+    @Test func passendeGrootteLooptAfMetDeLengte() {
+        let ruimte = CGSize(width: 640, height: 420)
+        let maten = [50, 150, 250, 350, 450, 2000].map { Kookmaten.passendeGrootte(tekens: $0, in: ruimte) }
+        #expect(maten == maten.sorted(by: >))
+        #expect(maten.allSatisfy { (Kookmaten.stapMinimumBreed...Kookmaten.stapBasisBreed).contains($0) })
+        #expect(Kookmaten.passendeGrootte(tekens: 300, in: .zero) == Kookmaten.stapBasisBreed)
+    }
+
+    /// K7: de knoppen onderin zijn groot genoeg voor een knokkel.
+    @Test func knoppenGrootGenoeg() {
+        #expect(Kookmaten.knophoogte >= 72)
+        #expect(Kookmaten.terugBreedteSmal >= 72)
+    }
+}
+
+@MainActor
+struct MicrofoonstatusTests {
+    /// U3: elke toestand van de luisterdienst heeft een korte zin in beeld.
+    @Test func elkeToestandHeeftEenZin() {
+        let verwacht: [(LuisterService.Status, String, Microfoonstatus.Toon)] = [
+            (.uit, "Microfoon uit", .uit),
+            (.uitlegNodig, "Microfoon nog niet aan", .uit),
+            (.vraagtToestemming, "Wacht op toestemming", .bezig),
+            (.geweigerd, "Microfoon niet toegestaan", .probleem),
+            (.modelLaden(nil), "Spraakmodel laden…", .bezig),
+            (.modelLaden(0.4), "Spraakmodel laden · 40 %", .bezig),
+            (.start, "Microfoon gaat aan…", .bezig),
+            (.luistert, "Luistert · zeg ‘volgende’", .actief),
+            (.nietBeschikbaar("Geen Nederlandse spraakherkenning."), "Spraak niet beschikbaar", .probleem),
+        ]
+        for (status, tekst, toon) in verwacht {
+            #expect(Microfoonstatus.tekst(status, spraakAan: true, leestVoor: false) == tekst)
+            #expect(Microfoonstatus.toon(status, spraakAan: true) == toon)
+        }
+    }
+
+    @Test func uitGezetEnTijdensVoorlezen() {
+        #expect(Microfoonstatus.tekst(.luistert, spraakAan: false, leestVoor: false) == "Microfoon uit")
+        #expect(Microfoonstatus.toon(.luistert, spraakAan: false) == .uit)
+        #expect(Microfoonstatus.tekst(.luistert, spraakAan: true, leestVoor: true) == "Luistert · zeg ‘stop’")
+    }
 }
 
 @MainActor

@@ -24,6 +24,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 - UX-ronde "mooier en makkelijker": eisen U1–U8 (`docs/ontwerp.md` §2.1) en schetsen per scherm met keuzes (`docs/ux/schetsen-v2.html`); uitgewerkt in #21–#24
 
 ### Gewijzigd
+- Kookmodus: onderin een kleine terug-knop en een brede knop "Volgende stap" (72 pt hoog, ook met een knokkel te raken); bij de laatste stap "Klaar", daarna "Gekookt" en "Sluiten". De microfoonstatus staat als korte zin in beeld ("Luistert · zeg ‘volgende’", "Microfoon uit"). Op iPad staat de stap op 40 pt (een lange stap krimpt tot minimaal 32 pt) en lichten de ingrediënten van deze stap op in de afvinklijst, met de hoeveelheid in tomaat. Tikken, vegen, toetsenbord en spraak werken zoals voorheen (#21)
 - Indelen met de regels: een column of verhaal vóór het recept wordt intro, en de bereiding begint bij de eerste alinea met een gebiedende zin, ook zonder kopje midden in een kolom; e-mailadressen vallen weg, een regel als "Nagerecht voor 4 personen" is geen titel, één reclamewoord in een lange column maakt er geen advertentie van, en bolletjes (•) vallen van de ingrediënten af (#17)
 - Indelen met Claude (en Apple Intelligence): het antwoord geeft per stap de regelnummers en de eerste woorden; Knipsel knipt de letterlijke tekst daarop en valt terug op de regels als dat niet klopt. De opdracht noemt de column vooraf en de bereiding zonder kopje (#17)
 

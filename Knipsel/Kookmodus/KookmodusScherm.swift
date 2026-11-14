@@ -1,23 +1,87 @@
 import SwiftUI
 import UIKit
 
-/// Maten van de kookmodus, los van de weergave zodat ze testbaar zijn (K5).
+/// Maten van de kookmodus, los van de weergave zodat ze testbaar zijn (K5, U7).
 enum Kookmaten {
-    /// Staptekst bij standaard Dynamic Type: op 70–80 cm leesbaar (≥ 30 pt iPhone, ≥ 28 pt iPad).
+    /// Staptekst bij standaard Dynamic Type: op 70–80 cm leesbaar (≥ 30 pt iPhone, K5).
     static let stapBasisSmal: CGFloat = 30
-    static let stapBasisBreed: CGFloat = 32
+    /// iPad staat op 1–1,5 m van je af: ±40 pt (critical print size, Legge & Bigelow 2011; U7).
+    static let stapBasisBreed: CGFloat = 40
+    /// Een lange stap op iPad krimpt tot hooguit deze maat, zodat hij zonder scrollen past.
+    static let stapMinimumBreed: CGFloat = 32
     /// Bovengrens bij de grootste tekstmaten: anders past een lang woord ("kerriepoeder") niet meer
     /// op één regel van een iPhone.
     static let stapMaximum: CGFloat = 56
     /// Vanaf deze breedte staan afvinklijst en stap naast elkaar (iPad; niet in een smalle Split View).
     static let breedVanaf: CGFloat = 700
+    /// Hoogte van de knoppen onderin: groot genoeg voor een knokkel of natte vinger (K7, ≥ 70 pt).
+    static let knophoogte: CGFloat = 72
+    /// Breedte van de terug-knop op iPhone; "Volgende stap" krijgt de rest.
+    static let terugBreedteSmal: CGFloat = 96
+    static let terugBreedteBreed: CGFloat = 150
 
     /// Lettergrootte van de huidige stap, meeschalend met Dynamic Type zoals bodytekst.
-    static func stapGrootte(breed: Bool, tekstgrootte: DynamicTypeSize) -> CGFloat {
-        let basis = breed ? stapBasisBreed : stapBasisSmal
+    ///
+    /// Op iPad (`breed`) krimpt een lange stap van 40 naar minimaal 32 pt zodat hij in `ruimte`
+    /// past; zonder `ruimte` (of `tekens`) geldt de basismaat.
+    static func stapGrootte(
+        breed: Bool, tekstgrootte: DynamicTypeSize, tekens: Int = 0, ruimte: CGSize? = nil
+    ) -> CGFloat {
+        var basis = breed ? stapBasisBreed : stapBasisSmal
+        if breed, let ruimte { basis = passendeGrootte(tekens: tekens, in: ruimte) }
         let kenmerken = UITraitCollection(preferredContentSizeCategory: UIContentSizeCategory(tekstgrootte))
         let geschaald = UIFontMetrics(forTextStyle: .body).scaledValue(for: basis, compatibleWith: kenmerken)
         return min(stapMaximum, max(basis, geschaald))
+    }
+
+    /// De grootste maat tussen 32 en 40 pt waarop `tekens` tekens in `ruimte` passen. Schatting:
+    /// een letter is gemiddeld ½ em breed, een regel 1,45 em hoog (met de regelafstand van 0,22 em),
+    /// en 25 % gaat verloren aan afbreken op woordgrenzen en de laatste, halve regel.
+    static func passendeGrootte(tekens: Int, in ruimte: CGSize) -> CGFloat {
+        guard tekens > 0, ruimte.width > 0, ruimte.height > 0 else { return stapBasisBreed }
+        let oppervlak = ruimte.width * ruimte.height * 0.75
+        let grootte = (oppervlak / (CGFloat(tekens) * 0.5 * 1.45)).squareRoot().rounded(.down)
+        return min(stapBasisBreed, max(stapMinimumBreed, grootte))
+    }
+}
+
+/// De microfoonstatus als korte zin in beeld (U3: "luistert hij nu?" moet je kunnen lezen).
+enum Microfoonstatus {
+    enum Toon: Equatable {
+        /// Luistert: groen stipje.
+        case actief
+        /// Even geduld: draaiend wieltje.
+        case bezig
+        /// Uit of nog niet begonnen: gedimd.
+        case uit
+        /// Kan of mag niet: tomaat, uitleg in de balk onderin.
+        case probleem
+    }
+
+    static func tekst(_ status: LuisterService.Status, spraakAan: Bool, leestVoor: Bool) -> String {
+        guard spraakAan else { return "Microfoon uit" }
+        switch status {
+        case .uit: return "Microfoon uit"
+        case .uitlegNodig: return "Microfoon nog niet aan"
+        case .vraagtToestemming: return "Wacht op toestemming"
+        case .start: return "Microfoon gaat aan…"
+        case .modelLaden(let voortgang):
+            return "Spraakmodel laden" + (voortgang.map { " · \(Int(($0 * 100).rounded())) %" } ?? "…")
+        // Tijdens het voorlezen luistert hij ook, maar dan is "stop" het nuttige woord.
+        case .luistert: return leestVoor ? "Luistert · zeg ‘stop’" : "Luistert · zeg ‘volgende’"
+        case .geweigerd: return "Microfoon niet toegestaan"
+        case .nietBeschikbaar: return "Spraak niet beschikbaar"
+        }
+    }
+
+    static func toon(_ status: LuisterService.Status, spraakAan: Bool) -> Toon {
+        guard spraakAan else { return .uit }
+        switch status {
+        case .luistert: return .actief
+        case .start, .vraagtToestemming, .modelLaden: return .bezig
+        case .uit, .uitlegNodig: return .uit
+        case .geweigerd, .nietBeschikbaar: return .probleem
+        }
     }
 }
 
@@ -169,6 +233,7 @@ struct KookmodusInhoud: View {
     var toestemmingGevraagd: () -> Void = {}
 
     @Environment(\.dynamicTypeSize) private var tekstgrootte
+    @Environment(\.colorScheme) private var kleurschema
     @Environment(\.openURL) private var openURL
     @AppStorage(AppConfiguratie.sleutelLettertype) private var lettertype: Lettertype = .serif
     @AppStorage(AppConfiguratie.sleutelVoorlezenAan) private var voorlezenStandaardAan = true
@@ -176,6 +241,8 @@ struct KookmodusInhoud: View {
     @State private var spraakmelding: Spraakbediening.Melding?
 
     @State private var breedte: CGFloat = 0
+    /// Het vlak waarin de stap op iPad staat, om een lange stap passend te maken.
+    @State private var stapvlak: CGSize = .zero
     @State private var bevestiging: Bevestiging?
     @State private var flits: Zone?
     @State private var isVastgelegd = false
@@ -205,6 +272,7 @@ struct KookmodusInhoud: View {
                         kopbalk
                         tikvlak { stapKolomBreed }
                         spraakbalk
+                        kooknavigatie
                     }
                 }
             } else {
@@ -212,6 +280,7 @@ struct KookmodusInhoud: View {
                     kopbalk
                     tikvlak { stapKolomSmal }
                     spraakbalk
+                    kooknavigatie
                 }
             }
             if luisterstatus == .uitlegNodig, spraakAan {
@@ -280,10 +349,11 @@ struct KookmodusInhoud: View {
                 }
                 .accessibilityElement(children: .combine)
                 Spacer(minLength: 0)
-                microfoon
+                if breed { microfoon }
                 luidspreker
             }
             voortgang
+            if !breed { microfoon }
         }
         .padding(.horizontal, 20)
         .padding(.top, 8)
@@ -315,7 +385,28 @@ struct KookmodusInhoud: View {
 
     // MARK: - Stap
 
-    private var stapGrootte: CGFloat { Kookmaten.stapGrootte(breed: breed, tekstgrootte: tekstgrootte) }
+    private var stapGrootte: CGFloat {
+        guard breed, let stap = sessie.huidigeStap else {
+            return Kookmaten.stapGrootte(breed: breed, tekstgrootte: tekstgrootte)
+        }
+        return Kookmaten.stapGrootte(
+            breed: true, tekstgrootte: tekstgrootte, tekens: stap.tekst.count, ruimte: ruimteVoorStap)
+    }
+
+    /// Wat er op iPad overblijft voor de huidige stap: het stapvlak min de marges en een schatting
+    /// voor de gedimde vorige en volgende stap (max. 3 regels) en de timer. `nil` vóór de eerste meting.
+    private var ruimteVoorStap: CGSize? {
+        guard stapvlak.width > 0, stapvlak.height > 0 else { return nil }
+        let gedimd: CGFloat = 3 * 26 + 28
+        var hoogte = stapvlak.height - 48
+        if sessie.vorigeStap != nil { hoogte -= gedimd }
+        if sessie.volgendeStap != nil { hoogte -= gedimd }
+        if let stap = sessie.huidigeStap {
+            if stap.timerSeconden >= 60 { hoogte -= 44 }
+            if let groep = stap.groep, !groep.isEmpty { hoogte -= 34 }
+        }
+        return CGSize(width: min(760, stapvlak.width - 80), height: max(1, hoogte))
+    }
 
     private var stapLettertype: Font { .system(size: stapGrootte, design: lettertype.ontwerp) }
 
@@ -336,7 +427,6 @@ struct KookmodusInhoud: View {
             .scrollBounceBehavior(.basedOnSize)
             .overlay(alignment: .bottom) { spraakfeedback }
             voorleesbalk
-            zonewijzer
         }
     }
 
@@ -361,9 +451,13 @@ struct KookmodusInhoud: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollBounceBehavior(.basedOnSize)
+            .onGeometryChange(for: CGSize.self) {
+                $0.size
+            } action: {
+                stapvlak = $0
+            }
             .overlay(alignment: .bottom) { spraakfeedback }
             voorleesbalk
-            zonewijzer
         }
     }
 
@@ -446,33 +540,107 @@ struct KookmodusInhoud: View {
     }
 
     /// Hoeveelheid vet, geschaald naar het gekozen aantal porties.
-    private func ingredientTekst(_ ingredient: KookIngredient) -> Text {
+    /// `maatKleur`: de hoeveelheid in een eigen kleur (iPad: tomaat voor deze stap).
+    private func ingredientTekst(_ ingredient: KookIngredient, maatKleur: Color? = nil) -> Text {
         guard let maat = sessie.maat(van: ingredient), let naam = sessie.naam(van: ingredient) else {
             return Text(ingredient.ruweTekst)
         }
         let toelichting = ingredient.toelichting.map { Portieschaling.schaalToelichting($0, factor: sessie.factor) }
         let rest = [naam, toelichting].compactMap { $0 }.joined(separator: ", ")
+        if let maatKleur {
+            return Text("\(Text(maat).bold().foregroundStyle(maatKleur)) \(rest)")
+        }
         return Text("\(Text(maat).bold()) \(rest)")
     }
 
-    /// Stille wegwijzer onderaan: links terug, rechts verder.
-    private var zonewijzer: some View {
-        HStack(spacing: 0) {
-            Text("‹ vorige")
-                .frame(maxWidth: .infinity)
-                .frame(width: breedteStapvlak / 3)
-            Text(sessie.isAfgerond ? "" : "volgende ›")
-                .frame(maxWidth: .infinity)
+    // MARK: - Knoppen onderin
+
+    /// Kooknavigatie (U3, K7): een kleine terug-knop en een brede "Volgende stap", ≥ 72 pt hoog.
+    /// Bij de laatste stap "Klaar" (naar Eet smakelijk), daarna "Gekookt" en "Sluiten". Staat buiten
+    /// het tikvlak, en valt bij de grootste tekstmaten niet weg: dan scrolt de stap.
+    private var kooknavigatie: some View {
+        HStack(spacing: 12) {
+            Button {
+                sessie.vorige()
+            } label: {
+                HStack(spacing: 6) {
+                    Image(systemName: "chevron.left")
+                        .font(.title2.weight(.bold))
+                    if breed { Text("Vorige") }
+                }
+                .font(.title3.weight(.semibold))
+                .lineLimit(1)
+                .frame(width: breed ? Kookmaten.terugBreedteBreed : Kookmaten.terugBreedteSmal)
+                .frame(minHeight: Kookmaten.knophoogte)
+                .background(Kookkleuren.kaart, in: RoundedRectangle(cornerRadius: 22))
+                .contentShape(RoundedRectangle(cornerRadius: 22))
+            }
+            .buttonStyle(.plain)
+            .disabled(kanNietTerug)
+            .opacity(kanNietTerug ? 0.4 : 1)
+            .accessibilityLabel("Vorige stap")
+
+            Button(action: verder) {
+                HStack(spacing: 10) {
+                    Text(verderKnop.titel)
+                    Image(systemName: verderKnop.symbool)
+                        .font(.title3.weight(.bold))
+                }
+                .font(.title3.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+                .padding(.horizontal, 16)
+                .frame(maxWidth: .infinity, minHeight: Kookmaten.knophoogte)
+                .background(
+                    verderKnop.nadruk ? Kookkleuren.accent : Kookkleuren.tekst, in: RoundedRectangle(cornerRadius: 22)
+                )
+                .foregroundStyle(verderKnop.nadruk ? Color.white : Kookkleuren.achtergrond)
+                .contentShape(RoundedRectangle(cornerRadius: 22))
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(verderKnop.label)
+            .accessibilityHint(verderKnop.hint)
         }
-        .font(.footnote)
-        .foregroundStyle(Kookkleuren.gedimd.opacity(0.8))
-        .padding(.vertical, 10)
-        .accessibilityHidden(true)
+        .padding(.horizontal, breed ? 24 : 16)
+        .padding(.top, 8)
+        .padding(.bottom, 8)
+        .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
     }
 
-    private var breedteStapvlak: CGFloat {
-        let totaal = breedte > 0 ? breedte : 393
-        return breed ? totaal - lijstbreedte - 1 : totaal
+    private var kanNietTerug: Bool { !sessie.isAfgerond && sessie.isEersteStap }
+
+    private struct Verderknop {
+        let titel: String
+        let symbool: String
+        let label: String
+        let hint: String
+        var nadruk = false
+    }
+
+    private var verderKnop: Verderknop {
+        if sessie.isAfgerond {
+            if isVastgelegd {
+                return Verderknop(titel: "Sluiten", symbool: "xmark", label: "Sluit kookmodus", hint: "")
+            }
+            return Verderknop(
+                titel: "Gekookt", symbool: "checkmark", label: "Gekookt",
+                hint: "Zet vandaag in het kooklog van dit recept", nadruk: true)
+        }
+        if sessie.isLaatsteStap {
+            return Verderknop(titel: "Klaar", symbool: "checkmark", label: "Klaar", hint: "Laatste stap gedaan")
+        }
+        return Verderknop(titel: "Volgende stap", symbool: "chevron.right", label: "Volgende stap", hint: "")
+    }
+
+    private func verder() {
+        if !sessie.isAfgerond {
+            sessie.volgende()
+        } else if !isVastgelegd {
+            gekookt()
+            isVastgelegd = true
+        } else {
+            sluit()
+        }
     }
 
     /// Afvinklijst op iPad: ±30 % van de breedte, wat breder bij de grootste tekstmaten.
@@ -555,25 +723,49 @@ struct KookmodusInhoud: View {
 
     private var luisterstatus: LuisterService.Status { luisteraar?.status ?? .uit }
 
-    /// Microfoon aan/uit: luisteren naar spraakcommando's. De keuze wordt onthouden.
+    /// Microfoon aan/uit met de status als korte zin ("Luistert · zeg ‘volgende’"). De keuze wordt
+    /// onthouden.
     private var microfoon: some View {
-        Button {
+        let toon = Microfoonstatus.toon(luisterstatus, spraakAan: spraakAan)
+        let tekst = Microfoonstatus.tekst(luisterstatus, spraakAan: spraakAan, leestVoor: voorlezer.spreekt)
+        return Button {
             spraakAan.toggle()
         } label: {
-            Image(systemName: spraakAan ? "mic.fill" : "mic.slash.fill")
-                .font(.title3.weight(.semibold))
-                .foregroundStyle(spraakAan ? Kookkleuren.accent : Kookkleuren.gedimd)
-                .frame(width: 48, height: 48)
-                .background(Kookkleuren.kaart, in: Circle())
+            HStack(spacing: 8) {
+                Image(systemName: spraakAan ? "mic.fill" : "mic.slash.fill")
+                    .font(.headline)
+                    .foregroundStyle(toon == .uit ? Kookkleuren.gedimd : Kookkleuren.accent)
+                switch toon {
+                case .actief:
+                    Circle().fill(Color.green).frame(width: 9, height: 9)
+                        .background(Circle().fill(Color.green.opacity(0.25)).frame(width: 17, height: 17))
+                case .bezig:
+                    ProgressView().controlSize(.mini)
+                case .probleem:
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .foregroundStyle(Kookkleuren.markering)
+                case .uit:
+                    EmptyView()
+                }
+                Text(tekst)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(toon == .uit ? Kookkleuren.gedimd : Kookkleuren.tekst)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .padding(.horizontal, 14)
+            .frame(minHeight: 44)
+            .background(Kookkleuren.kaart, in: Capsule())
+            .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .accessibilityLabel("Spraakbediening")
-        .accessibilityValue(spraakAan ? "aan" : "uit")
+        .accessibilityValue(tekst)
         .accessibilityHint(
             spraakAan ? "Tik om niet meer te luisteren" : "Tik om Knipsel naar je stem te laten luisteren")
     }
 
-    /// Onderin: luistert Knipsel, laadt hij het spraakmodel, of mag hij niet?
+    /// Onderin, alleen als er iets uit te leggen valt: het spraakmodel laadt, of hij mag of kan niet.
     @ViewBuilder private var spraakbalk: some View {
         if spraakAan, let inhoud = spraakbalkInhoud {
             HStack(spacing: 10) {
@@ -591,28 +783,6 @@ struct KookmodusInhoud: View {
 
     private var spraakbalkInhoud: AnyView? {
         switch luisterstatus {
-        case .luistert:
-            return AnyView(
-                Group {
-                    Circle().fill(Color.green).frame(width: 10, height: 10)
-                        .accessibilityHidden(true)
-                    Text("Luistert · zeg \"volgende\", \"herhaal\", \"hoeveel …?\"")
-                        .font(.footnote)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .accessibilityLabel("Knipsel luistert. Zeg volgende, herhaal of hoeveel.")
-                    Spacer(minLength: 0)
-                    Image(systemName: "waveform")
-                        .symbolEffect(.variableColor.iterative, isActive: true)
-                        .foregroundStyle(Color.green)
-                        .accessibilityHidden(true)
-                })
-        case .start, .vraagtToestemming:
-            return AnyView(
-                Group {
-                    ProgressView().controlSize(.small)
-                    Text("Microfoon gaat aan…")
-                })
         case .modelLaden(let voortgang):
             let procent = voortgang.map { " \(Int(($0 * 100).rounded())) %" } ?? ""
             return AnyView(
@@ -647,7 +817,8 @@ struct KookmodusInhoud: View {
                     Text("\(reden) Tikken werkt gewoon.")
                         .lineLimit(3)
                 })
-        case .uit, .uitlegNodig:
+        // Luisteren en opstarten staan in de microfoonregel bovenin.
+        case .uit, .uitlegNodig, .luistert, .start, .vraagtToestemming:
             return nil
         }
     }
@@ -707,25 +878,11 @@ struct KookmodusInhoud: View {
                     .font(.headline)
                     .foregroundStyle(Kookkleuren.gedimd)
             } else {
-                Button {
-                    gekookt()
-                    isVastgelegd = true
-                } label: {
-                    SwiftUI.Label("Gekookt", systemImage: "checkmark")
-                        .font(.title3.weight(.semibold))
-                        .padding(.horizontal, 28)
-                        .padding(.vertical, 14)
-                        .background(Kookkleuren.accent, in: Capsule())
-                        .foregroundStyle(.white)
-                }
-                .buttonStyle(.plain)
-                .accessibilityHint("Zet vandaag in het kooklog van dit recept")
+                Text("Tik op Gekookt om het in je kooklog te zetten.")
+                    .font(.headline)
+                    .foregroundStyle(Kookkleuren.gedimd)
+                    .multilineTextAlignment(.center)
             }
-            Button("Sluiten", action: sluit)
-                .font(.headline)
-                .padding(12)
-                .buttonStyle(.plain)
-                .foregroundStyle(Kookkleuren.gedimd)
             Spacer(minLength: 0)
         }
         .padding(24)
@@ -772,24 +929,32 @@ struct KookmodusInhoud: View {
         .background(Kookkleuren.kaart.opacity(0.5))
     }
 
+    /// Lichter dan de lijst: papier in licht, een warme grijstint in donker.
+    private var oplichten: Color {
+        kleurschema == .dark ? Kookkleuren.balkLeeg.opacity(0.55) : Kookkleuren.achtergrond
+    }
+
+    /// Een regel van de afvinklijst. Nodig in deze stap: lichte achtergrond en de hoeveelheid in tomaat.
     private func afvinkRegel(_ ingredient: KookIngredient, nodig: Bool) -> some View {
         let isAf = sessie.isAfgevinkt(ingredient)
-        let kleur: Color = isAf ? Kookkleuren.gedimd : (nodig ? Kookkleuren.markering : Kookkleuren.tekst)
+        let licht = nodig && !isAf
+        let kleur: Color = isAf ? Kookkleuren.gedimd : Kookkleuren.tekst
         return Button {
             sessie.wisselAfgevinkt(ingredient)
         } label: {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
                 Image(systemName: isAf ? "checkmark.circle.fill" : "circle")
                     .foregroundStyle(isAf ? Kookkleuren.gedimd : (nodig ? Kookkleuren.markering : Kookkleuren.gedimd))
-                ingredientTekst(ingredient)
+                ingredientTekst(ingredient, maatKleur: licht ? Kookkleuren.markering : nil)
                     .font(.system(.title3, design: lettertype.ontwerp))
                     .strikethrough(isAf)
                     .foregroundStyle(kleur)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(nodig && !isAf ? Kookkleuren.markering.opacity(0.12) : .clear)
+            .background(licht ? oplichten : .clear, in: RoundedRectangle(cornerRadius: 10))
+            .padding(.horizontal, 8)
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
