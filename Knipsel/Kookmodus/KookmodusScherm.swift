@@ -120,6 +120,8 @@ struct KookmodusScherm: View {
     var vraagFoto = false
     /// "Foto maken": de kookmodus sluit en het recept opent de camera.
     var fotoMaken: () -> Void = {}
+    /// De kookmodus gaat dicht (ook na "Gekookt"): de stap bewaren voor "Verder met…".
+    var gesloten: () -> Void = {}
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -138,12 +140,13 @@ struct KookmodusScherm: View {
 
     init(
         sessie: KookSessie, gekookt: @escaping () -> Void = {}, vraagFoto: Bool = false,
-        fotoMaken: @escaping () -> Void = {}
+        fotoMaken: @escaping () -> Void = {}, gesloten: @escaping () -> Void = {}
     ) {
         self.sessie = sessie
         self.gekookt = gekookt
         self.vraagFoto = vraagFoto
         self.fotoMaken = fotoMaken
+        self.gesloten = gesloten
         let wissel = WisselSpreker()
         let voorlezer = VoorleesService(spreker: wissel)
         _wissel = State(initialValue: wissel)
@@ -173,6 +176,7 @@ struct KookmodusScherm: View {
             schermAan.kookmodusGesloten()
             stopLuisteren()
             voorlezer.stop()
+            gesloten()
         }
         .onChange(of: scenePhase) { _, fase in
             schermAan.faseGewijzigd(fase)
@@ -652,6 +656,7 @@ struct KookmodusInhoud: View {
         if !sessie.isAfgerond {
             sessie.volgende()
         } else if !isVastgelegd {
+            sessie.markeerGekookt()
             gekookt()
             isVastgelegd = true
         } else {

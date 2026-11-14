@@ -48,7 +48,7 @@ struct InstellingenView: View {
                     Text("Weergave")
                 } footer: {
                     Text(
-                        "Kaarten tonen elk recept in de kleur en met het symbool van zijn categorie; een lijst toont meer recepten tegelijk. Geldt voor de iPhone."
+                        "Kaarten tonen elk recept in de kleur en met het symbool van zijn categorie; een lijst toont meer recepten tegelijk. Geldt voor iPhone en iPad."
                     )
                 }
                 ClaudeInstellingen()

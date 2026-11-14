@@ -57,6 +57,8 @@ final class KookSessie: Identifiable {
     private(set) var huidigeIndex = 0
     /// Voorbij de laatste stap: het recept is klaar.
     private(set) var isAfgerond = false
+    /// "Gekookt" is getikt: deze kookbeurt staat in het kooklog en hoeft niet verder.
+    private(set) var isGekookt = false
     private(set) var afgevinkt: Set<Int> = []
     /// Voor hoeveel personen er gekookt wordt.
     private(set) var porties: Int
@@ -68,8 +70,14 @@ final class KookSessie: Identifiable {
     /// Per stap de woorden die naar ingrediënten verwijzen.
     private let treffersPerStap: [[Ingredientkoppeling.Treffer]]
 
-    init(titel: String, ingredienten: [KookIngredient], stappen: [KookStap], receptPorties: Int, porties: Int? = nil) {
+    /// - Parameter startIndex: de stap om op te beginnen (0 = stap 1), bijvoorbeeld bij "Verder met…";
+    ///   buiten het bereik wordt het de dichtstbijzijnde stap.
+    init(
+        titel: String, ingredienten: [KookIngredient], stappen: [KookStap], receptPorties: Int, porties: Int? = nil,
+        startIndex: Int = 0
+    ) {
         self.titel = titel
+        huidigeIndex = stappen.isEmpty ? 0 : min(max(0, startIndex), stappen.count - 1)
         self.ingredienten = ingredienten
         self.stappen = stappen
         self.receptPorties = max(0, receptPorties)
@@ -130,6 +138,11 @@ final class KookSessie: Identifiable {
         huidigeIndex = index
         isAfgerond = false
         return meld(.naarStap(index))
+    }
+
+    /// "Gekookt" op het laatste scherm.
+    func markeerGekookt() {
+        isGekookt = true
     }
 
     /// Verandert niets aan de stap, maar meldt dat hij herhaald moet worden (voorlezen, fase 4).
@@ -200,7 +213,7 @@ final class KookSessie: Identifiable {
 
 extension KookSessie {
     /// Een sessie voor een bewaard recept.
-    convenience init(recept: Recept, porties: Int? = nil) {
+    convenience init(recept: Recept, porties: Int? = nil, startIndex: Int = 0) {
         let ingredienten = recept.gesorteerdeIngredienten.enumerated().map { index, ingredient in
             KookIngredient(
                 id: index, ruweTekst: ingredient.ruweTekst ?? "", hoeveelheid: ingredient.hoeveelheid?.doubleValue,
@@ -212,6 +225,11 @@ extension KookSessie {
         }
         self.init(
             titel: recept.titelOfStandaard, ingredienten: ingredienten, stappen: stappen,
-            receptPorties: Int(recept.porties), porties: porties)
+            receptPorties: Int(recept.porties), porties: porties, startIndex: startIndex)
+    }
+
+    /// Verder waar je bleef (`KookVoortgang`): die stap, die porties.
+    convenience init(recept: Recept, stand: KookVoortgang.Stand) {
+        self.init(recept: recept, porties: stand.porties > 0 ? stand.porties : nil, startIndex: stand.stapIndex)
     }
 }
