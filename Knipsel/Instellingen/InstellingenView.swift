@@ -5,6 +5,7 @@ struct InstellingenView: View {
     @Environment(\.dismiss) private var dismiss
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var bibliotheekWeergave =
         BibliotheekWeergave.kaarten
+    @AppStorage(AppConfiguratie.sleutelWebFotoBewaren) private var webFotoBewaren = true
 
     var body: some View {
         NavigationStack {
@@ -49,6 +50,17 @@ struct InstellingenView: View {
                 } footer: {
                     Text(
                         "Kaarten tonen elk recept in de kleur en met het symbool van zijn categorie; een lijst toont meer recepten tegelijk. Geldt voor iPhone en iPad."
+                    )
+                }
+                Section {
+                    Toggle(isOn: $webFotoBewaren) {
+                        SwiftUI.Label("Foto van receptsites bewaren", systemImage: "photo")
+                    }
+                } header: {
+                    Text("Inlezen")
+                } footer: {
+                    Text(
+                        "Bij een recept van een website bewaart Knipsel één foto van het gerecht van die site. Knipsel haalt pagina's rechtstreeks op dit toestel op. Van een papierknipsel wordt nooit een foto bewaard."
                     )
                 }
                 ClaudeInstellingen()

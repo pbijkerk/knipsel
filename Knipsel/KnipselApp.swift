@@ -12,6 +12,7 @@ struct KnipselApp: App {
         WindowGroup {
             ContentView()
                 .environment(\.managedObjectContext, opslag.context)
+                .environment(InleesInbox.gedeeld)
         }
     }
 }

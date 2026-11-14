@@ -3,7 +3,20 @@ import SwiftUI
 
 /// De invoer van het controlescherm: het concept uit de indeling plus de keuzes van de gebruiker.
 struct ControleInvoer: Equatable {
+    /// Waar het recept vandaan komt: bepaalt de woorden in het bronblok.
+    enum Soort: Equatable {
+        /// Een geknipte pagina (foto): blad, datum, pagina.
+        case papier
+        /// Een website: site, datum, link (in `bronPagina`).
+        case website
+        /// Geplakte of gedeelde tekst, of een PDF.
+        case tekst
+    }
+
     var concept: ReceptConcept
+    var soort = Soort.papier
+    /// De receptfoto van de site (al bijgesneden en verkleind, `GerechtFoto`); nooit een krantenfoto (B7).
+    var fotoData: Data?
     var categorieen: Set<NSManagedObjectID> = []
     var labels: Set<NSManagedObjectID> = []
     /// Wat de indeler voorstelde; blijft zichtbaar als voorstel als de gebruiker het uitzet.
@@ -31,17 +44,25 @@ struct ControleInvoer: Equatable {
         invoer.categorieen = categorieen
         invoer.labels = labels
         invoer.ingredientenTekst = concept.ingredienten.map(\.tekst).joined(separator: "\n")
-        // Een stap per alinea; regeleinden binnen een stap worden spaties.
-        invoer.stappenTekst = concept.stappen.map { $0.tekst.replacingOccurrences(of: "\n", with: " ") }
-            .joined(separator: "\n\n")
+        // Een stap per alinea; regeleinden binnen een stap worden spaties. Een stapgroep (van een
+        // website) wordt een kopregel met dubbele punt, die `ReceptInvoer` weer als groep leest.
+        var regels: [String] = []
+        var groep: String?
+        for stap in concept.stappen {
+            if let nieuw = stap.groep, !nieuw.isEmpty, nieuw != groep { regels.append(nieuw + ":") }
+            groep = stap.groep
+            regels.append(stap.tekst.replacingOccurrences(of: "\n", with: " "))
+        }
+        invoer.stappenTekst = regels.joined(separator: "\n\n")
         return invoer
     }
 }
 
 /// Het controlescherm: het gestructureerde recept, bewerkbaar, met twijfel in oranje en
-/// categorie- en labelvoorstellen als knopjes. Op iPad staat de foto ernaast.
+/// categorie- en labelvoorstellen als knopjes. Op iPad staat de foto ernaast. Zonder knipsessie
+/// (een website, geplakte tekst) is er geen paginafoto en geen uitsnede.
 struct ControleScherm: View {
-    let sessie: KnipSessie
+    let sessie: KnipSessie?
     let klaar: () -> Void
 
     @Environment(\.managedObjectContext) private var context
@@ -59,7 +80,7 @@ struct ControleScherm: View {
     ])
     private var labels: FetchedResults<ReceptLabel>
 
-    init(sessie: KnipSessie, invoer: ControleInvoer, klaar: @escaping () -> Void) {
+    init(sessie: KnipSessie?, invoer: ControleInvoer, klaar: @escaping () -> Void) {
         self.sessie = sessie
         self.klaar = klaar
         _invoer = State(initialValue: invoer)
@@ -67,11 +88,33 @@ struct ControleScherm: View {
 
     var body: some View {
         Group {
-            if breedte == .regular {
+            if breedte == .regular, let sessie, !sessie.paginas.isEmpty {
                 HStack(spacing: 0) {
                     KnipselScherm(sessie: sessie, alleenKijken: true)
                         .containerRelativeFrame(.horizontal) { lengte, _ in lengte * 0.42 }
                         .background(Color(.secondarySystemBackground))
+                    Divider()
+                    formulier
+                }
+            } else if breedte == .regular, let beeld = fotoBeeld {
+                // Website op iPad: de foto van de site links, zoals de paginafoto bij knippen.
+                HStack(spacing: 0) {
+                    VStack(spacing: 16) {
+                        Image(uiImage: beeld)
+                            .resizable()
+                            .aspectRatio(GerechtFoto.verhouding, contentMode: .fit)
+                            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                            .accessibilityLabel("Foto van het gerecht van de site")
+                        fotoWegKnop
+                        Text(fotoUitleg)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .multilineTextAlignment(.center)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(24)
+                    .containerRelativeFrame(.horizontal) { lengte, _ in lengte * 0.42 }
+                    .background(Color(.secondarySystemBackground))
                     Divider()
                     formulier
                 }
@@ -101,17 +144,27 @@ struct ControleScherm: View {
             if invoer.twijfelAantal > 0 {
                 Section {
                     SwiftUI.Label {
-                        Text(
-                            invoer.twijfelAantal == 1
-                                ? "1 regel om te controleren. Vergelijk hem met de uitsnede uit de foto."
-                                : "\(invoer.twijfelAantal) regels om te controleren. Vergelijk ze met de uitsnede uit de foto."
-                        )
+                        Text(twijfelTekst)
                     } icon: {
                         Image(systemName: "exclamationmark.triangle.fill").foregroundStyle(.orange)
                     }
                     .font(.subheadline)
                 }
                 .listRowBackground(Color.orange.opacity(0.15))
+            }
+
+            if breedte != .regular, let beeld = fotoBeeld {
+                Section {
+                    Image(uiImage: beeld)
+                        .resizable()
+                        .aspectRatio(GerechtFoto.verhouding, contentMode: .fit)
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                        .listRowInsets(EdgeInsets(top: 8, leading: 8, bottom: 8, trailing: 8))
+                        .accessibilityLabel("Foto van het gerecht van de site")
+                    fotoWegKnop
+                } footer: {
+                    Text(fotoUitleg)
+                }
             }
 
             Section {
@@ -147,24 +200,33 @@ struct ControleScherm: View {
 
             Section {
                 ForEach(Array($invoer.concept.stappen.enumerated()), id: \.element.id) { index, $regel in
-                    HStack(alignment: .firstTextBaseline, spacing: 10) {
-                        Text(index + 1, format: .number)
-                            .font(.headline)
-                            .foregroundStyle(Color.accentColor)
-                            .frame(minWidth: 18, alignment: .trailing)
-                        regelVeld($regel, isIngredient: false, plaatshouder: "Stap")
-                        if heeftStapActies(index) {
-                            Menu {
-                                stapActies(index)
-                            } label: {
-                                Image(systemName: "ellipsis.circle")
-                                    .foregroundStyle(Color.accentColor)
-                                    .frame(minWidth: 28, minHeight: 28)
+                    VStack(alignment: .leading, spacing: 6) {
+                        if let groep = nieuweGroep(index) {
+                            Text(groep)
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                                .accessibilityAddTraits(.isHeader)
+                        }
+                        HStack(alignment: .firstTextBaseline, spacing: 10) {
+                            Text(index + 1, format: .number)
+                                .font(.headline)
+                                .foregroundStyle(Color.accentColor)
+                                .frame(minWidth: 18, alignment: .trailing)
+                            regelVeld($regel, isIngredient: false, plaatshouder: "Stap")
+                            if heeftStapActies(index) {
+                                Menu {
+                                    stapActies(index)
+                                } label: {
+                                    Image(systemName: "ellipsis.circle")
+                                        .foregroundStyle(Color.accentColor)
+                                        .frame(minWidth: 28, minHeight: 28)
+                                }
+                                .buttonStyle(.borderless)
+                                .accessibilityLabel("Stap \(index + 1) splitsen of samenvoegen")
                             }
-                            .buttonStyle(.borderless)
-                            .accessibilityLabel("Stap \(index + 1) splitsen of samenvoegen")
                         }
                     }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                     .contextMenu { stapActies(index) }
                     .swipeActions(edge: .leading) {
                         if index > 0 {
@@ -226,22 +288,59 @@ struct ControleScherm: View {
             }
 
             Section {
-                LabeledContent("Blad") {
-                    TextField("Blad of boek", text: $invoer.bronNaam)
+                LabeledContent(invoer.soort == .website ? "Site" : "Blad") {
+                    TextField(invoer.soort == .website ? "Naam van de site" : "Blad of boek", text: $invoer.bronNaam)
                         .multilineTextAlignment(.trailing)
                 }
                 DatePicker("Datum", selection: $invoer.bronDatum, displayedComponents: .date)
-                LabeledContent("Pagina") {
-                    TextField("Pagina", text: $invoer.bronPagina)
+                LabeledContent(invoer.soort == .website ? "Link" : "Pagina") {
+                    TextField(invoer.soort == .website ? "Webadres" : "Pagina", text: $invoer.bronPagina)
                         .multilineTextAlignment(.trailing)
+                        .keyboardType(invoer.soort == .website ? .URL : .default)
+                        .textInputAutocapitalization(invoer.soort == .website ? .never : nil)
+                        .lineLimit(1)
                 }
                 LabeledContent("Kookboek", value: Kookboek.mijn.naam)
             } header: {
                 Text("Bron")
             } footer: {
-                Text("Alleen de tekst wordt bewaard; de foto niet.")
+                Text(bronUitleg)
             }
         }
+    }
+
+    private var fotoBeeld: UIImage? {
+        invoer.fotoData.flatMap(UIImage.init(data:))
+    }
+
+    private var fotoWegKnop: some View {
+        Button("Foto niet bewaren", systemImage: "photo.badge.minus", role: .destructive) {
+            withAnimation { invoer.fotoData = nil }
+        }
+    }
+
+    private let fotoUitleg = "De foto van de site komt bij het recept. Uit te zetten in Instellingen › Inlezen."
+
+    private var twijfelTekst: String {
+        let vergelijk = sessie?.paginas.isEmpty == false ? " Vergelijk met de uitsnede uit de foto." : ""
+        return invoer.twijfelAantal == 1
+            ? "1 regel om te controleren.\(vergelijk)"
+            : "\(invoer.twijfelAantal) regels om te controleren.\(vergelijk)"
+    }
+
+    private var bronUitleg: String {
+        switch invoer.soort {
+        case .papier: "Alleen de tekst wordt bewaard; de foto niet."
+        case .website: "De site, de link en de datum blijven bij het recept."
+        case .tekst: "Vul in waar het recept vandaan komt, als je dat weet."
+        }
+    }
+
+    /// Het kopje van een stapgroep, alleen bij de eerste stap van die groep.
+    private func nieuweGroep(_ index: Int) -> String? {
+        let stappen = invoer.concept.stappen
+        guard stappen.indices.contains(index), let groep = stappen[index].groep, !groep.isEmpty else { return nil }
+        return index > 0 && stappen[index - 1].groep == groep ? nil : groep
     }
 
     // MARK: - Splitsen en samenvoegen
@@ -295,8 +394,9 @@ struct ControleScherm: View {
                         .accessibilityLabel("Controleren")
                 }
                 TextField(plaatshouder, text: regel.tekst, axis: .vertical)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
-            if twijfel, let uitsnede = sessie.uitsnede(regel.wrappedValue.regels) {
+            if twijfel, let uitsnede = sessie?.uitsnede(regel.wrappedValue.regels) {
                 Image(uiImage: uitsnede)
                     .resizable()
                     .scaledToFit()
@@ -339,8 +439,11 @@ struct ControleScherm: View {
 
     private func bewaar() {
         do {
-            try invoer.receptInvoer.bewaar(in: context)
-            sessie.herstel()  // de foto's uit het geheugen (B7)
+            let recept = try invoer.receptInvoer.bewaar(in: context)
+            if let foto = invoer.fotoData {
+                try recept.zetFoto(foto)
+            }
+            sessie?.herstel()  // de foto's uit het geheugen (B7)
             klaar()
         } catch {
             context.rollback()

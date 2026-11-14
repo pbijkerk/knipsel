@@ -3,8 +3,17 @@ import PhotosUI
 import SwiftUI
 import VisionKit
 
-/// Recept knippen: pagina scannen of foto kiezen → knipselscherm → controle → bewaren.
+/// Recept knippen: pagina scannen of foto kiezen → knipselscherm → controle → bewaren. Met
+/// `beelden` begint het meteen met herkennen (een schermafdruk of een PDF zonder tekstlaag, #18).
 struct KnipStart: View {
+    /// Al gekozen afbeeldingen: geen keuzescherm, direct herkennen (zonder documentscanner).
+    var beelden: [UIImage] = []
+    /// Vooraf ingevulde bron (bijvoorbeeld de site achter een betaalmuur).
+    var bronNaam = ""
+    var bronPagina = ""
+    /// Na bewaren, vóór het sluiten (bijvoorbeeld: het item uit "Nog te controleren" halen).
+    var bewaard: () -> Void = {}
+
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var context
     @State private var sessie = KnipSessie()
@@ -49,7 +58,10 @@ struct KnipStart: View {
                     isPresented: Binding(get: { controle != nil }, set: { if !$0 { controle = nil } })
                 ) {
                     if let controle {
-                        ControleScherm(sessie: sessie, invoer: controle) { dismiss() }
+                        ControleScherm(sessie: sessie, invoer: controle) {
+                            bewaard()
+                            dismiss()
+                        }
                     }
                 }
         }
@@ -68,6 +80,10 @@ struct KnipStart: View {
             Text(
                 "De documentscanner werkt niet op dit toestel (bijvoorbeeld in de simulator). Kies een foto uit je fotobibliotheek."
             )
+        }
+        .task {
+            guard !beelden.isEmpty, sessie.toestand == .kiezen, sessie.regels.isEmpty else { return }
+            await verwerk(beelden, datum: nil)
         }
         .onChange(of: fotoKeuze) { _, keuze in
             guard !keuze.isEmpty else { return }
@@ -177,7 +193,7 @@ struct KnipStart: View {
         return ControleInvoer(
             concept: sessie.concept, categorieen: voorgesteldeCategorieen, labels: voorgesteldeLabels,
             voorgesteldeCategorieen: voorgesteldeCategorieen, voorgesteldeLabels: voorgesteldeLabels,
-            bronDatum: sessie.bronDatum)
+            bronNaam: bronNaam, bronDatum: sessie.bronDatum, bronPagina: bronPagina)
     }
 
     private func ids(_ namen: [String], uit lijst: [(NSManagedObjectID, String)]) -> Set<NSManagedObjectID> {

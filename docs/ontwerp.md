@@ -198,6 +198,12 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
   `LuisterService` (AVAudioEngine + SpeechAnalyzer), `CommandoHerkenner` (puur, testbaar),
   `KookSessie` (toestandsmachine stap/voorlezen/luisteren/timers), `TimerService` (AlarmKit),
   `KookActivity` (ActivityKit), App Intents.
+- **Inlezen (#18, deel 1 in de app):** `SchemaReceptLezer` (schema.org `Recipe` uit JSON-LD of microdata),
+  `PaginaLezer` + `TekstRegels` (leesbare tekst → herkende regels → bestaande `Indeler`), `Betaalmuur`
+  (heuristiek), `ReceptInlezer`, `WebOphaler` (`URLSession` rechtstreeks vanaf het toestel) en
+  `InleesInbox` ("Nog te controleren": JSON + bestanden in een map die later de App Group van de
+  deel-extensie wordt). Een recept van een website bewaart de link in `bronPagina` (geen modelwijziging)
+  en, als dat aan staat, één foto van de site in `fotoData`; papierknipsels blijven tekst-only (B7).
 - **Rechten (Info.plist):** camera, microfoon, spraakherkenning, foto's (alleen kiezen), AlarmKit. Netwerk alleen voor Claude (optioneel) en iCloud.
 
 ## 8. Risico's en proeven

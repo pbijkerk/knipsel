@@ -37,6 +37,10 @@ enum AppConfiguratie {
     static let sleutelSpraakWekwoord = "spraakAlleenMetWekwoord"
     static let sleutelSpraakUitlegGezien = "spraakUitlegGezien"
 
+    /// Inlezen van websites (#18): de receptfoto van de site bewaren als foto bij het recept
+    /// (standaard aan). Papierknipsels blijven tekst-only (B7).
+    static let sleutelWebFotoBewaren = "webFotoBewaren"
+
     /// Keychain: de eigen Anthropic-sleutel voor indelen met Claude (optioneel, B10).
     static let sleutelClaude = "claudeApiSleutel"
 

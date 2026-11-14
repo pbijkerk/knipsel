@@ -165,6 +165,13 @@ struct ReceptWeergave: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
+            if let link = Weergave.link(pagina: recept.bronPagina) {
+                Link(destination: link) {
+                    SwiftUI.Label(
+                        "Bekijk op \(ReceptInlezer.host(link) ?? "de site")", systemImage: "safari")
+                }
+                .font(.subheadline)
+            }
             tijdblokken
             if !(recept.categorieen ?? []).isEmpty || !(recept.labels ?? []).isEmpty || recept.aantalKeerGekookt > 0 {
                 Stroomopmaak {
