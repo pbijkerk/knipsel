@@ -38,6 +38,11 @@ final class Recept: NSManagedObject {
     @NSManaged var laatstGekooktOp: Date?
     @NSManaged var aangemaaktOp: Date?
     @NSManaged var gewijzigdOp: Date?
+    /// Eigen foto van het gekookte gerecht (JPEG, 4:3, max. 1600 px; `GerechtFoto`). Nooit de
+    /// krantenfoto (B7). Extern opgeslagen; in CloudKit een asset.
+    @NSManaged var fotoData: Data?
+    /// Wanneer de foto is gezet; `nil` = geen foto. Ook de sleutel voor de thumbnail-cache.
+    @NSManaged var fotoGewijzigdOp: Date?
     /// Ruwe waarde van `Kookboek`; standaard "mijn".
     @NSManaged var kookboek: String
     @NSManaged var categorieen: Set<Categorie>?
@@ -171,6 +176,24 @@ extension Recept {
     }
 
     var aantalKeerGekookt: Int { kooklog?.count ?? 0 }
+}
+
+extension Recept {
+    /// Of er een eigen gerechtfoto is. Kijkt naar de datum, niet naar `fotoData`: dat laadt het
+    /// (externe) bestand, en deze vraag stelt elke kaart bij het scrollen.
+    var heeftFoto: Bool { fotoGewijzigdOp != nil }
+
+    /// Zet (of met `nil`: verwijdert) de eigen gerechtfoto en bewaart. `data` is al bijgesneden en
+    /// verkleind (`GerechtFoto.maakData`).
+    func zetFoto(_ data: Data?, op datum: Date = .now) throws {
+        guard let context = managedObjectContext else {
+            throw CocoaError(.validationMissingMandatoryProperty)
+        }
+        fotoData = data
+        fotoGewijzigdOp = data == nil ? nil : datum
+        gewijzigdOp = datum
+        try context.save()
+    }
 }
 
 extension Ingredient {
