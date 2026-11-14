@@ -32,6 +32,8 @@ struct ReceptWeergave: View {
     /// ±60–65 tekens per regel bij bodytekst in New York (Dyson, 2004); schaalt mee met de tekstgrootte.
     @ScaledMetric(relativeTo: .body) private var leesbreedte: CGFloat = 560
     @ScaledMetric(relativeTo: .body) private var ingredientenBreedte: CGFloat = 300
+    /// Op iPad smaller en gecentreerd; op een iPhone vult de balk de breedte.
+    @ScaledMetric(relativeTo: .body) private var balkBreedte: CGFloat = 480
 
     private var porties: Int { gekozenPorties > 0 ? gekozenPorties : Int(recept.porties) }
     private var factor: Double { Portieschaling.factor(van: Int(recept.porties), naar: porties) }
@@ -65,6 +67,7 @@ struct ReceptWeergave: View {
             .padding(.vertical, 16)
             .frame(maxWidth: .infinity)
         }
+        .safeAreaInset(edge: .bottom) { receptBalk }
         .onGeometryChange(for: CGFloat.self) {
             $0.size.width - 40
         } action: {
@@ -112,24 +115,17 @@ struct ReceptWeergave: View {
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
-            let kenmerken = [
-                Weergave.porties(Int(recept.porties)).map { ("person.2", $0) },
-                Weergave.tijd(minuten: Int(recept.bereidingstijdMinuten)).map { ("clock", $0) },
-                Weergave.tijd(minuten: Int(recept.totaleTijdMinuten)).map { ("hourglass", "totaal \($0)") },
-                recept.aantalKeerGekookt > 0 ? ("checkmark.circle", "\(recept.aantalKeerGekookt)× gekookt") : nil,
-            ].compactMap { $0 }
-            if !kenmerken.isEmpty || !(recept.categorieen ?? []).isEmpty || !(recept.labels ?? []).isEmpty {
+            tijdblokken
+            if !(recept.categorieen ?? []).isEmpty || !(recept.labels ?? []).isEmpty || recept.aantalKeerGekookt > 0 {
                 Stroomopmaak {
-                    ForEach(kenmerken, id: \.1) { symbool, tekst in
-                        SwiftUI.Label(tekst, systemImage: symbool)
-                            .font(.subheadline)
-                            .padding(.vertical, 4)
-                    }
                     ForEach(recept.gesorteerdeCategorieen, id: \.objectID) { categorie in
                         Kenmerk(titel: categorie.naamOfStandaard, symbool: categorie.symboolOfStandaard)
                     }
                     ForEach(recept.gesorteerdeLabels, id: \.objectID) { label in
                         Kenmerk(titel: label.naamOfStandaard)
+                    }
+                    if recept.aantalKeerGekookt > 0 {
+                        Kenmerk(titel: "\(recept.aantalKeerGekookt)× gekookt", symbool: "checkmark.circle")
                     }
                 }
             }
@@ -139,35 +135,87 @@ struct ReceptWeergave: View {
                     .foregroundStyle(.secondary)
                     .padding(.top, 4)
             }
-            if !recept.gesorteerdeStappen.isEmpty {
-                Button {
-                    kookSessie = KookSessie(recept: recept, porties: porties > 0 ? porties : nil)
-                } label: {
-                    SwiftUI.Label("Kook dit", systemImage: "play.fill")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 6)
-                }
-                .buttonStyle(.borderedProminent)
-                .padding(.top, 8)
-                .accessibilityHint("Opent de kookmodus: één stap tegelijk, groot, en het scherm blijft aan")
-            }
         }
+    }
+
+    /// Bereiden, totaal en personen als blokjes naast elkaar (schets v2, Recept A); alleen wat er is.
+    @ViewBuilder private var tijdblokken: some View {
+        let blokken = Weergave.tijdblokken(
+            bereiding: Int(recept.bereidingstijdMinuten), totaal: Int(recept.totaleTijdMinuten),
+            porties: recept.porties > 0 ? porties : 0)
+        if !blokken.isEmpty {
+            Stroomopmaak {
+                ForEach(blokken, id: \.omschrijving) { tijdblok($0) }
+            }
+            .padding(.top, 4)
+        }
+    }
+
+    private func tijdblok(_ blok: Weergave.Tijdblok) -> some View {
+        VStack(spacing: 2) {
+            Text(blok.waarde)
+                .font(.headline)
+                .monospacedDigit()
+            Text(blok.omschrijving)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .frame(minWidth: 92)
+        .background(Color(.secondarySystemFill), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .accessibilityElement(children: .combine)
+    }
+
+    /// Vaste balk onderin (U2): porties en "Kook dit" onder de duim, ook als je naar de bereiding scrolt.
+    @ViewBuilder private var receptBalk: some View {
+        let kanKoken = !recept.gesorteerdeStappen.isEmpty
+        if kanKoken || recept.porties > 0 {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    portiesKnoppen
+                    if kanKoken { kookKnop }
+                }
+                VStack(spacing: 8) {
+                    portiesKnoppen
+                    if kanKoken { kookKnop }
+                }
+            }
+            .padding(.vertical, 8)
+            .padding(.leading, recept.porties > 0 ? 10 : 8)
+            .padding(.trailing, 8)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 33, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 33, style: .continuous).stroke(Color(.separator), lineWidth: 0.5))
+            .shadow(color: .black.opacity(0.12), radius: 12, y: 4)
+            .frame(maxWidth: balkBreedte)
+            .padding(.horizontal, 12)
+            .padding(.bottom, 4)
+            .frame(maxWidth: .infinity)
+            .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        }
+    }
+
+    private var kookKnop: some View {
+        Button {
+            kookSessie = KookSessie(recept: recept, porties: porties > 0 ? porties : nil)
+        } label: {
+            SwiftUI.Label("Kook dit", systemImage: "play.fill")
+                .font(.headline.weight(.bold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, 20)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .background(Kookkleuren.accent, in: Capsule())
+                .foregroundStyle(.white)
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Opent de kookmodus: één stap tegelijk, groot, en het scherm blijft aan")
     }
 
     private var ingredientenBlok: some View {
         VStack(alignment: .leading, spacing: 12) {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .firstTextBaseline) {
-                    ingredientenKop
-                    Spacer(minLength: 8)
-                    portiesKnoppen
-                }
-                VStack(alignment: .leading, spacing: 6) {
-                    ingredientenKop
-                    portiesKnoppen
-                }
-            }
+            ingredientenKop
             let ingredienten = recept.gesorteerdeIngredienten
             if ingredienten.isEmpty {
                 Text("Geen ingrediënten ingevoerd.").foregroundStyle(.secondary)
@@ -191,7 +239,7 @@ struct ReceptWeergave: View {
 
     @ViewBuilder private var portiesKnoppen: some View {
         if recept.porties > 0 {
-            PortiesKnoppen(porties: porties) { gekozenPorties = min(99, max(1, $0)) }
+            PortiesKnoppen(porties: porties, wijzig: { gekozenPorties = min(99, max(1, $0)) }, rond: true)
         }
     }
 
