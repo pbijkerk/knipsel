@@ -1,0 +1,215 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Knipsel — UX-ronde ‘mooier en makkelijker’</title><style>
+:root{--tomaat:#D9613C;--tomaat-d:#B24B2A;--papier:#FBF7F0;--kaart:#F0E8DC;--inkt:#2B2622;--gedimd:#6F665C;--lijn:#E2D8C9;
+--serif:"New York","Iowan Old Style",Charter,Georgia,serif;--sans:-apple-system,"SF Pro Text",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:#EDE6DA;color:var(--inkt);padding:28px 20px 60px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-family:var(--serif);font-size:34px;letter-spacing:-.5px}
+h2{font-family:var(--serif);font-size:24px;margin:34px 0 10px}
+.lead{color:var(--gedimd);max-width:820px;margin-top:8px;font-size:15px}
+.note{background:#fff8;border-left:4px solid var(--tomaat);padding:10px 14px;margin:14px 0;font-size:14px;max-width:900px;border-radius:0 8px 8px 0}
+table.eisen{border-collapse:collapse;width:100%;font-size:13.5px;background:#fffc;border-radius:12px;overflow:hidden}
+.eisen th,.eisen td{padding:9px 11px;text-align:left;vertical-align:top;border-bottom:1px solid var(--lijn)}
+.eisen th{background:var(--kaart);font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--gedimd)}
+.eisen td:first-child{font-weight:700;color:var(--tomaat-d);white-space:nowrap}
+/* tabs, CSS-only */
+.tabs input{display:none}
+.tabbar{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 18px;position:sticky;top:0;background:#EDE6DA;padding:8px 0;z-index:5}
+.tabbar label{padding:9px 16px;border-radius:999px;background:#fff;cursor:pointer;font-weight:600;font-size:14px;border:1px solid var(--lijn)}
+.panel{display:none}
+#t1:checked~.tabbar label[for=t1],#t2:checked~.tabbar label[for=t2],#t3:checked~.tabbar label[for=t3],#t4:checked~.tabbar label[for=t4],#t5:checked~.tabbar label[for=t5]{background:var(--tomaat);color:#fff;border-color:var(--tomaat)}
+#t1:checked~#p1,#t2:checked~#p2,#t3:checked~#p3,#t4:checked~#p4,#t5:checked~#p5{display:block}
+.nu{background:#fff;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:14px}
+.nu b{color:var(--tomaat-d)}
+.nu ul{margin:6px 0 0 18px}
+.rij{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.optie{width:340px}
+.optie h3{font-family:var(--serif);font-size:19px;margin:12px 0 4px}
+.optie .tag{display:inline-block;font-size:11px;font-weight:700;background:var(--kaart);color:var(--tomaat-d);padding:2px 7px;border-radius:6px;margin:0 4px 4px 0}
+.optie p{font-size:13.5px;margin:5px 0}
+.optie p b{color:var(--gedimd);font-weight:600}
+.btn{display:inline-block;margin-top:8px;background:var(--inkt);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer}
+.aanrader{background:var(--tomaat);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle;font-family:var(--sans)}
+/* telefoon */
+.tel{width:340px;height:700px;border-radius:46px;background:#111;padding:11px;box-shadow:0 18px 40px #0003}
+.scherm{width:100%;height:100%;border-radius:36px;background:#fff;overflow:hidden;position:relative;font-size:13px}
+.status{height:40px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-weight:600;font-size:13px}
+.ipad{width:760px;height:540px;border-radius:30px;background:#111;padding:12px;box-shadow:0 18px 40px #0003}
+.ipad .scherm{border-radius:20px}
+.optie.breed{width:760px}
+/* bouwstenen */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:4px 16px}
+.rond{width:34px;height:34px;border-radius:50%;background:#f2f0ed;display:flex;align-items:center;justify-content:center;font-size:15px}
+.groot{font-family:var(--serif);font-weight:700;font-size:28px;padding:4px 16px 8px}
+.chips{display:flex;gap:6px;padding:4px 16px 10px;overflow:hidden;white-space:nowrap}
+.chip{padding:5px 11px;border-radius:999px;background:#f2f0ed;font-size:12px;font-weight:500}
+.chip.aan{background:#fff;border:1.5px solid var(--tomaat);color:var(--tomaat-d)}
+.zoek{position:absolute;left:16px;right:16px;bottom:22px;height:42px;border-radius:21px;background:#fff;box-shadow:0 4px 18px #0002;display:flex;align-items:center;padding:0 14px;color:#888;gap:8px}
+.serif{font-family:var(--serif)}
+.klein{font-size:11px;color:var(--gedimd)}
+.tom{color:var(--tomaat-d)}
+.fab{position:absolute;right:18px;bottom:78px;height:52px;padding:0 20px;border-radius:26px;background:var(--tomaat);color:#fff;display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 6px 18px #D9613C66}
+/* receptkaarten */
+.raster{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}
+.rkaart{border-radius:16px;height:150px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.rkaart .t{font-family:var(--serif);font-weight:700;font-size:15px;line-height:1.15}
+.rkaart .sym{font-size:30px;opacity:.9}
+.k-soep{background:#F6E3C8}.k-sal{background:#DDE9CF}.k-hoofd{background:#EBD3CB}.k-na{background:#EADCF0}.k-lunch{background:#F3EBC5}.k-brood{background:#EFE2D1}
+.foto{background-size:cover;background-position:center;color:#fff}
+.foto::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,#0009)}
+.foto>*{position:relative;z-index:1}
+.f1{background-image:radial-gradient(circle at 35% 40%,#F2A54A 0 22%,#E07B28 23% 36%,#5b3a22 37% 40%,#efe6d6 41%)}
+.f2{background-image:radial-gradient(circle at 60% 55%,#7aa35a 0 18%,#b9d38f 19% 30%,#e6d8b8 31% 36%,#3d5c3a 37%)}
+.f3{background-image:radial-gradient(ellipse at 50% 60%,#8a3324 0 30%,#5a2318 31% 40%,#d9c7ad 41%)}
+/* lijst */
+.lrij{display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid #eee}
+.lsym{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.ltitel{font-family:var(--serif);font-weight:700;font-size:15px}
+/* recept */
+.balk-onder{position:absolute;left:12px;right:12px;bottom:18px;height:62px;border-radius:31px;background:#fff;box-shadow:0 6px 24px #0002;display:flex;align-items:center;padding:0 8px 0 18px;gap:10px}
+.kookknop{margin-left:auto;background:var(--tomaat);color:#fff;font-weight:700;border-radius:24px;height:46px;padding:0 20px;display:flex;align-items:center;gap:6px}
+.stepper{display:flex;align-items:center;gap:10px;font-weight:600}
+.stepper span{width:28px;height:28px;border-radius:50%;background:#f2f0ed;display:flex;align-items:center;justify-content:center}
+.ing{display:flex;gap:9px;padding:5px 16px;font-family:var(--serif);font-size:14px}
+.ing i{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--tomaat);flex:none;margin-top:3px}
+.ing i.af{background:var(--tomaat)}
+.ing.af{color:#aaa;text-decoration:line-through}
+.seg{display:flex;margin:6px 16px 10px;background:#f2f0ed;border-radius:10px;padding:3px}
+.seg div{flex:1;text-align:center;padding:6px;border-radius:8px;font-weight:600;font-size:12px;color:var(--gedimd)}
+.seg .aan{background:#fff;color:var(--inkt);box-shadow:0 1px 3px #0002}
+.blok{background:#f7f4ef;border-radius:16px;margin:8px 14px;padding:12px}
+.tijdlijn{display:flex;gap:6px;margin:6px 16px}
+.tijdlijn div{flex:1;background:#f7f4ef;border-radius:12px;padding:8px;text-align:center}
+.tijdlijn b{display:block;font-size:15px}
+/* kookmodus */
+.kook{background:var(--papier);height:calc(100% - 40px);position:relative}
+.ipad .kook{height:100%}
+.voortgang{display:flex;gap:4px;padding:6px 16px}
+.voortgang div{flex:1;height:5px;border-radius:3px;background:var(--lijn)}
+.voortgang .g{background:var(--tomaat)}.voortgang .h{background:var(--inkt)}
+.stap{font-family:var(--serif);font-size:29px;line-height:1.22;padding:14px 18px}
+.stap em{font-style:normal;color:var(--tomaat-d);font-weight:700}
+.nodig{background:var(--kaart);border-radius:14px;margin:4px 16px;padding:10px 12px}
+.navknoppen{position:absolute;left:12px;right:12px;bottom:18px;display:flex;gap:10px}
+.navknoppen div{height:76px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+.terug{width:96px;background:var(--kaart)}
+.verder{flex:1;background:var(--inkt);color:var(--papier)}
+.mic{display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;margin:0 16px;width:max-content}
+.mic .stip{width:8px;height:8px;border-radius:50%;background:#3BA55C;box-shadow:0 0 0 4px #3BA55C33}
+.gluur{position:absolute;left:0;right:0;bottom:0;height:150px;background:#fff;border-radius:26px 26px 0 0;box-shadow:0 -6px 20px #0001;padding:12px 18px}
+.greep{width:40px;height:5px;border-radius:3px;background:#ddd;margin:0 auto 10px}
+.timerchip{display:inline-flex;align-items:center;gap:8px;background:var(--tomaat);color:#fff;border-radius:16px;padding:12px 16px;font-weight:700;font-size:16px;margin:6px 16px}
+.zone{position:absolute;top:110px;bottom:120px;width:50%;display:flex;align-items:center;justify-content:center;color:#0002;font-size:44px;font-weight:200}
+/* ipad */
+.kol{position:absolute;top:0;bottom:0;overflow:hidden}
+</style></head><body><div class="wrap">
+<h1>Knipsel — mooier en makkelijker te bedienen</h1>
+<p class="lead">Schetsen v0.3 · 14 november 2026. Uitgangspunt: renders van de huidige app (main <code>ffc3092</code>). Per scherm 2–3 richtingen, elk met idee, onderbouwing en afweging. De eisen U1–U8 vullen K1–K14 uit <code>docs/ontwerp.md</code> aan. Alle recepten en foto’s in de schetsen zijn verzonnen.</p>
+<div class="note"><b>Wat nu al goed is en blijft:</b> de serif-letter, tomaat als enige accentkleur, de papierkleur van de kookmodus, ‘Nodig in deze stap’, porties schalen en afvinken. Deze ronde gaat over herkenbaarheid, bereikbaarheid en zichtbare bediening — niet over een nieuwe huisstijl.</div>
+<h2>Eisen U1–U8</h2>
+<table class="eisen"><tr><th>Eis</th><th>Wat</th><th>Basis</th></tr><tr><td>U1</td><td><b>Elk recept een eigen gezicht</b><br>In de lijst herken je een recept aan meer dan de titel: kleur, symbool of eigen foto. Nu heeft elk recept hetzelfde schaartje.</td><td>Information scent (Pirolli &amp; Card, 1999); picture superiority (Paivio, 1971). Praktijk: Mela, Crouton, Paprika tonen foto’s.</td></tr><tr><td>U2</td><td><b>Hoofdactie onder de duim</b><br><i>Knip</i> en <i>Kook dit</i> zijn groot en bereikbaar met één hand; nu staan ze bovenin of halverwege de pagina.</td><td>Fitts (1954); Hoober (2013): 49 % één hand, duimzone onderaan. Apple HIG iOS 26 (bediening onderin).</td></tr><tr><td>U3</td><td><b>Bediening die je ziet</b><br>Wat je kunt tikken of zeggen, staat in beeld. Tikvlakken en spraakcommando’s mogen niet verborgen zijn.</td><td>Signifiers (Norman, 2013); Nielsen heuristieken 1 en 6 (status zichtbaar, herkennen boven herinneren).</td></tr><tr><td>U4</td><td><b>Eerst klaarzetten, dan koken</b><br>Vóór het koken zie je wat je klaar moet zetten; tijdens het koken wat er nu nodig is en wat er komt.</td><td>Cognitive load (Sweller, 1988); mise en place. Vtyurina &amp; Fourney (2018): koks vragen vaak ‘wat komt hierna?’.</td></tr><tr><td>U5</td><td><b>Rust</b><br>Eén chiprij (categorieën), labels achter <i>Filter</i>; minder grijze kleine tekst, meer witruimte en één accentkleur.</td><td>Hick (1952); aesthetic-usability effect (Kurosu &amp; Kashimura, 1995; Tractinsky e.a., 2000).</td></tr><tr><td>U6</td><td><b>Geen lege vlakken op iPad</b><br>Het grote scherm toont overzicht of inhoud, nooit ‘Kies een recept’ op een derde van het scherm.</td><td>Overview first, details on demand (Shneiderman, 1996).</td></tr><tr><td>U7</td><td><b>Leesbaar op aanrechtafstand</b><br>Kookmodus op iPad ±40 pt (1–1,5 m), op iPhone ≥ 30 pt (70–80 cm, K5 blijft).</td><td>Critical print size (Legge &amp; Bigelow, 2011).</td></tr><tr><td>U8</td><td><b>Je kookgeschiedenis telt</b><br>‘3× gekookt’, sterren en ‘verder met…’ zijn zichtbaar waar je kiest.</td><td>Zeigarnik (1927); Mark e.a. (2008) over onderbroken taken; herkennen boven herinneren.</td></tr></table>
+<div class="tabs">
+<input type="radio" name="t" id="t1" checked><input type="radio" name="t" id="t2"><input type="radio" name="t" id="t3"><input type="radio" name="t" id="t4"><input type="radio" name="t" id="t5">
+<div class="tabbar"><label for="t1">Bibliotheek</label><label for="t2">Recept</label><label for="t3">Kookmodus</label><label for="t4">iPad</label><label for="t5">Volgorde</label></div>
+<div class="panel" id="p1"><div class="nu"><b>Nu:</b><ul><li>Elk recept heeft hetzelfde schaartje — je herkent niets aan de vorm.</li><li>Twee chiprijen (categorieën én labels) die van het scherm aflopen.</li><li><i>Knip</i> en <i>＋</i> klein in de rechterbovenhoek, buiten bereik van de duim.</li></ul></div><div class="rij"><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">⚙︎</div><div class="rond">＋</div></div>
+<div class="groot">Recepten</div>
+<div class="chips"><span class="chip aan">Alles</span><span class="chip">Soepen</span><span class="chip">Salades</span><span class="chip">Hoofd</span><span class="chip">⚲ Filter</span></div>
+<div class="raster">
+<div class="rkaart k-soep"><div class="sym">🥣</div><div><div class="t">Pompoensoep met gember</div><div class="klein">45 min · 4 pers.</div></div></div>
+<div class="rkaart k-sal"><div class="sym">🥗</div><div><div class="t">Lauwwarme linzensalade</div><div class="klein">25 min · snel</div></div></div>
+<div class="rkaart k-hoofd"><div class="sym">🍲</div><div><div class="t">Stoofpot met rode wijn</div><div class="klein">3 u · feestelijk</div></div></div>
+<div class="rkaart k-lunch"><div class="sym">🥧</div><div><div class="t">Prei-quiche met oude kaas</div><div class="klein">1 u · vega</div></div></div>
+</div>
+<div class="fab">✂︎ Knip</div>
+<div class="zoek">⌕ Zoek op recept of ingrediënt</div></div></div><h3>A · Kaartenbak</h3><div><span class="tag">U1</span><span class="tag">U2</span><span class="tag">U5</span><span class="tag">K4</span></div><p><b>Idee</b> — Raster van kaarten in de kleur en het symbool van de categorie, titel groot in serif. Geen foto nodig: elk recept krijgt toch een eigen gezicht. Labels verhuizen naar één knop <i>Filter</i>; de chiprij houdt alleen categorieën.</p><p><b>Basis</b> — Information scent: je herkent sneller wat je zoekt aan vorm en kleur dan aan regels tekst (Pirolli &amp; Card, 1999). Minder keuzes tegelijk = sneller kiezen (Hick, 1952). Praktijk: Mela en Crouton tonen recepten als kaarten.</p><p><b>Afweging</b> — Minder recepten per scherm (4–6 i.p.v. 7). Kleur per categorie moet ook in donkere modus kloppen.</p><button class="btn" data-hermes-send="Knipsel UX: werk Bibliotheek A (kaartenbak) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">⚙︎</div><div class="rond">＋</div></div>
+<div class="groot">Recepten</div>
+<div class="chips"><span class="chip aan">Alles</span><span class="chip">Soepen</span><span class="chip">Salades</span><span class="chip">⚲ Filter</span></div>
+<div class="raster">
+<div class="rkaart foto f1"><div class="klein" style="color:#fff">✓ 3× gekookt</div><div><div class="t">Pompoensoep met gember</div><div class="klein" style="color:#fffc">45 min</div></div></div>
+<div class="rkaart foto f2"><div></div><div><div class="t">Lauwwarme linzensalade</div><div class="klein" style="color:#fffc">25 min</div></div></div>
+<div class="rkaart foto f3"><div></div><div><div class="t">Stoofpot met rode wijn</div><div class="klein" style="color:#fffc">3 u</div></div></div>
+<div class="rkaart k-lunch"><div class="sym">🥧</div><div><div class="t">Prei-quiche met oude kaas</div><div class="klein">nog geen foto · 📷</div></div></div>
+</div>
+<div class="fab">✂︎ Knip</div>
+<div class="zoek">⌕ Zoek op recept of ingrediënt</div></div></div><h3>B · Eigen foto<span class="aanrader">mijn voorkeur</span></h3><div><span class="tag">U1</span><span class="tag">U8</span><span class="tag">K14</span></div><p><b>Idee</b> — Als A, maar je kunt na het koken een foto van je eigen gerecht maken. Die komt op de kaart; zonder foto valt de kaart terug op kleur en symbool. De krantenfoto blijft weg (B7).</p><p><b>Basis</b> — Plaatjes worden beter onthouden en herkend dan woorden (picture superiority, Paivio, 1971) — en jouw eigen voorkeur ‘plaatjes zeggen meer dan woorden’. Was al eigen suggestie 6 in het ontwerp.</p><p><b>Afweging</b> — Vraagt een kleine uitbreiding van het datamodel (foto als extern bestand, iCloud-sync). Een half lege bieb met foto’s is in het begin onrustig.</p><button class="btn" data-hermes-send="Knipsel UX: werk Bibliotheek B (eigen foto) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">⚙︎</div><div class="rond">＋</div></div>
+<div class="groot">Recepten</div>
+<div style="margin:0 14px 8px;background:var(--papier);border-radius:16px;padding:12px">
+<div class="klein" style="font-weight:700;letter-spacing:.4px">VERDER MET</div>
+<div class="ltitel" style="margin-top:3px">Stoofpot met rode wijn</div><div class="klein">Gisteren bij stap 4 van 7 gestopt</div></div>
+<div class="chips"><span class="chip aan">Alles</span><span class="chip">Soepen</span><span class="chip">Salades</span><span class="chip">⚲ Filter</span></div>
+<div class="lrij"><div class="lsym k-sal">🥗</div><div><div class="ltitel">Lauwwarme linzensalade</div><div class="klein">Salades · 25 min</div></div></div>
+<div class="lrij"><div class="lsym k-soep">🥣</div><div><div class="ltitel">Pompoensoep met gember</div><div class="klein">Soepen · 45 min · 3× gekookt</div></div></div>
+<div class="lrij"><div class="lsym k-lunch">🥧</div><div><div class="ltitel">Prei-quiche met oude kaas</div><div class="klein">Lunch · 1 u</div></div></div>
+<div class="lrij"><div class="lsym k-na">🍰</div><div><div class="ltitel">Rabarbercrumble</div><div class="klein">Nagerechten · 50 min</div></div></div>
+<div class="fab">✂︎ Knip</div>
+<div class="zoek">⌕ Zoek op recept of ingrediënt</div></div></div><h3>C · Rustige lijst</h3><div><span class="tag">U1</span><span class="tag">U5</span><span class="tag">U8</span></div><p><b>Idee</b> — De huidige lijst, maar met het categoriesymbool in plaats van steeds hetzelfde schaartje, labels naar <i>Filter</i>, en bovenaan ‘Verder met…’ als je een kookmodus halverwege afbrak.</p><p><b>Basis</b> — Herkennen gaat beter dan herinneren (Nielsen, heuristiek 6). Een onderbroken taak wil je afmaken; maak de weg terug kort (Zeigarnik, 1927; Mark e.a., 2008).</p><p><b>Afweging</b> — Kleinste ingreep, meeste recepten per scherm. Minder ‘mooi’ dan A/B.</p><button class="btn" data-hermes-send="Knipsel UX: werk Bibliotheek C (rustige lijst) uit">Uitwerken</button></div></div></div>
+<div class="panel" id="p2"><div class="nu"><b>Nu:</b><ul><li><i>Kook dit</i> staat halverwege; scrol je naar de bereiding, dan is hij weg.</li><li>Porties stellen zit rechts naast ‘Ingrediënten’, klein.</li><li>Tijden, categorieën en labels lopen door elkaar in één regel.</li></ul></div><div class="rij"><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">‹</div><div style="display:flex;gap:8px"><div class="rond">Aa</div><div class="rond">⋯</div></div></div>
+<div class="groot" style="font-size:26px">Pompoensoep met gember</div>
+<div class="klein" style="padding:0 16px">Het Testblad · 13 nov 2026 · p. 52</div>
+<div class="tijdlijn"><div><b>15 min</b><span class="klein">voorbereiden</span></div><div><b>30 min</b><span class="klein">koken</span></div><div><b>4</b><span class="klein">personen</span></div></div>
+<div class="serif" style="font-weight:700;font-size:17px;padding:8px 16px 4px">Ingrediënten</div>
+<div class="ing af"><i class="af"></i><span><b>1</b> flespompoen, ca. 1 kg</span></div><div class="ing"><i></i><span><b>2</b> uien, gesnipperd</span></div><div class="ing"><i></i><span><b>3 cm</b> verse gember</span></div><div class="ing"><i></i><span><b>2 el</b> olijfolie</span></div><div class="ing"><i></i><span><b>1 l</b> groentebouillon</span></div><div class="ing"><i></i><span><b>200 ml</b> kokosmelk</span></div>
+<div class="serif" style="font-weight:700;font-size:17px;padding:10px 16px 4px">Bereiding</div>
+<div class="ing"><span class="tom" style="font-weight:700">1</span><span>Schil de pompoen, verwijder de pitten…</span></div>
+<div class="balk-onder"><div class="stepper"><span>−</span>4<span>＋</span></div><div class="kookknop">▶ Kook dit</div></div></div></div><h3>A · Kook dit onderin<span class="aanrader">mijn voorkeur</span></h3><div><span class="tag">U2</span><span class="tag">U3</span><span class="tag">K3</span></div><p><b>Idee</b> — Porties en <i>Kook dit</i> staan in een vaste balk onder je duim, ook als je naar beneden scrolt. Tijden als drie blokjes bovenaan: voorbereiden, koken, personen.</p><p><b>Basis</b> — Fitts (1954): een grote knop dichtbij gaat sneller. 49 % houdt de telefoon met één hand vast; de duim haalt de onderkant makkelijk, de bovenhoeken niet (Hoober, 2013). iOS 26 zet hoofdacties ook onderin.</p><p><b>Afweging</b> — De balk dekt 60 pt van de tekst af; de laatste regel krijgt extra ruimte onderaan.</p><button class="btn" data-hermes-send="Knipsel UX: werk Recept A (kook dit onderin) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">‹</div><div style="display:flex;gap:8px"><div class="rond">Aa</div><div class="rond">⋯</div></div></div>
+<div class="groot" style="font-size:26px">Pompoensoep met gember</div>
+<div class="seg"><div class="aan">Klaarzetten</div><div>Bereiding</div><div>Notities</div></div>
+<div class="klein" style="padding:0 16px 6px">Zet dit klaar voor je begint — tik af wat er staat.</div>
+<div class="blok"><div class="klein" style="font-weight:700">GROENTE</div><div class="ing" style="padding:4px 0"><i class="af"></i><span><b>1</b> flespompoen</span></div><div class="ing" style="padding:4px 0"><i></i><span><b>2</b> uien</span></div><div class="ing" style="padding:4px 0"><i></i><span><b>3 cm</b> gember</span></div></div>
+<div class="blok"><div class="klein" style="font-weight:700">VOORRAAD</div><div class="ing" style="padding:4px 0"><i></i><span><b>2 el</b> olijfolie</span></div><div class="ing" style="padding:4px 0"><i></i><span><b>½ tl</b> kerriepoeder</span></div></div>
+<div class="blok"><div class="klein" style="font-weight:700">PANNEN</div><div class="ing" style="padding:4px 0"><i></i><span>soeppan · staafmixer</span></div></div>
+<div class="balk-onder"><div class="klein" style="font-weight:600">1 van 8 klaar</div><div class="kookknop">▶ Kook dit</div></div></div></div><h3>B · Eerst klaarzetten</h3><div><span class="tag">U4</span><span class="tag">U2</span></div><p><b>Idee</b> — Drie tabbladen. <i>Klaarzetten</i> groepeert ingrediënten (groente, voorraad, koeling) en noemt pannen; je tikt af wat er staat. Daarna pas bereiding.</p><p><b>Basis</b> — Mise en place: alles klaar hebben haalt denkwerk uit het koken zelf (cognitieve belasting, Sweller, 1988). Praktijk: Crouton en NYT Cooking tonen ‘prep’ apart.</p><p><b>Afweging</b> — Groeperen per soort ingrediënt vraagt een woordenlijst of Claude; fout ingedeeld is erger dan niet ingedeeld. Pannen staan zelden in de krant.</p><button class="btn" data-hermes-send="Knipsel UX: werk Recept B (klaarzetten) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div style="height:170px;background:linear-gradient(135deg,#F6E3C8,#EBC9A0);margin-top:-40px;padding:52px 16px 0;position:relative">
+<div class="nav" style="padding:0"><div class="rond" style="background:#fff9">‹</div><div class="rond" style="background:#fff9">⋯</div></div>
+<div style="font-size:42px;position:absolute;right:20px;bottom:12px">🥣</div></div>
+<div class="groot" style="font-size:26px;padding-top:12px">Pompoensoep met gember</div>
+<div class="serif klein" style="padding:0 16px;font-style:italic">Een warme, fluweelzachte soep voor koude dagen.</div>
+<div class="chips" style="padding:10px 16px"><span class="chip">⏱ 45 min</span><span class="chip">👥 4</span><span class="chip">✓ 3×</span><span class="chip">★★★★</span></div>
+<div class="serif" style="font-weight:700;font-size:17px;padding:4px 16px">Ingrediënten · voor 4</div>
+<div class="ing"><i></i><span><b>1</b> flespompoen, ca. 1 kg</span></div><div class="ing"><i></i><span><b>2</b> uien, gesnipperd</span></div><div class="ing"><i></i><span><b>3 cm</b> verse gember</span></div><div class="ing"><i></i><span><b>2 el</b> olijfolie</span></div><div class="ing"><i></i><span><b>1 l</b> groentebouillon</span></div><div class="ing"><i></i><span><b>200 ml</b> kokosmelk</span></div>
+<div class="fab" style="bottom:22px;left:16px;right:16px;justify-content:center">▶ Kook dit · 4 personen</div></div></div><h3>C · Omslag</h3><div><span class="tag">U5</span><span class="tag">U8</span><span class="tag">U1</span></div><p><b>Idee</b> — Een kop in de kleur van de categorie (of jouw eigen foto, zie Bibliotheek B), daaronder kenmerken als chips met sterren en ‘3× gekookt’. Brede <i>Kook dit</i>-knop onderaan.</p><p><b>Basis</b> — Esthetiek beïnvloedt hoe bruikbaar mensen iets vinden (aesthetic-usability effect, Kurosu &amp; Kashimura, 1995; Tractinsky e.a., 2000). Herkennen boven herinneren voor ‘hoe vond ik het?’.</p><p><b>Afweging</b> — Kost hoogte boven de ingrediënten. Werkt pas echt met foto’s.</p><button class="btn" data-hermes-send="Knipsel UX: werk Recept C (omslag) uit">Uitwerken</button></div></div></div>
+<div class="panel" id="p3"><div class="nu"><b>Nu:</b><ul><li>‘vorige’ en ‘volgende’ staan in 11 pt grijs onderin; dat de hele helft van het scherm een knop is, zie je niet.</li><li>De onderste helft van het scherm is leeg.</li><li>Microfoon en luidspreker zijn icoontjes zonder tekst; ‘luistert hij nu?’ is niet te zien.</li></ul></div><div class="rij"><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="kook"><div class="nav"><div class="rond" style="background:var(--kaart)">✕</div><div style="flex:1;padding-left:10px"><div style="font-weight:700">Stap 2 van 5</div><div class="klein">Pompoensoep met gember · 4 pers.</div></div><div class="rond" style="background:var(--kaart)">🔊</div></div>
+<div class="voortgang"><div class="g"></div><div class="h"></div><div></div><div></div><div></div></div><div style="height:6px"></div><div class="mic"><span class="stip"></span>Luistert · zeg ‘volgende’</div><div class="stap">Verhit de <em>olie</em> in een soeppan en fruit de <em>ui</em> en <em>gember</em> 5 minuten op middelhoog vuur.</div>
+<div class="nodig"><div class="klein" style="font-weight:600">Nodig in deze stap</div><div class="serif tom" style="font-size:15px;margin-top:3px"><b>2 el</b> olijfolie · <b>2</b> uien · <b>3 cm</b> gember</div></div>
+<div class="navknoppen"><div class="terug">‹</div><div class="verder">Volgende stap ›</div></div></div></div></div><h3>A · Zichtbare knoppen<span class="aanrader">mijn voorkeur</span></h3><div><span class="tag">U3</span><span class="tag">K7</span></div><p><b>Idee</b> — Onderin twee grote knoppen: een kleine <i>terug</i> en een brede <i>Volgende stap</i>, groot genoeg voor een knokkel. De microfoonstatus staat als zin in beeld (‘Luistert · zeg volgende’).</p><p><b>Basis</b> — Een bediening die je niet ziet, bestaat niet voor de gebruiker (signifiers, Norman, 2013). Nu staan ‘vorige/volgende’ in 11 pt grijs — de hele helft van het scherm is tikbaar, maar dat zie je niet. Doelen ≥ 44 pt (Apple HIG); met vieze handen liever ≥ 70 pt.</p><p><b>Afweging</b> — Haalt ~90 pt van de stap af. Op een kleine iPhone met grote letters moet de stap dan eerder scrollen.</p><button class="btn" data-hermes-send="Knipsel UX: werk Kookmodus A (zichtbare knoppen) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="kook"><div class="nav"><div class="rond" style="background:var(--kaart)">✕</div><div style="flex:1;padding-left:10px"><div style="font-weight:700">Stap 2 van 5</div><div class="klein">Pompoensoep met gember · 4 pers.</div></div><div class="rond" style="background:var(--kaart)">🔊</div></div>
+<div class="voortgang"><div class="g"></div><div class="h"></div><div></div><div></div><div></div></div><div style="height:6px"></div><div class="mic"><span class="stip"></span>Luistert</div><div class="stap">Verhit de <em>olie</em> in een soeppan en fruit de <em>ui</em> en <em>gember</em> 5 minuten op middelhoog vuur.</div>
+<div class="timerchip">⏱ Timer 5 min</div>
+<div class="gluur"><div class="greep"></div><div class="klein" style="font-weight:700;letter-spacing:.4px">HIERNA · STAP 3</div><div class="serif" style="font-size:16px;color:var(--gedimd);margin-top:4px">Voeg de pompoen en de kerrie toe en bak 2 minuten mee.</div></div></div></div></div><h3>B · Gluren naar de volgende stap</h3><div><span class="tag">U4</span><span class="tag">U3</span><span class="tag">K11</span></div><p><b>Idee</b> — Onderaan zie je alvast de volgende stap, gedimd. Een tijd uit de tekst staat als grote timerknop bij de stap (voorbereiding op fase 7). Vegen naar boven = volgende.</p><p><b>Basis</b> — Vooruitkijken helpt plannen: koks lezen de volgende stap terwijl de ui fruit (Vtyurina &amp; Fourney, 2018: vragen ‘wat komt hierna?’). Spatial contiguity (Mayer, 2009).</p><p><b>Afweging</b> — Twee teksten tegelijk = meer om te lezen; botst een beetje met K9 ‘in jouw tempo’. Timer pas echt in fase 7.</p><button class="btn" data-hermes-send="Knipsel UX: werk Kookmodus B (gluren + timer) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="kook"><div class="nav"><div class="rond" style="background:var(--kaart)">✕</div><div style="flex:1;padding-left:10px"><div style="font-weight:700">Stap 2 van 5</div><div class="klein">Pompoensoep met gember · 4 pers.</div></div><div class="rond" style="background:var(--kaart)">🔊</div></div>
+<div class="voortgang"><div class="g"></div><div class="h"></div><div></div><div></div><div></div></div><div class="stap">Verhit de <em>olie</em> in een soeppan en fruit de <em>ui</em> en <em>gember</em> 5 minuten op middelhoog vuur.</div>
+<div class="zone" style="left:0">‹</div><div class="zone" style="right:0">›</div>
+<div style="position:absolute;left:16px;right:16px;bottom:24px;display:flex;justify-content:space-between;align-items:center">
+<div class="mic" style="margin:0"><span class="stip"></span>Luistert</div><div class="klein">tik links/rechts · of zeg het</div></div></div></div></div><h3>C · Hele scherm is de knop</h3><div><span class="tag">U3</span><span class="tag">K7</span><span class="tag">K5</span></div><p><b>Idee</b> — Geen knoppen, maar de twee tikvlakken worden zichtbaar gemaakt met grote, lichte pijlen. Onderin één regel uitleg en de microfoonstatus.</p><p><b>Basis</b> — Zo houdt de stap alle ruimte (K5, K7). Uitleg in beeld helpt alleen de eerste keren (Nielsen, heuristiek 10).</p><p><b>Afweging</b> — Lichte pijlen over de tekst zijn ‘ruis’ en verdwijnen in donkere modus snel. Minst duidelijk voor een huisgenoot die de app niet kent.</p><button class="btn" data-hermes-send="Knipsel UX: werk Kookmodus C (zichtbare tikvlakken) uit">Uitwerken</button></div></div></div>
+<div class="panel" id="p4"><div class="nu"><b>Nu:</b><ul><li>Bibliotheek: de rechterkolom is leeg (‘Kies een recept’) tot je iets kiest.</li><li>Kookmodus: de stap is ~28 pt op een scherm dat meestal 1–1,5 m verderop staat; veel lege ruimte eronder.</li></ul></div><div class="rij"><div class="optie breed"><div class="ipad"><div class="scherm"><div class="kol" style="left:0;width:190px;background:#f7f5f2;padding:18px 14px"><div style="font-weight:700;margin-bottom:12px">Knipsel</div>
+<div class="chip aan" style="display:block;margin-bottom:6px">📚 Alles</div><div class="klein" style="line-height:2.1">🌅 Ontbijt &amp; brunch<br>🥪 Lunch<br>🥣 Soepen<br>🥗 Salades<br>🍲 Hoofdgerechten<br>🍰 Nagerechten</div></div><div class="kol" style="left:190px;right:0;padding:22px 24px">
+<div style="display:flex;justify-content:space-between;align-items:center"><div class="groot" style="padding:0">Alle recepten</div><div class="fab" style="position:static;height:40px">✂︎ Knip</div></div>
+<div style="background:var(--papier);border-radius:16px;padding:12px 14px;margin:10px 0;display:flex;gap:14px;align-items:center"><div class="lsym k-hoofd">🍲</div><div><div class="klein" style="font-weight:700">VERDER MET</div><div class="ltitel">Stoofpot met rode wijn — stap 4 van 7</div></div><div class="kookknop" style="margin-left:auto;height:38px">▶ Verder</div></div>
+<div class="raster" style="grid-template-columns:repeat(4,1fr);padding:0">
+<div class="rkaart foto f1" style="height:140px"><div></div><div class="t">Pompoensoep met gember</div></div>
+<div class="rkaart foto f2" style="height:140px"><div></div><div class="t">Lauwwarme linzensalade</div></div>
+<div class="rkaart foto f3" style="height:140px"><div></div><div class="t">Stoofpot met rode wijn</div></div>
+<div class="rkaart k-lunch" style="height:140px"><div class="sym">🥧</div><div class="t">Prei-quiche</div></div>
+<div class="rkaart k-na" style="height:140px"><div class="sym">🍰</div><div class="t">Rabarbercrumble</div></div>
+<div class="rkaart k-brood" style="height:140px"><div class="sym">🍞</div><div class="t">Speltbrood</div></div>
+<div class="rkaart k-sal" style="height:140px"><div class="sym">🥗</div><div class="t">Venkelsalade</div></div>
+<div class="rkaart k-soep" style="height:140px"><div class="sym">🥣</div><div class="t">Erwtensoep</div></div></div></div></div></div><h3>A · Bibliotheek zonder leeg vlak</h3><div><span class="tag">U6</span><span class="tag">U1</span></div><p><b>Idee</b> — Op iPad geen derde kolom met ‘Kies een recept’, maar een groot raster (vier kaarten breed) met ‘Verder met…’ erboven. Een recept opent over het raster heen.</p><p><b>Basis</b> — Nu is ruim een derde van het scherm leeg zolang je niets kiest. Overzicht-dan-detail (Shneiderman, 1996): het overzicht verdient de ruimte.</p><p><b>Afweging</b> — Afwijkend van het standaard drie-kolommenpatroon van iPadOS; wel wat Mela en Crouton doen.</p><button class="btn" data-hermes-send="Knipsel UX: werk iPad A (bibliotheek raster) uit">Uitwerken</button></div><div class="optie breed"><div class="ipad"><div class="scherm"><div class="kook"><div class="kol" style="left:0;width:230px;background:var(--kaart);padding:22px 16px">
+<div class="klein" style="font-weight:700">INGREDIËNTEN · 4 PERS.</div>
+<div class="ing" style="padding:6px 0;color:#aaa;text-decoration:line-through"><i class="af"></i><span>1 flespompoen</span></div>
+<div class="ing" style="padding:6px 0;background:#fff;border-radius:8px;margin:0 -6px;padding-left:6px"><i></i><span class="tom"><b>2 el</b> olijfolie</span></div>
+<div class="ing" style="padding:6px 0;background:#fff;border-radius:8px;margin:2px -6px;padding-left:6px"><i></i><span class="tom"><b>2</b> uien</span></div>
+<div class="ing" style="padding:6px 0;background:#fff;border-radius:8px;margin:0 -6px;padding-left:6px"><i></i><span class="tom"><b>3 cm</b> gember</span></div>
+<div class="ing" style="padding:6px 0"><i></i><span>1 l bouillon</span></div><div class="ing" style="padding:6px 0"><i></i><span>200 ml kokosmelk</span></div></div>
+<div class="kol" style="left:230px;right:0;padding:16px 26px">
+<div class="nav" style="padding:0"><div class="rond" style="background:var(--kaart)">✕</div><div style="flex:1;padding-left:12px;font-weight:700">Stap 2 van 5</div><div class="mic" style="margin:0"><span class="stip"></span>Luistert</div></div>
+<div class="voortgang" style="padding:10px 0"><div class="g"></div><div class="h"></div><div></div><div></div><div></div></div>
+<div class="stap" style="font-size:40px;padding:16px 0">Verhit de <em>olie</em> in een soeppan en fruit de <em>ui</em> en <em>gember</em> 5 minuten op middelhoog vuur.</div>
+<div class="timerchip" style="margin:0">⏱ Timer 5 min</div>
+<div class="navknoppen" style="left:26px;right:26px"><div class="terug" style="height:64px">‹ Vorige</div><div class="verder" style="height:64px">Volgende stap ›</div></div></div></div></div></div><h3>B · Kookmodus voor op het aanrecht<span class="aanrader">mijn voorkeur</span></h3><div><span class="tag">U7</span><span class="tag">U3</span><span class="tag">K5</span><span class="tag">K6</span></div><p><b>Idee</b> — De stap 40 pt in plaats van ~28 pt; de ingrediënten van deze stap lichten links op; grote knoppen onderin. Leesbaar vanaf 1–1,5 m, waar een iPad meestal staat.</p><p><b>Basis</b> — Critical print size ≈ 0,2° x-hoogte (Legge &amp; Bigelow, 2011): op 1,2 m is dat ~4 mm x-hoogte → ±40 pt op een iPad. K5 rekende met 70–80 cm (iPhone-afstand). Spatial contiguity (Mayer, 2009).</p><p><b>Afweging</b> — Lange stappen moeten scrollen of krimpen; ik zou de grootte laten meeschalen met de lengte van de stap (min. 32 pt).</p><button class="btn" data-hermes-send="Knipsel UX: werk iPad B (kookmodus aanrecht) uit">Uitwerken</button></div></div></div>
+<div class="panel" id="p5"><div class="nu">Mijn voorstel voor de bouwvolgorde als je mijn voorkeuren volgt. Na elke stap een TestFlight-build en een week koken.</div><table class="eisen"><tr><th>Stap</th><th>Wat</th><th>Waarom eerst</th></tr>
+<tr><td>1</td><td>Kookmodus A (iPhone) + iPad B</td><td>Hier ben je met vieze handen; grootste winst in gebruiksgemak, geen datamodel nodig.</td></tr>
+<tr><td>2</td><td>Recept A — Kook dit en porties onderin</td><td>Klein, los te bouwen, raakt elk recept.</td></tr>
+<tr><td>3</td><td>Bibliotheek A → B (kaarten, daarna eigen foto)</td><td>A eerst zonder datamodelwijziging; B voegt de foto toe (model + iCloud).</td></tr>
+<tr><td>4</td><td>iPad A + ‘Verder met…’</td><td>Bouwt voort op de kaarten uit stap 3 en de kookgeschiedenis.</td></tr>
+<tr><td>Geparkeerd</td><td>Recept B (klaarzetten), Recept C (omslag), Kookmodus B/C</td><td>B leunt op ingrediëntgroepen die we nog niet goed herkennen; C pas zinvol met foto’s; timer komt in fase 7.</td></tr></table></div>
+</div>
+<h2>Bronnen</h2><p class="lead" style="font-size:13px">Fitts (1954) · Hick (1952) · Hoober (2013), How do users really hold mobile devices, UXmatters · Kurosu &amp; Kashimura (1995), CHI · Legge &amp; Bigelow (2011), J. of Vision 11(5) · Mark, Gudith &amp; Klocke (2008), CHI · Mayer (2009), Multimedia Learning · Nielsen (1994), 10 heuristics · Norman (2013), The Design of Everyday Things · Paivio (1971), Imagery and Verbal Processes · Pirolli &amp; Card (1999), Information Foraging · Shneiderman (1996), The eyes have it · Sweller (1988), Cognitive Science 12 · Tractinsky, Katz &amp; Ikar (2000), Interacting with Computers · Vtyurina &amp; Fourney (2018), CHI · Zeigarnik (1927). Praktijk: MacStories-reviews van Mela (2021) en Crouton; Apple HIG.</p>
+</div></body></html>

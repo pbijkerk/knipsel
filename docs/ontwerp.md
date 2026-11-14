@@ -45,6 +45,22 @@ Elke eis heeft een wetenschappelijke of praktijkbasis. De nummers keren terug in
 | **K13** Delen met huisgenoot | Een gedeeld kookboek "Thuis" dat beide gebruikers zien en aanvullen. | Besluit B4. |
 | **K14** Bron en auteursrecht | Bron blijft bij elk recept staan. De paginafoto wordt niet bewaard (B7). | Kopiëren voor eigen gebruik valt onder de thuiskopie (art. 16b Auteurswet); publiek delen niet. Echte krantenfoto's komen dus ook niet in deze publieke repo. |
 
+### 2.1 Eisen U1–U8: mooier en makkelijker (UX-ronde 14-11-2026)
+
+Aanvulling op K1–K14 na gebruik van fase 1–5. Schetsen en onderbouwing: `docs/ux/schetsen-v2.html`.
+Gekozen door Peter: Kookmodus A + iPad B (#21), Recept A (#22), Bibliotheek A → B (#23), iPad A (#24).
+
+| Eis | Wat | Basis |
+|---|---|---|
+| **U1** Elk recept een eigen gezicht | Kleur, symbool of eigen foto in de lijst | Pirolli & Card (1999); Paivio (1971) |
+| **U2** Hoofdactie onder de duim | *Knip* en *Kook dit* groot en onderin | Fitts (1954); Hoober (2013) |
+| **U3** Bediening die je ziet | Tikvlakken en spraakstatus zichtbaar | Norman (2013); Nielsen (1994) |
+| **U4** Eerst klaarzetten, dan koken | Wat nu nodig is en wat komt | Sweller (1988); Vtyurina & Fourney (2018) |
+| **U5** Rust | Eén chiprij, labels achter *Filter* | Hick (1952); Tractinsky e.a. (2000) |
+| **U6** Geen lege vlakken op iPad | Overzicht of inhoud, nooit "Kies een recept" | Shneiderman (1996) |
+| **U7** Leesbaar op aanrechtafstand | iPad-kookmodus ±40 pt (1–1,5 m) | Legge & Bigelow (2011) |
+| **U8** Kookgeschiedenis telt | "n× gekookt", sterren, "Verder met…" | Zeigarnik (1927); Mark e.a. (2008) |
+
 ## 3. De belangrijkste stromen
 
 ### 3.1 Knippen (foto → recept)
