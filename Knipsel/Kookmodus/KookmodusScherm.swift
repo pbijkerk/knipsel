@@ -46,7 +46,8 @@ extension Color {
 
 /// De kookmodus (K5–K7): één stap groot, ingrediënten van de stap oranje, het hele scherm is een
 /// tikzone (rechts ⅔ = volgende, links ⅓ = vorige), vegen en toetsenbord werken ook, en het scherm
-/// blijft aan. Op iPad links de afvinklijst, rechts de stap met de vorige en volgende gedimd.
+/// blijft aan. Op iPad links de afvinklijst, rechts de stap met de vorige en volgende gedimd. Met de
+/// luidspreker aan wordt elke stap voorgelezen (K9), en daarna wacht Knipsel.
 struct KookmodusScherm: View {
     let sessie: KookSessie
     /// "Gekookt" op het laatste scherm: kooklog bijwerken.
@@ -60,26 +61,44 @@ struct KookmodusScherm: View {
     @AppStorage(AppConfiguratie.sleutelKookmodusDonker) private var altijdDonker = true
 
     @State private var schermAan = SchermAan()
+    @State private var voorlezer = VoorleesService()
+
+    init(sessie: KookSessie, gekookt: @escaping () -> Void = {}) {
+        self.sessie = sessie
+        self.gekookt = gekookt
+    }
 
     var body: some View {
-        KookmodusInhoud(sessie: sessie, gekookt: gekookt, sluit: { dismiss() })
+        KookmodusInhoud(sessie: sessie, voorlezer: voorlezer, gekookt: gekookt, sluit: { dismiss() })
             .dynamicTypeSize(Leesinstellingen.vergroot(systeemgrootte, met: extraGrootte))
             .environment(\.colorScheme, altijdDonker ? .dark : systeemSchema)
             .preferredColorScheme(altijdDonker ? .dark : nil)
-            .onAppear { schermAan.kookmodusGeopend() }
-            .onDisappear { schermAan.kookmodusGesloten() }
-            .onChange(of: scenePhase) { _, fase in schermAan.faseGewijzigd(fase) }
+            .onAppear {
+                schermAan.kookmodusGeopend()
+                if voorlezer.isAan { voorlezer.leesHuidigeStap(van: sessie) }
+            }
+            .onDisappear {
+                schermAan.kookmodusGesloten()
+                voorlezer.stop()
+            }
+            .onChange(of: scenePhase) { _, fase in
+                schermAan.faseGewijzigd(fase)
+                // Naar de achtergrond: stil. Doorlezen met vergrendeld scherm kan later (fase 6/7).
+                if fase == .background { voorlezer.stop() }
+            }
     }
 }
 
 /// De inhoud, los van scherm-aan en thema zodat hij ook te renderen is.
 struct KookmodusInhoud: View {
     let sessie: KookSessie
+    let voorlezer: VoorleesService
     var gekookt: () -> Void = {}
     var sluit: () -> Void = {}
 
     @Environment(\.dynamicTypeSize) private var tekstgrootte
     @AppStorage(AppConfiguratie.sleutelLettertype) private var lettertype: Lettertype = .serif
+    @AppStorage(AppConfiguratie.sleutelVoorlezenAan) private var voorlezenStandaardAan = true
 
     @State private var breedte: CGFloat = 0
     @State private var bevestiging: Bevestiging?
@@ -137,7 +156,11 @@ struct KookmodusInhoud: View {
             breedte = $0
         }
         .background { toetsenbord }
-        .onChange(of: sessie.gebeurtenisNummer) { bevestig() }
+        .onChange(of: sessie.gebeurtenisNummer) {
+            bevestig()
+            // Nieuwe stap: de vorige uitspraak stopt en de nieuwe stap wordt voorgelezen; daarna wacht hij.
+            voorlezer.reageer(op: sessie.gebeurtenis, in: sessie)
+        }
     }
 
     // MARK: - Kop
@@ -154,9 +177,17 @@ struct KookmodusInhoud: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("Sluit kookmodus")
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(sessie.isAfgerond ? "Klaar" : "Stap \(sessie.stapNummer) van \(sessie.aantalStappen)")
-                        .font(.headline)
-                        .lineLimit(1)
+                    // Porties naast de stap, zodat de titel de volle breedte naast de knoppen houdt.
+                    HStack(alignment: .firstTextBaseline, spacing: 6) {
+                        Text(sessie.isAfgerond ? "Klaar" : "Stap \(sessie.stapNummer) van \(sessie.aantalStappen)")
+                            .font(.headline)
+                        if !breed, sessie.receptPorties > 0 {
+                            Text("· \(sessie.porties) pers.")
+                                .font(.subheadline)
+                                .foregroundStyle(Kookkleuren.gedimd)
+                        }
+                    }
+                    .lineLimit(1)
                     Text(sessie.titel)
                         .font(.subheadline)
                         .foregroundStyle(Kookkleuren.gedimd)
@@ -164,11 +195,7 @@ struct KookmodusInhoud: View {
                 }
                 .accessibilityElement(children: .combine)
                 Spacer(minLength: 0)
-                if !breed, sessie.receptPorties > 0 {
-                    Text("\(sessie.porties) pers.")
-                        .font(.subheadline)
-                        .foregroundStyle(Kookkleuren.gedimd)
-                }
+                luidspreker
             }
             voortgang
         }
@@ -221,6 +248,7 @@ struct KookmodusInhoud: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollBounceBehavior(.basedOnSize)
+            voorleesbalk
             zonewijzer
         }
     }
@@ -246,6 +274,7 @@ struct KookmodusInhoud: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollBounceBehavior(.basedOnSize)
+            voorleesbalk
             zonewijzer
         }
     }
@@ -362,6 +391,76 @@ struct KookmodusInhoud: View {
     private var lijstbreedte: CGFloat {
         let totaal = breedte > 0 ? breedte : 1180
         return tekstgrootte.isAccessibilitySize ? min(460, totaal * 0.38) : min(380, max(300, totaal * 0.3))
+    }
+
+    // MARK: - Voorlezen
+
+    /// Luidspreker aan/uit; golft mee zolang er voorgelezen wordt. De keuze wordt onthouden.
+    private var luidspreker: some View {
+        Button {
+            voorlezer.zetAan(!voorlezer.isAan, sessie: sessie)
+            voorlezenStandaardAan = voorlezer.isAan
+        } label: {
+            Image(systemName: voorlezer.isAan ? "speaker.wave.2.fill" : "speaker.slash.fill")
+                .symbolEffect(.variableColor.iterative, isActive: voorlezer.status == .spreekt)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(voorlezer.isAan ? Kookkleuren.accent : Kookkleuren.gedimd)
+                .frame(width: 48, height: 48)
+                .background(Kookkleuren.kaart, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Voorlezen")
+        .accessibilityValue(voorlezer.isAan ? "aan" : "uit")
+        .accessibilityHint(voorlezer.isAan ? "Tik om voorlezen uit te zetten" : "Tik om elke stap voor te laten lezen")
+    }
+
+    /// Onder de stap: tijdens het voorlezen een grote stopknop, daarna herhaal en ingrediënten.
+    /// Alleen met de luidspreker aan; knoppen gaan voor de tikzones.
+    @ViewBuilder private var voorleesbalk: some View {
+        if voorlezer.isAan {
+            HStack(spacing: 10) {
+                if voorlezer.spreekt {
+                    Image(systemName: "waveform")
+                        .symbolEffect(.variableColor.iterative, isActive: voorlezer.status == .spreekt)
+                        .font(.title2.weight(.semibold))
+                        .foregroundStyle(Kookkleuren.accent)
+                        .accessibilityHidden(true)
+                    Text("Leest voor…")
+                        .font(.headline)
+                        .foregroundStyle(Kookkleuren.gedimd)
+                        .lineLimit(1)
+                    Spacer(minLength: 0)
+                    balkKnop("Stop", systemImage: "stop.fill", nadruk: true) { voorlezer.stop() }
+                        .accessibilityHint("Stopt het voorlezen direct")
+                } else {
+                    balkKnop("Herhaal", systemImage: "arrow.counterclockwise") { sessie.herhaal() }
+                        .accessibilityHint("Leest deze stap nog een keer voor")
+                    balkKnop("Ingrediënten", systemImage: "list.bullet") { voorlezer.leesIngredienten(van: sessie) }
+                        .accessibilityLabel("Lees ingrediënten")
+                    Spacer(minLength: 0)
+                }
+            }
+            .frame(minHeight: 52)
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        }
+    }
+
+    private func balkKnop(
+        _ titel: String, systemImage: String, nadruk: Bool = false, actie: @escaping () -> Void
+    ) -> some View {
+        Button(action: actie) {
+            SwiftUI.Label(titel, systemImage: systemImage)
+                .font(.headline)
+                .lineLimit(1)
+                .padding(.horizontal, 18)
+                .frame(minHeight: 48)
+                .background(nadruk ? Kookkleuren.accent : Kookkleuren.kaart, in: Capsule())
+                .foregroundStyle(nadruk ? Color.white : Kookkleuren.tekst)
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Klaar

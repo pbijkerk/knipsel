@@ -1,14 +1,14 @@
-Fase 3 — kookmodus.
+Fase 4 — voorlezen.
 
 Probeer:
-• Open een recept en zet met − / + het aantal personen anders. Kloppen de hoeveelheden (½, ¼, ¾, 1½)?
-• Tik op "Kook dit". Je ziet één stap groot in het donker; het scherm gaat niet uit.
-• Tik rechts op het scherm (ook met een knokkel of elleboog) voor de volgende stap, links voor de vorige. Vegen kan ook. Op de iPad met toetsenbord: spatie of pijlen, esc sluit.
-• Staan de ingrediënten van de stap in oranje, in de tekst en eronder (iPad: in de lijst links)? Mist er een, of is er een te veel? Laat het weten.
-• Na de laatste stap: tik op "Gekookt".
-• Wil je de kookmodus licht? Zet bij Weergave (Aa) "Altijd donker" uit.
+• Tik op "Kook dit". Knipsel leest stap 1 voor en wacht dan. Tik rechts voor de volgende stap: die wordt voorgelezen, nooit vanzelf.
+• Tik midden in een zin op "Stop": stopt het direct? "Herhaal" leest de stap opnieuw, "Ingrediënten" leest de hele lijst.
+• Zet muziek of een podcast aan en kook: gaat de muziek zachter tijdens het voorlezen en daarna weer harder?
+• De luidspreker rechtsboven zet voorlezen aan of uit; Knipsel onthoudt dat.
+• Instellingen › Voorlezen: kies een stem en tempo (tik op "Probeer"), en zet "Ingrediënten van de stap meelezen" aan. Klinkt de stem robotachtig? Download een verbeterde stem (uitleg staat erbij).
+• Klinken hoeveelheden goed ("twee eetlepels", "anderhalve liter", "180 graden")? Laat weten wat raar klinkt.
 
-Nog niet in deze versie: voorlezen, spraak, timers, delen.
+Nog niet in deze versie: spraakbesturing, Siri, timers, delen.
 Synchronisatie tussen toestellen werkt nog niet in TestFlight.
 
 Iets vreemds gezien? Maak een schermafdruk en tik op "Deel feedback" in TestFlight.

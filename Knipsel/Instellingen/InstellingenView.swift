@@ -25,6 +25,11 @@ struct InstellingenView: View {
                     } label: {
                         SwiftUI.Label("Lettertype en tekstgrootte", systemImage: "textformat.size")
                     }
+                    NavigationLink {
+                        VoorleesInstellingenView()
+                    } label: {
+                        SwiftUI.Label("Voorlezen", systemImage: "speaker.wave.2")
+                    }
                 }
                 ClaudeInstellingen()
                 Section {
