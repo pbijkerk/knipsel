@@ -31,8 +31,9 @@ struct ReceptConcept: Equatable, Sendable {
 }
 
 /// Voegt ingedeelde regels samen tot een recept. Alleen code, geen taalmodel: de tekst blijft
-/// letterlijk. Stapregels gaan aan elkaar tot een nieuw nummer begint; elke ingrediëntregel blijft
-/// een eigen regel (een afgebroken regel wordt weer heel).
+/// letterlijk. Genummerde stapregels gaan aan elkaar tot een nieuw nummer begint; lopende bereiding
+/// knipt `StapSplitser` in stappen. Elke ingrediëntregel blijft een eigen regel (een afgebroken
+/// regel wordt weer heel).
 enum ReceptOpbouw {
     static func bouw(_ regels: [HerkendeRegel], indeling: Indeling) -> ReceptConcept {
         let opmaak = Opmaak(regels)
@@ -50,7 +51,8 @@ enum ReceptOpbouw {
         // Ingrediënten: een regel per ingrediënt; kopjes ("Ingrediënten") vallen weg.
         for nummer in inVolgorde(.ingredient) {
             let regel = regels[nummer]
-            let tekst = regel.tekst.trimmingCharacters(in: .whitespaces)
+            // Een opsommingsteken ("• 1 fles rode wijn") hoort niet bij het ingrediënt.
+            let tekst = IngredientParser.zonderOpsommingsteken(regel.tekst)
             guard !tekst.isEmpty, !IngredientParser.isKopje(tekst) else { continue }
             if let vorige = concept.ingredienten.last, loopDoor(vorige.tekst, met: tekst) {
                 concept.ingredienten[concept.ingredienten.count - 1] = ConceptRegel(
@@ -63,30 +65,48 @@ enum ReceptOpbouw {
             }
         }
 
-        // Stappen: samenvoegen tot een nieuw nummer begint. Zonder nummering is elk blok een stap.
+        // Stappen: genummerd → samenvoegen tot een nieuw nummer begint (blijft zoals het was).
+        // Lopende tekst → `StapSplitser` (op de beginwoorden van het taalmodel, als die kloppen).
         let stapRegels = inVolgorde(.stap).filter { !IngredientParser.isKopje(regels[$0].tekst) }
         let genummerd = stapRegels.contains { IngredientParser.isGenummerd(regels[$0].tekst) }
-        var vorigBlok: Int?
-        for nummer in stapRegels {
-            let regel = regels[nummer]
-            let blok = opmaak.blokVanRegel[nummer]
-            let nieuweStap =
-                concept.stappen.isEmpty
-                || (genummerd ? IngredientParser.isGenummerd(regel.tekst) : blok != vorigBlok)
-            vorigBlok = blok
-            if nieuweStap {
-                concept.stappen.append(
-                    ConceptRegel(tekst: zonderNummer(regel.tekst), laagVertrouwen: isOnzeker(regel), regels: [nummer]))
-            } else {
-                let vorige = concept.stappen.removeLast()
-                concept.stappen.append(
-                    ConceptRegel(
-                        tekst: plak([vorige.tekst, regel.tekst]),
-                        laagVertrouwen: vorige.laagVertrouwen || isOnzeker(regel), regels: vorige.regels + [nummer]))
+        if genummerd {
+            for nummer in stapRegels {
+                let regel = regels[nummer]
+                if concept.stappen.isEmpty || IngredientParser.isGenummerd(regel.tekst) {
+                    concept.stappen.append(
+                        ConceptRegel(
+                            tekst: zonderNummer(regel.tekst), laagVertrouwen: isOnzeker(regel), regels: [nummer]))
+                } else {
+                    let vorige = concept.stappen.removeLast()
+                    concept.stappen.append(
+                        ConceptRegel(
+                            tekst: plak([vorige.tekst, regel.tekst]),
+                            laagVertrouwen: vorige.laagVertrouwen || isOnzeker(regel), regels: vorige.regels + [nummer])
+                    )
+                }
             }
+        } else {
+            var stukken: [StapSplitser.Stuk] = []
+            var vorigBlok: Int?
+            for nummer in stapRegels {
+                let blok = opmaak.blokVanRegel[nummer]
+                // Nieuwe alinea: een ander blok (witruimte, andere kolom) of een ingesprongen regel.
+                let ingesprongen =
+                    regels[nummer].kader.minX - opmaak.blokken[blok].kader.minX > Self.inspringing
+                stukken.append(
+                    StapSplitser.Stuk(
+                        tekst: regels[nummer].tekst, regel: nummer, laagVertrouwen: isOnzeker(regels[nummer]),
+                        nieuweAlinea: (vorigBlok != nil && blok != vorigBlok) || ingesprongen))
+                vorigBlok = blok
+            }
+            concept.stappen = StapSplitser.conceptStappen(stukken, beginnen: indeling.stapBeginnen)
         }
         return concept
     }
+
+    /// Een regel die zoveel verder naar rechts begint (deel van de paginabreedte) springt in: een
+    /// nieuwe alinea. Vision-kaders van gewone regels in één kolom wijken tot ±0,012 af.
+    static let inspringing: CGFloat = 0.015
 
     // MARK: - Twijfel
 

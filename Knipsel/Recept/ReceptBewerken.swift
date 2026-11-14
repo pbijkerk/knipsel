@@ -9,6 +9,7 @@ struct ReceptBewerken: View {
     @Environment(\.dismiss) private var dismiss
     @State private var invoer: ReceptInvoer
     @State private var foutmelding: String?
+    @State private var toonHerindeling = false
 
     @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "volgorde", ascending: true)])
     private var categorieen: FetchedResults<Categorie>
@@ -83,10 +84,14 @@ struct ReceptBewerken: View {
                 Section {
                     TextField("Bijvoorbeeld: Verhit de olie in een pan.", text: $invoer.stappenTekst, axis: .vertical)
                         .lineLimit(4...40)
+                    Button("Stappen opnieuw indelen", systemImage: "text.line.first.and.arrowtriangle.forward") {
+                        toonHerindeling = true
+                    }
+                    .disabled(ReceptInvoer.regels(invoer.stappenTekst).isEmpty)
                 } header: {
                     Text("Bereiding")
                 } footer: {
-                    Text("Eén stap per alinea.")
+                    Text("Eén stap per alinea. \"Stappen opnieuw indelen\" laat eerst een voorbeeld zien.")
                 }
 
                 Section("Bron") {
@@ -114,6 +119,14 @@ struct ReceptBewerken: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Bewaar", action: bewaar)
                         .disabled(!invoer.isGeldig)
+                }
+            }
+            .sheet(isPresented: $toonHerindeling) {
+                StappenHerindelenScherm(
+                    model: StappenHerindeling(stappenTekst: invoer.stappenTekst),
+                    sleutel: KeychainService.load(forKey: AppConfiguratie.sleutelClaude)
+                ) { herindeling in
+                    herindeling.pasToe(op: &invoer)
                 }
             }
             .alert(

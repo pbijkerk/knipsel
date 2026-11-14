@@ -1,0 +1,100 @@
+import CoreGraphics
+import Foundation
+
+@testable import Knipsel
+
+/// Echte herkenning (Vision, nl-NL, accurate, met taalcorrectie) van een foto van Peter: Volkskrant,
+/// rubriek Volkskeuken, "Peren in rode wijn" (4032 × 3024). Een column vooraf, de bereiding zonder
+/// kopje midden in de tweede kolom en de ingrediënten in een kader onderaan (#17). Kaders zoals in
+/// `HerkendeRegel`: genormaliseerd, oorsprong linksboven (Vision geeft linksonder: y = 1 − y − hoogte).
+/// Let op de echte OCR: de initiaal "G" van "Glühwein" ontbreekt, en na "los de suiker op" mist de punt.
+enum PerenInRodeWijn {
+    static func r(_ tekst: String, _ x: CGFloat, _ y: CGFloat, _ b: CGFloat, _ h: CGFloat, _ zeker: Float = 1)
+        -> HerkendeRegel
+    {
+        HerkendeRegel(tekst: tekst, kader: CGRect(x: x, y: y, width: b, height: h), betrouwbaarheid: zeker)
+    }
+
+    static let regels: [HerkendeRegel] = [
+        r("Peren in rode wijn", 0.2054, 0.0145, 0.1938, 0.016),
+        r("Nagerecht voor 4 personen", 0.2052, 0.0316, 0.2718, 0.0212),
+        r("lühwein, bisschopswijn, hoe", 0.2402, 0.0846, 0.2271, 0.0164),
+        r("je het verder noemen wilt,", 0.2326, 0.1017, 0.2171, 0.0146),
+        r("aan mij is het niet besteed.", 0.2442, 0.1192, 0.2112, 0.0131),
+        r("Leuk hoor, op zo'n kerstmarkt,", 0.2093, 0.1352, 0.2384, 0.0146),
+        r("beetje kleumen, en dan een beker", 0.211, 0.1484, 0.264, 0.0164),
+        r("veel te hete reldeldelwijn met sui-", 0.2111, 0.1657, 0.26, 0.0143),
+        r("ker en specerijen in je handen ge-", 0.2112, 0.183, 0.2616, 0.0117),
+        r("drukt krijgen. Maar vervolgens", 0.2132, 0.1991, 0.2345, 0.0117),
+        r("vind ik hem niet lekker.", 0.2112, 0.215, 0.1783, 0.0103),
+        r("Toch was dat de rauwe realiteit", 0.2304, 0.2281, 0.2465, 0.0156),
+        r("van veel wijnconsumenten in", 0.2112, 0.2455, 0.2306, 0.0117, 0.5),
+        r("voorbije eeuwen. De meeste", 0.2112, 0.2616, 0.2267, 0.0117),
+        r("wijn was namelijk slecht. Zelfs de", 0.2111, 0.2758, 0.2619, 0.0154),
+        r("goede werd dat, zodra er lucht", 0.2132, 0.2936, 0.2539, 0.0132),
+        r("bij kwam. Dus wat in dat spreek-", 0.2112, 0.308, 0.2597, 0.0146),
+        r("woordelijke vat zat, verzuurde", 0.2132, 0.3241, 0.2384, 0.0132),
+        r("wel degelijk, als het eenmaal", 0.2112, 0.3415, 0.2306, 0.0146),
+        r("open was. De oplossing was de", 0.215, 0.3562, 0.2483, 0.0147),
+        r("drank pimpen met suiker en spe-", 0.2151, 0.3735, 0.2597, 0.0117),
+        r("cerijen, als je dat betalen kon.", 0.2169, 0.3883, 0.2328, 0.0148),
+        r("Koude wijn met specerijen", 0.2326, 0.4055, 0.2112, 0.0117),
+        r("smaakt voor mij al stukken beter.", 0.2171, 0.4215, 0.2578, 0.0103),
+        r("Zeker als er perensmaak aan zit.", 0.2209, 0.436, 0.2481, 0.0117),
+        r("En die bewerkstellig je door pe-", 0.2209, 0.4506, 0.2481, 0.0117),
+        r("ren in wijn te maken, een glorieus", 0.219, 0.465, 0.2597, 0.0117),
+        r("simpel nagerecht. In een warm", 0.2188, 0.4783, 0.2427, 0.0149),
+        r("grijs verleden maakte ik er kennis", 0.2168, 0.494, 0.262, 0.0148),
+        r("mee bij een besterd restaurant in", 0.2169, 0.5101, 0.2599, 0.0138),
+        r("Salles-Curan, hoog op een toch-", 0.2171, 0.5275, 0.2539, 0.0117),
+        r("tige hoogvlakte in Zuid-Frank-", 0.2169, 0.5416, 0.2484, 0.0145),
+        r("rijk. Het was de tijd dat je met", 0.2149, 0.5569, 0.2408, 0.0159),
+        r("gewoon heel goed koken een", 0.2188, 0.5729, 0.233, 0.0146),
+        r("ster kon behalen; gewaagde", 0.2188, 0.5884, 0.2234, 0.0163),
+        r("combinaties en pincetgewijs ge-", 0.219, 0.6047, 0.2539, 0.0117),
+        r("drapeerde exotenblaadjes waren", 0.2208, 0.6195, 0.2561, 0.0138),
+        r("nog niet vereist.", 0.2207, 0.6365, 0.1264, 0.0137),
+        r("Vandaar dat ik er de maaltijd", 0.2362, 0.6492, 0.2312, 0.017),
+        r("beëindigde met een poire au", 0.2208, 0.6668, 0.2289, 0.014),
+        r("vin de cahors. Een bereiding", 0.5019, 0.0843, 0.2229, 0.0132),
+        r("die ik mezelf daarna aanleerde.", 0.5019, 0.1002, 0.2461, 0.0132),
+        r("Onderdeel ervan was het inkoken", 0.5019, 0.1163, 0.2636, 0.0145),
+        r("van het kookvocht tot er stroop", 0.5039, 0.1337, 0.2481, 0.0117),
+        r("overbleef. Dat mag u nog steeds", 0.5039, 0.1497, 0.2539, 0.0131),
+        r("doen, maar het huis stond wel", 0.5058, 0.1657, 0.2345, 0.0131),
+        r("stijf van de zoete walm. Onlangs", 0.5019, 0.1817, 0.2558, 0.0131),
+        r("koos ik voor het binden van de", 0.5039, 0.1977, 0.2422, 0.0102),
+        r("saus met wat zetmeel. Beslist", 0.5056, 0.2116, 0.231, 0.0144),
+        r("niet minder lekker.", 0.5039, 0.2282, 0.1473, 0.0131),
+        r("Schil de peren, maar laat zo", 0.5037, 0.2583, 0.2329, 0.0175),
+        r("mogelijk het steeltje eraan zitten.", 0.5056, 0.2744, 0.26, 0.0161),
+        r("Neem een hoog pannetje waar", 0.5076, 0.2902, 0.2425, 0.0147),
+        r("de peren krap aan in passen.", 0.5076, 0.3059, 0.2251, 0.015),
+        r("Verwarm er de wijn met de", 0.5037, 0.3214, 0.2175, 0.0161),
+        r("specerijen in en los de suiker op", 0.5037, 0.3379, 0.2523, 0.0157),
+        r("Doe de peren in de pan en kook", 0.5075, 0.3528, 0.2505, 0.016),
+        r("ze heel zachtjes een 20 minuten.", 0.5056, 0.3697, 0.2543, 0.0166),
+        r("Draai ze af en toe om. Haal de", 0.5076, 0.3858, 0.233, 0.0144),
+        r("peren uit de pan en laat ze af-", 0.5075, 0.4009, 0.2331, 0.0157),
+        r("koelen. Roer het zetmeel los met", 0.5074, 0.4143, 0.2546, 0.0186),
+        r("een minidrupje water en voeg bij", 0.5076, 0.433, 0.2541, 0.0128),
+        r("het kookvocht. Laat al roerend", 0.5077, 0.4476, 0.2367, 0.0122),
+        r("binden en kook zachtjes 1 minuut", 0.5078, 0.4622, 0.2597, 0.0117),
+        r("door. Laat afkoelen, zet een paar", 0.5097, 0.4782, 0.2539, 0.0146),
+        r("uur in de koelkast.", 0.5076, 0.493, 0.1437, 0.013),
+        r("Overgiet de peren vlak voor", 0.527, 0.5083, 0.2193, 0.0144),
+        r("het serveren met de saus. Wie", 0.5096, 0.5245, 0.2347, 0.0133),
+        r("wil, doet er vanille-ijs of slagroom", 0.5097, 0.5407, 0.2578, 0.0117),
+        r("bij, maar eigenlijk is dat zonde.", 0.5078, 0.5567, 0.2422, 0.0131),
+        r("Wijn erbij? Welnee.", 0.5075, 0.5713, 0.1536, 0.0161),
+        r("volkskeuken@volkskrant.nl", 0.5039, 0.6657, 0.2112, 0.0116, 0.5),
+        r("INGREDIËNTEN", 0.4147, 0.8416, 0.1647, 0.016),
+        r("• 4 handperen (ze hoeven niet helemaal rijp te zijn)", 0.2984, 0.8765, 0.3992, 0.0132),
+        r("• 1 fles rode wijn", 0.4322, 0.8909, 0.1337, 0.0117),
+        r("• 1 kruidnagel", 0.4299, 0.9056, 0.1285, 0.0163),
+        r("• ½ steranijs", 0.4419, 0.9229, 0.1085, 0.0132, 0.5),
+        r("• snufje kaneel", 0.438, 0.939, 0.124, 0.0117),
+        r("• 150 gram suiker", 0.4264, 0.9534, 0.1453, 0.0147),
+        r("• 1 dikke theel. aardappelzetmeel", 0.3719, 0.9674, 0.2581, 0.0139),
+    ]
+}

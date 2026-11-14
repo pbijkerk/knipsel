@@ -15,23 +15,40 @@ struct RegelIndeler: Indeler {
         var rollen = Array(repeating: Rol.weg, count: regels.count)
         var blokRol = Array(repeating: Rol?.none, count: opmaak.blokken.count)
 
-        // 1. Reclame en andere artikelen: het hele blok weg.
-        for (index, blok) in opmaak.blokken.enumerated()
-        where blok.regels.contains(where: { isReclame(regels[$0].tekst) }) {
-            blokRol[index] = .weg
+        // 1. Reclame en andere artikelen: het hele blok weg. Eén reclamewoord in een lange column
+        //    ("als je dat betalen kon") maakt er nog geen advertentie van.
+        for (index, blok) in opmaak.blokken.enumerated() {
+            let reclame = blok.regels.filter { isReclame(regels[$0].tekst) }.count
+            if reclame > 0, blok.regels.count <= 8 || reclame * 4 >= blok.regels.count {
+                blokRol[index] = .weg
+            }
         }
 
-        // 2. Titel: de grootste letter (hoogste regel) buiten de weggelaten blokken.
+        // 2. Titel: de grootste letter (hoogste regel) buiten de weggelaten blokken; een regel met
+        //    porties ("Nagerecht voor 4 personen") is geen titel. Steekt geen regel duidelijk boven de
+        //    rest uit (Vision-kaders van een krantenkop zijn soms niet hoger), dan de bovenste korte
+        //    regel die geen zin is.
         let kandidaten = regels.indices.filter {
-            blokRol[opmaak.blokVanRegel[$0]] == nil && regels[$0].tekst.count >= 3
+            blokRol[opmaak.blokVanRegel[$0]] == nil && regels[$0].tekst.count >= 3 && !isPortiesregel(regels[$0].tekst)
         }
-        guard let grootste = kandidaten.max(by: { regels[$0].kader.height < regels[$1].kader.height }) else {
+        guard var grootste = kandidaten.max(by: { regels[$0].kader.height < regels[$1].kader.height }) else {
             return Indeling(rollen: rollen)
+        }
+        let hoogtes = kandidaten.map { regels[$0].kader.height }.sorted()
+        let mediaan = hoogtes[hoogtes.count / 2]
+        if regels[grootste].kader.height < mediaan * 1.5,
+            let bovenste =
+                kandidaten
+                .filter({ isKopregel(regels[$0].tekst) })
+                .min(by: { regels[$0].kader.minY < regels[$1].kader.minY })
+        {
+            grootste = bovenste
         }
         let titelBlok = opmaak.blokVanRegel[grootste]
         let titelHoogte = regels[grootste].kader.height
         for regel in opmaak.blokken[titelBlok].regels {
-            rollen[regel] = regels[regel].kader.height >= titelHoogte * 0.8 ? .titel : .intro
+            let isTitel = regels[regel].kader.height >= titelHoogte * 0.8 && !isPortiesregel(regels[regel].tekst)
+            rollen[regel] = isTitel ? .titel : .intro
         }
         blokRol[titelBlok] = .titel
 
@@ -82,6 +99,18 @@ struct RegelIndeler: Indeler {
             for regel in blok.regels { rollen[regel] = blokRol[index] ?? .weg }
         }
 
+        // 4b. Een column of verhaal vooraf waarin de bereiding zonder kopje begint ("Schil de peren,
+        //     …" midden in de laatste kolom): vanaf die alinea bereiding, ervóór intro (#17).
+        for (index, blok) in opmaak.blokken.enumerated()
+        where index != titelBlok && blok.pagina == titelPagina && (blokRol[index] == nil || blokRol[index] == .intro) {
+            guard let begin = bereidingBegin(blok.regels, in: regels) else { continue }
+            for (positie, regel) in blok.regels.enumerated() {
+                rollen[regel] = positie < begin ? .intro : .stap
+            }
+        }
+        // Een afzender (e-mailadres, website) hoort nooit bij het recept.
+        for regel in regels.indices where isAfzender(regels[regel].tekst) { rollen[regel] = .weg }
+
         // 5. Voorstellen voor categorie en labels, alleen uit de bestaande namen.
         let titel = rollen.indices.filter { rollen[$0] == .titel }.map { regels[$0].tekst }.joined(separator: " ")
         let intro = rollen.indices.filter { rollen[$0] == .intro }.map { regels[$0].tekst }.joined(separator: " ")
@@ -106,6 +135,59 @@ struct RegelIndeler: Indeler {
             return abs(blok.kader.minX - stap.kader.minX) < 0.02 && tussenruimte >= -0.005
                 && tussenruimte < regelhoogte * 0.8
         }
+    }
+
+    /// Waar in lopende tekst de bereiding begint: de eerste alinea die met een gebiedende zin begint
+    /// ("Schil de peren, …"), gevolgd door overwegend handelingen. Een alinea herken je aan inspringen
+    /// of aan een korte regel ervoor; Vision geeft geen vet. Zinnen met ik, je of we en zinnen in de
+    /// verleden tijd ("Onderdeel ervan was het inkoken …") tellen niet. Geeft de positie in `nummers`.
+    static func bereidingBegin(_ nummers: [Int], in regels: [HerkendeRegel]) -> Int? {
+        guard nummers.count >= 2 else { return nil }
+        let stukken = nummers.map { StapSplitser.Stuk(tekst: regels[$0].tekst) }
+        let bron = StapSplitser.Bron(stukken)
+        let zinnen = StapSplitser.zinnen(bron).map {
+            (begin: $0.bereik.lowerBound, tekst: String(bron.tekens[$0.bereik]))
+        }
+        let kaders = nummers.map { regels[$0].kader }
+        let links = kaders.map(\.minX).min() ?? 0
+        let rechts = kaders.map(\.maxX).max() ?? 1
+        let breedte = rechts - links
+        for positie in nummers.indices {
+            let bereik = bron.bereik[positie]
+            guard !bereik.isEmpty, let eerste = zinnen.firstIndex(where: { $0.begin == bereik.lowerBound }) else {
+                continue
+            }
+            let alinea =
+                positie == 0 || kaders[positie].minX > links + 0.008
+                || kaders[positie - 1].width < breedte * 0.85
+            guard alinea, StapSplitser.isGebiedend(zinnen[eerste].tekst) else { continue }
+            let rest = zinnen[eerste...].map(\.tekst).filter { !isAfzender($0) }
+            let handelingen = rest.filter(StapSplitser.isHandeling).count
+            let vooraan = rest.prefix(3).filter(StapSplitser.isHandeling).count
+            if handelingen >= 3, vooraan >= 2, handelingen * 2 >= rest.count { return positie }
+        }
+        return nil
+    }
+
+    /// "Nagerecht voor 4 personen", "6 porties".
+    static func isPortiesregel(_ tekst: String) -> Bool {
+        tekst.range(of: #"\d+\s*(personen|persoon|porties|portie)\b"#, options: [.regularExpression, .caseInsensitive])
+            != nil
+    }
+
+    /// Kan een titel zijn: kort en geen zin.
+    private static func isKopregel(_ tekst: String) -> Bool {
+        let t = tekst.trimmingCharacters(in: .whitespaces)
+        guard let laatste = t.last, t.count >= 3 else { return false }
+        return t.split(separator: " ").count <= 8 && !".,;:-".contains(laatste) && !isAfzender(t)
+            && t.first?.isUppercase == true
+    }
+
+    /// "volkskeuken@krant.nl", "www.voorbeeld.nl": een afzender, geen recepttekst.
+    static func isAfzender(_ tekst: String) -> Bool {
+        let t = tekst.trimmingCharacters(in: .whitespaces)
+        return t.range(of: #"^\S+@\S+\.\w{2,}$"#, options: .regularExpression) != nil
+            || t.range(of: #"^(https?://|www\.)\S+$"#, options: [.regularExpression, .caseInsensitive]) != nil
     }
 
     /// Woorden die op een advertentie of ander artikel wijzen.
@@ -154,6 +236,7 @@ enum Voorstellen {
         ("dressing", "Sauzen & dressings"), ("pesto", "Sauzen & dressings"), ("vinaigrette", "Sauzen & dressings"),
         ("mousse", "Nagerechten"), ("pudding", "Nagerechten"), ("tiramisu", "Nagerechten"),
         ("crumble", "Nagerechten"), ("ijs", "Nagerechten"), ("toetje", "Nagerechten"), ("dessert", "Nagerechten"),
+        ("nagerecht", "Nagerechten"),
         ("panna cotta", "Nagerechten"), ("ontbijt", "Ontbijt & brunch"), ("brunch", "Ontbijt & brunch"),
         ("pannenkoek", "Ontbijt & brunch"), ("granola", "Ontbijt & brunch"), ("omelet", "Ontbijt & brunch"),
         ("limonade", "Dranken"), ("cocktail", "Dranken"), ("smoothie", "Dranken"), ("borrel", "Borrelhapjes"),

@@ -278,7 +278,7 @@ enum IngredientParser {
 
     // MARK: - Hulp
 
-    private static func zonderOpsommingsteken(_ regel: String) -> String {
+    static func zonderOpsommingsteken(_ regel: String) -> String {
         var tekst = schoon(regel)
         while let eerste = tekst.first, "•·-–—*▪︎●".contains(eerste) {
             tekst = schoon(String(tekst.dropFirst()))

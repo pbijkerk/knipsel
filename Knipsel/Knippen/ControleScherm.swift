@@ -153,6 +153,24 @@ struct ControleScherm: View {
                             .foregroundStyle(Color.accentColor)
                             .frame(minWidth: 18, alignment: .trailing)
                         regelVeld($regel, isIngredient: false, plaatshouder: "Stap")
+                        if heeftStapActies(index) {
+                            Menu {
+                                stapActies(index)
+                            } label: {
+                                Image(systemName: "ellipsis.circle")
+                                    .foregroundStyle(Color.accentColor)
+                                    .frame(minWidth: 28, minHeight: 28)
+                            }
+                            .buttonStyle(.borderless)
+                            .accessibilityLabel("Stap \(index + 1) splitsen of samenvoegen")
+                        }
+                    }
+                    .contextMenu { stapActies(index) }
+                    .swipeActions(edge: .leading) {
+                        if index > 0 {
+                            Button("Samenvoegen", systemImage: "arrow.merge") { voegSamen(index) }
+                                .tint(.accentColor)
+                        }
                     }
                     .listRowBackground(
                         ReceptOpbouw.isTwijfel(regel, isIngredient: false) ? Color.orange.opacity(0.15) : nil)
@@ -163,6 +181,10 @@ struct ControleScherm: View {
                 }
             } header: {
                 Text("Bereiding")
+            } footer: {
+                if invoer.concept.stappen.count > 1 || invoer.concept.stappen.contains(where: { isSplitsbaar($0) }) {
+                    Text("Met ⋯ bij een stap splits je hem op een zin, of voeg je hem samen met de stap ervoor.")
+                }
             }
 
             Section {
@@ -220,6 +242,46 @@ struct ControleScherm: View {
                 Text("Alleen de tekst wordt bewaard; de foto niet.")
             }
         }
+    }
+
+    // MARK: - Splitsen en samenvoegen
+
+    private func isSplitsbaar(_ stap: ConceptRegel) -> Bool {
+        StapSplitser.zinnen(in: stap.tekst).count > 1
+    }
+
+    private func heeftStapActies(_ index: Int) -> Bool {
+        index > 0 || (invoer.concept.stappen.indices.contains(index) && isSplitsbaar(invoer.concept.stappen[index]))
+    }
+
+    /// "Splits hier" (kies de zin waarmee de nieuwe stap begint) en "Voeg samen met vorige".
+    @ViewBuilder
+    private func stapActies(_ index: Int) -> some View {
+        if invoer.concept.stappen.indices.contains(index) {
+            let zinnen = StapSplitser.zinnen(in: invoer.concept.stappen[index].tekst)
+            if zinnen.count > 1 {
+                Menu("Splits hier", systemImage: "scissors") {
+                    ForEach(1..<zinnen.count, id: \.self) { zin in
+                        Button("Vóór „\(Self.begin(van: zinnen[zin]))”") {
+                            withAnimation { invoer.concept.splitsStap(index, voorZin: zin) }
+                        }
+                    }
+                }
+            }
+            if index > 0 {
+                Button("Voeg samen met vorige", systemImage: "arrow.merge") { voegSamen(index) }
+            }
+        }
+    }
+
+    private func voegSamen(_ index: Int) {
+        withAnimation { invoer.concept.voegStapSamenMetVorige(index) }
+    }
+
+    /// De eerste woorden van een zin, voor in het menu.
+    static func begin(van zin: String) -> String {
+        let woorden = zin.split(separator: " ")
+        return woorden.count <= 6 ? zin : woorden.prefix(6).joined(separator: " ") + " …"
     }
 
     /// Eén ingrediënt of stap; bij twijfel oranje met de uitsnede uit de foto eronder.

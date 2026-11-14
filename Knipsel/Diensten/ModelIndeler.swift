@@ -13,6 +13,14 @@
         }
 
         @Generable
+        struct Stapvoorstel {
+            @Guide(description: "Nummers van de regels van deze stap")
+            var regels: [Int]
+            @Guide(description: "De eerste vier woorden van de stap, letterlijk zoals in de tekst")
+            var begin: String
+        }
+
+        @Generable
         struct Uitkomst {
             @Guide(description: "Nummers van regels met de titel")
             var titel: [Int]
@@ -20,8 +28,8 @@
             var intro: [Int]
             @Guide(description: "Nummers van regels met ingrediënten (geen kopjes)")
             var ingredienten: [Int]
-            @Guide(description: "Nummers van regels met bereidingstekst")
-            var bereiding: [Int]
+            @Guide(description: "De stappen van de bereiding, op volgorde")
+            var stappen: [Stapvoorstel]
             @Guide(description: "Categorieën, alleen uit de gegeven lijst")
             var categorieen: [String]
             @Guide(description: "Labels, alleen uit de gegeven lijst")
@@ -47,9 +55,10 @@
                 ).content
                 let indeling = Indeling(
                     aantal: regels.count, titel: uitkomst.titel, intro: uitkomst.intro,
-                    ingredienten: uitkomst.ingredienten, bereiding: uitkomst.bereiding,
+                    ingredienten: uitkomst.ingredienten, bereiding: uitkomst.stappen.flatMap(\.regels),
                     categorieen: Indeling.bestaande(uitkomst.categorieen, uit: categorieen),
-                    labels: Indeling.bestaande(uitkomst.labels, uit: labels), bron: .model)
+                    labels: Indeling.bestaande(uitkomst.labels, uit: labels), bron: .model,
+                    stapBeginnen: uitkomst.stappen.map(\.begin))
                 guard !indeling.blokken(.titel).isEmpty else {
                     return await terugval.deelIn(regels, categorieen: categorieen, labels: labels)
                 }
