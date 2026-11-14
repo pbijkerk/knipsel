@@ -98,7 +98,8 @@ struct ReceptWeergave: View {
         .fullScreenCover(item: $kookSessie, onDismiss: naKookmodus) { sessie in
             KookmodusScherm(
                 sessie: sessie, gekookt: legGekooktVast, vraagFoto: !recept.heeftFoto,
-                fotoMaken: { fotoNaKoken = true })
+                fotoMaken: { fotoNaKoken = true },
+                gesloten: { KookVoortgang().naSluiten(sessie, recept: recept.objectID.uriRepresentation()) })
         }
         .gerechtFotoKiezer(recept: recept, bibliotheek: $toonFotoBibliotheek, camera: $toonCamera)
         .confirmationDialog("Foto verwijderen?", isPresented: $bevestigFotoVerwijderen, titleVisibility: .visible) {
@@ -390,6 +391,7 @@ struct ReceptWeergave: View {
     }
 
     private func legGekooktVast() {
+        KookVoortgang().wis(recept: recept.objectID.uriRepresentation())
         do {
             try recept.legGekooktVast()
         } catch {

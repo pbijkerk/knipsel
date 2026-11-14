@@ -1,6 +1,7 @@
 import SwiftUI
 
-/// De bibliotheek: op iPhone een lijst met chips, op iPad (brede breedte) drie kolommen.
+/// De bibliotheek: op iPhone een lijst met chips, op iPad (brede breedte) zijbalk plus
+/// kaartenraster.
 struct ContentView: View {
     @Environment(\.horizontalSizeClass) private var breedte
 

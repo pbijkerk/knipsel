@@ -35,6 +35,34 @@ struct KookSessieTests {
         ingredienten.compactMap(\.naam)
     }
 
+    @Test func begintOpEenGegevenStap() throws {
+        let opslag = legeOpslag()
+        let recept = try pompoensoep(in: opslag.context)
+        let s = KookSessie(recept: recept, porties: 2, startIndex: 2)
+        #expect(s.stapNummer == 3)
+        #expect(s.huidigeStap?.id == 2)
+        #expect(s.porties == 2)
+        #expect(!s.isAfgerond)
+        #expect(s.vorige())
+        #expect(s.stapNummer == 2)
+    }
+
+    @Test func startbuitenHetBereikWordtDeDichtstbijzijndeStap() throws {
+        let opslag = legeOpslag()
+        let recept = try pompoensoep(in: opslag.context)
+        #expect(KookSessie(recept: recept, startIndex: 9).stapNummer == 4)
+        #expect(KookSessie(recept: recept, startIndex: -3).stapNummer == 1)
+        let leeg = KookSessie(titel: "Leeg", ingredienten: [], stappen: [], receptPorties: 0, startIndex: 3)
+        #expect(leeg.huidigeIndex == 0)
+    }
+
+    @Test func gekooktWordtOnthouden() throws {
+        let s = try sessie()
+        #expect(!s.isGekookt)
+        s.markeerGekookt()
+        #expect(s.isGekookt)
+    }
+
     @Test func begintBijStapEen() throws {
         let s = try sessie()
         #expect(s.aantalStappen == 4)

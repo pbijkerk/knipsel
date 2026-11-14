@@ -1,16 +1,22 @@
 import CoreData
 import SwiftUI
 
-/// iPad (en brede vensters): drie kolommen — zijbalk, lijst, recept.
+/// iPad (en brede vensters): twee kolommen — de zijbalk met categorieën en labels, en rechts een
+/// `NavigationStack` met het kaartenraster (of de lijst, Instellingen › Weergave). Een recept opent
+/// over het raster (push); er is geen lege kolom "Kies een recept" meer (U6). Bovenaan "Verder met…"
+/// (U8), en *Knip* zweeft rechtsonder zoals op de iPhone.
 struct BibliotheekSplit: View {
     @Environment(\.managedObjectContext) private var context
     @State private var filter = ReceptFilter()
     @State private var zijbalkKeuze: CategorieKeuze? = .alles
-    @State private var gekozenRecept: NSManagedObjectID?
+    @State private var pad: [NSManagedObjectID] = []
     @State private var toonInstellingen = false
     @State private var toonNieuw = false
     @State private var toonKnippen = false
-    /// Zijbalk standaard zichtbaar, zoals in de schets (tab 2B).
+    @State private var verder: VerderKeuze?
+    @State private var verderGestart: VerderKeuze?
+    @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
+    /// Zijbalk standaard zichtbaar, zoals in de schets.
     @State private var kolommen: NavigationSplitViewVisibility = .all
 
     var body: some View {
@@ -22,36 +28,51 @@ struct BibliotheekSplit: View {
                         Button("Instellingen", systemImage: "gearshape") { toonInstellingen = true }
                     }
                 }
-        } content: {
-            ReceptLijst(filter: filter, selectie: $gekozenRecept)
-                .navigationTitle(lijstTitel)
-                .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
-                .toolbar {
-                    ToolbarItem(placement: .primaryAction) {
-                        Button("Knip recept", systemImage: "scissors") { toonKnippen = true }
-                    }
-                    ToolbarItem(placement: .primaryAction) {
-                        Button("Nieuw recept", systemImage: "plus") { toonNieuw = true }
-                    }
-                }
         } detail: {
-            if let gekozenRecept {
-                NavigationStack {
-                    ReceptScherm(id: gekozenRecept) { self.gekozenRecept = nil }
-                }
-                .id(gekozenRecept)
-            } else {
-                ContentUnavailableView(
-                    "Kies een recept", systemImage: "scissors",
-                    description: Text("Of voeg er een toe met de plusknop."))
+            NavigationStack(path: $pad) {
+                ReceptLijst(filter: filter, weergave: weergave, kop: kop)
+                    .safeAreaInset(edge: .bottom, spacing: 0) {
+                        HStack {
+                            Spacer()
+                            KnipKnop { toonKnippen = true }
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 12)
+                    }
+                    .navigationTitle(lijstTitel)
+                    .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
+                    .navigationDestination(for: NSManagedObjectID.self) { id in
+                        ReceptScherm(id: id) { pad.removeAll { $0 == id } }
+                    }
+                    .toolbar {
+                        ToolbarItem(placement: .primaryAction) {
+                            Button("Nieuw recept", systemImage: "plus") { toonNieuw = true }
+                        }
+                    }
             }
         }
         .onChange(of: zijbalkKeuze) { _, nieuw in
             filter.categorie = nieuw ?? .alles
+            // Een andere categorie: terug naar het raster.
+            pad.removeAll()
         }
+        .verderMet($verder, gestart: $verderGestart)
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
         .sheet(isPresented: $toonKnippen) { KnipStart() }
+    }
+
+    /// "Verder met…" boven het raster; niet tijdens het zoeken.
+    private var kop: AnyView? {
+        guard let verder, filter.zoekterm.isEmpty else { return nil }
+        return AnyView(
+            VerderMetKaart(
+                keuze: verder, verder: { verderGestart = verder },
+                vergeet: { KookVoortgang().wis(recept: verder.stand.recept) }
+            )
+            .padding(.horizontal, weergave == .kaarten ? 24 : 16)
+            .padding(.top, 4)
+            .padding(.bottom, 12))
     }
 
     private var lijstTitel: String {

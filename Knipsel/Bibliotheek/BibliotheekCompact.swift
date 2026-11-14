@@ -2,7 +2,8 @@ import CoreData
 import SwiftUI
 
 /// iPhone: kaarten (of een lijst) met zoekveld, één chiprij met categorieën, de labels achter
-/// "Filter" en een zwevende knop "Knip" onderin (U1, U2, U5).
+/// "Filter" en een zwevende knop "Knip" onderin (U1, U2, U5). Bovenaan "Verder met…" als je een
+/// kookmodus halverwege sloot (U8).
 struct BibliotheekCompact: View {
     @State private var filter = ReceptFilter()
     @State private var pad: [NSManagedObjectID] = []
@@ -10,13 +11,26 @@ struct BibliotheekCompact: View {
     @State private var toonNieuw = false
     @State private var toonKnippen = false
     @State private var toonLabels = false
+    @State private var verder: VerderKeuze?
+    @State private var verderGestart: VerderKeuze?
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
 
     var body: some View {
         NavigationStack(path: $pad) {
             ReceptLijst(
                 filter: filter, weergave: weergave,
-                kop: AnyView(FilterChips(filter: $filter, toonLabels: $toonLabels).padding(.vertical, 8))
+                kop: AnyView(
+                    VStack(spacing: 0) {
+                        if let verder, filter.zoekterm.isEmpty {
+                            VerderMetKaart(
+                                keuze: verder, verder: { verderGestart = verder },
+                                vergeet: { KookVoortgang().wis(recept: verder.stand.recept) }
+                            )
+                            .padding(.horizontal, 16)
+                            .padding(.top, 4)
+                        }
+                        FilterChips(filter: $filter, toonLabels: $toonLabels).padding(.vertical, 8)
+                    })
             )
             .safeAreaInset(edge: .bottom, spacing: 0) {
                 HStack {
@@ -40,6 +54,7 @@ struct BibliotheekCompact: View {
                 }
             }
         }
+        .verderMet($verder, gestart: $verderGestart)
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
         .sheet(isPresented: $toonKnippen) { KnipStart() }

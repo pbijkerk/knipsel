@@ -1,7 +1,7 @@
 import CoreData
 import SwiftUI
 
-/// Hoe de iPhone-bibliotheek recepten toont (Instellingen › Weergave). Standaard kaarten.
+/// Hoe de bibliotheek recepten toont (Instellingen › Weergave). Standaard kaarten.
 enum BibliotheekWeergave: String, CaseIterable, Identifiable, Sendable {
     case kaarten
     case lijst
