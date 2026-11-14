@@ -3,7 +3,7 @@ import Testing
 
 @testable import Knipsel
 
-/// De echte Volkskrant-foto (#17): verwachte stappen volgens de regels.
+/// De echte krantenfoto (#17): verwachte stappen volgens de regels.
 enum PerenVerwacht {
     static let stappen = [
         "Schil de peren, maar laat zo mogelijk het steeltje eraan zitten. Neem een hoog pannetje waar de peren krap aan in passen.",
@@ -29,9 +29,9 @@ struct PerenInRodeWijnTests {
         let concept = ReceptOpbouw.bouw(regels, indeling: indeling)
         #expect(concept.titel == "Peren in rode wijn")
         #expect(concept.porties == 4)
-        #expect(concept.intro.hasPrefix("Nagerecht voor 4 personen lühwein, bisschopswijn"))
-        #expect(concept.intro.contains("Onderdeel ervan was het inkoken van het kookvocht tot er stroop overbleef."))
-        #expect(concept.intro.hasSuffix("Beslist niet minder lekker."))
+        #expect(concept.intro.hasPrefix("Nagerecht voor 4 personen ok wel eens zo'n winteravond"))
+        #expect(concept.intro.contains("Onderdeel daarvan was het inkoken van het kookvocht tot er stroop overbleef."))
+        #expect(concept.intro.hasSuffix("Het smaakt niet minder lekker."))
         #expect(concept.ingredienten.map(\.tekst) == PerenVerwacht.ingredienten)
         #expect(concept.stappen.map(\.tekst) == PerenVerwacht.stappen)
         #expect(concept.stappen.first?.regels == [50, 51, 52, 53])
