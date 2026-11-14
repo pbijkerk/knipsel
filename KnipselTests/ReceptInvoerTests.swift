@@ -189,6 +189,28 @@ struct WeergaveTests {
         #expect(Weergave.tijd(minuten: 135) == "2 u 15 min")
     }
 
+    @Test func tijdblokkenTonenAlleenWatErIs() {
+        #expect(Weergave.tijdblokken(bereiding: 0, totaal: 0, porties: 0).isEmpty)
+        #expect(
+            Weergave.tijdblokken(bereiding: 15, totaal: 45, porties: 4) == [
+                .init(waarde: "15 min", omschrijving: "bereiden"), .init(waarde: "45 min", omschrijving: "totaal"),
+                .init(waarde: "4", omschrijving: "personen"),
+            ])
+        #expect(
+            Weergave.tijdblokken(bereiding: 45, totaal: 0, porties: 1) == [
+                .init(waarde: "45 min", omschrijving: "bereiden"), .init(waarde: "1", omschrijving: "persoon"),
+            ])
+        #expect(
+            Weergave.tijdblokken(bereiding: 0, totaal: 90, porties: 0) == [
+                .init(waarde: "1 u 30 min", omschrijving: "totaal")
+            ])
+        // Gelijke tijden: één blokje.
+        #expect(
+            Weergave.tijdblokken(bereiding: 30, totaal: 30, porties: 0) == [
+                .init(waarde: "30 min", omschrijving: "totaal")
+            ])
+    }
+
     @Test func hoeveelheden() {
         #expect(Weergave.hoeveelheid(2) == "2")
         #expect(Weergave.hoeveelheid(0.5) == "½")

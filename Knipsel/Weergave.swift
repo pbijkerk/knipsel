@@ -19,6 +19,28 @@ enum Weergave {
         return aantal == 1 ? "1 persoon" : "\(aantal) personen"
     }
 
+    /// Een blokje bovenaan een recept: "45 min" boven "bereiden".
+    struct Tijdblok: Equatable {
+        let waarde: String
+        let omschrijving: String
+    }
+
+    /// De blokjes bovenaan een recept: bereidingstijd, totale tijd en personen, alleen wat er is.
+    /// Is de totale tijd gelijk aan de bereidingstijd, dan alleen "totaal".
+    static func tijdblokken(bereiding: Int, totaal: Int, porties: Int) -> [Tijdblok] {
+        var blokken: [Tijdblok] = []
+        if bereiding != totaal, let tijd = tijd(minuten: bereiding) {
+            blokken.append(Tijdblok(waarde: tijd, omschrijving: "bereiden"))
+        }
+        if let tijd = tijd(minuten: totaal) {
+            blokken.append(Tijdblok(waarde: tijd, omschrijving: "totaal"))
+        }
+        if porties > 0 {
+            blokken.append(Tijdblok(waarde: "\(porties)", omschrijving: porties == 1 ? "persoon" : "personen"))
+        }
+        return blokken
+    }
+
     /// 0,5 → "½", 1,5 → "1½", 2 → "2", 0,3 → "0,3"; met `tot` een bereik: "2–3".
     static func hoeveelheid(_ waarde: Double, tot: Double? = nil) -> String {
         let van = getal(waarde)

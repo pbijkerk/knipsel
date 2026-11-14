@@ -1050,24 +1050,26 @@ struct PortiesKnoppen: View {
     let porties: Int
     let wijzig: (Int) -> Void
     var kleur: Color = .accentColor
+    /// Ronde knopjes (balk onder een recept); raakvlak blijft 44 pt.
+    var rond = false
 
     var body: some View {
         HStack(spacing: 4) {
             Button {
                 wijzig(porties - 1)
             } label: {
-                Image(systemName: "minus").frame(width: 36, height: 36)
+                knop("minus")
             }
             .disabled(porties <= 1)
             Text("\(porties) pers.")
                 .font(.subheadline.weight(.semibold))
                 .monospacedDigit()
                 .fixedSize()
-                .frame(minWidth: 56)
+                .frame(minWidth: rond ? 52 : 56)
             Button {
                 wijzig(porties + 1)
             } label: {
-                Image(systemName: "plus").frame(width: 36, height: 36)
+                knop("plus")
             }
             .disabled(porties >= 99)
         }
@@ -1082,6 +1084,19 @@ struct PortiesKnoppen: View {
             case .decrement: wijzig(max(1, porties - 1))
             @unknown default: break
             }
+        }
+    }
+
+    @ViewBuilder private func knop(_ symbool: String) -> some View {
+        if rond {
+            Image(systemName: symbool)
+                .font(.body.weight(.semibold))
+                .frame(width: 34, height: 34)
+                .background(Color(.tertiarySystemFill), in: Circle())
+                .frame(width: 44, height: 44)
+                .contentShape(Rectangle())
+        } else {
+            Image(systemName: symbool).frame(width: 36, height: 36)
         }
     }
 }
