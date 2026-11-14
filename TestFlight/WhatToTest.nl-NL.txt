@@ -13,6 +13,12 @@ Graag horen:
 • Hoe snel reageert hij, vooral op "stop"? Op welk toestel kook je?
 • Muziek of podcast wordt zachter zolang Knipsel luistert. Is dat hinderlijk?
 
+Nieuw: stappen herkennen.
+• Knip een recept waarvan de bereiding één lopende tekst is (zonder nummers), bijvoorbeeld uit een krantencolumn. Knipsel deelt de stappen nu zelf in; de tekst blijft precies zoals hij op papier staat.
+• In het controlescherm: tik op ⋯ bij een stap voor "Splits hier" of "Voeg samen met vorige".
+• Bij een bewaard recept: Bewerk › "Stappen opnieuw indelen" laat eerst zien hoe het wordt; Annuleer laat alles zoals het was.
+• Graag horen: zijn de stappen te lang of te kort?
+
 Nog niet in deze versie: Siri, timers, delen.
 Synchronisatie tussen toestellen werkt nog niet in TestFlight.
 

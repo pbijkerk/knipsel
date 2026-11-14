@@ -58,19 +58,26 @@ struct Indeling: Equatable, Sendable {
     var categorieen: [String] = []
     var labels: [String] = []
     var bron: Bron = .regels
+    /// De eerste woorden van elke stap, zoals een taalmodel ze voorstelt. Leeg: de stappen deelt
+    /// `StapSplitser` in. De tekst blijft letterlijk; dit zegt alleen waar een stap begint.
+    var stapBeginnen: [String] = []
 
-    init(rollen: [Rol], categorieen: [String] = [], labels: [String] = [], bron: Bron = .regels) {
+    init(
+        rollen: [Rol], categorieen: [String] = [], labels: [String] = [], bron: Bron = .regels,
+        stapBeginnen: [String] = []
+    ) {
         self.rollen = rollen
         self.categorieen = categorieen
         self.labels = labels
         self.bron = bron
+        self.stapBeginnen = stapBeginnen
     }
 
     /// Uit bloknummers per rol, zoals een taalmodel ze teruggeeft. Ongeldige nummers vallen weg;
     /// regels zonder rol zijn "weg". Bij dubbele toewijzing wint de eerste rol (titel vóór intro enz.).
     init(
         aantal: Int, titel: [Int] = [], intro: [Int] = [], ingredienten: [Int] = [], bereiding: [Int] = [],
-        categorieen: [String] = [], labels: [String] = [], bron: Bron = .regels
+        categorieen: [String] = [], labels: [String] = [], bron: Bron = .regels, stapBeginnen: [String] = []
     ) {
         var rollen = Array(repeating: Rol.weg, count: aantal)
         var toegewezen = Set<Int>()
@@ -80,7 +87,7 @@ struct Indeling: Equatable, Sendable {
                 toegewezen.insert(nummer)
             }
         }
-        self.init(rollen: rollen, categorieen: categorieen, labels: labels, bron: bron)
+        self.init(rollen: rollen, categorieen: categorieen, labels: labels, bron: bron, stapBeginnen: stapBeginnen)
     }
 
     /// Regelnummers met deze rol, oplopend.
