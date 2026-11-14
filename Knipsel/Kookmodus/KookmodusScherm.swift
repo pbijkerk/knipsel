@@ -116,6 +116,10 @@ struct KookmodusScherm: View {
     let sessie: KookSessie
     /// "Gekookt" op het laatste scherm: kooklog bijwerken.
     var gekookt: () -> Void = {}
+    /// Na "Gekookt" vragen of je een foto van je gerecht wilt maken (alleen als er nog geen is).
+    var vraagFoto = false
+    /// "Foto maken": de kookmodus sluit en het recept opent de camera.
+    var fotoMaken: () -> Void = {}
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -132,9 +136,14 @@ struct KookmodusScherm: View {
     @State private var luisteraar = LuisterService()
     @State private var motorSpreker: MotorSpreker?
 
-    init(sessie: KookSessie, gekookt: @escaping () -> Void = {}) {
+    init(
+        sessie: KookSessie, gekookt: @escaping () -> Void = {}, vraagFoto: Bool = false,
+        fotoMaken: @escaping () -> Void = {}
+    ) {
         self.sessie = sessie
         self.gekookt = gekookt
+        self.vraagFoto = vraagFoto
+        self.fotoMaken = fotoMaken
         let wissel = WisselSpreker()
         let voorlezer = VoorleesService(spreker: wissel)
         _wissel = State(initialValue: wissel)
@@ -148,7 +157,8 @@ struct KookmodusScherm: View {
     var body: some View {
         KookmodusInhoud(
             sessie: sessie, voorlezer: voorlezer, spraak: spraak, luisteraar: luisteraar, gekookt: gekookt,
-            sluit: { dismiss() }, toestemmingGevraagd: { Task { await vraagToestemming() } }
+            vraagFoto: vraagFoto, fotoMaken: fotoMaken, sluit: { dismiss() },
+            toestemmingGevraagd: { Task { await vraagToestemming() } }
         )
         .dynamicTypeSize(Leesinstellingen.vergroot(systeemgrootte, met: extraGrootte))
         .environment(\.colorScheme, altijdDonker ? .dark : systeemSchema)
@@ -228,6 +238,8 @@ struct KookmodusInhoud: View {
     var spraak: Spraakbediening?
     var luisteraar: LuisterService?
     var gekookt: () -> Void = {}
+    var vraagFoto = false
+    var fotoMaken: () -> Void = {}
     var sluit: () -> Void = {}
     /// "Doorgaan" na de uitleg over de microfoon.
     var toestemmingGevraagd: () -> Void = {}
@@ -246,10 +258,13 @@ struct KookmodusInhoud: View {
     @State private var bevestiging: Bevestiging?
     @State private var flits: Zone?
     @State private var isVastgelegd = false
+    @State private var fotoVraagWeg = false
     @State private var bevestigingTaak: Task<Void, Never>?
 
     /// Voor renders zonder venster: forceer de opmaak.
     var breedOverschrijving: Bool?
+    /// Voor renders: begin alsof "Gekookt" al is getikt.
+    var alVastgelegd = false
 
     private enum Zone { case vorige, volgende }
 
@@ -310,6 +325,7 @@ struct KookmodusInhoud: View {
             breedte = $0
         }
         .background { toetsenbord }
+        .onAppear { if alVastgelegd { isVastgelegd = true } }
         .onChange(of: sessie.gebeurtenisNummer) {
             bevestig()
             // Nieuwe stap: de vorige uitspraak stopt en de nieuwe stap wordt voorgelezen; daarna wacht hij.
@@ -877,6 +893,7 @@ struct KookmodusInhoud: View {
                 SwiftUI.Label("Vastgelegd in je kooklog", systemImage: "checkmark.circle.fill")
                     .font(.headline)
                     .foregroundStyle(Kookkleuren.gedimd)
+                if vraagFoto, !fotoVraagWeg { fotoVraag }
             } else {
                 Text("Tik op Gekookt om het in je kooklog te zetten.")
                     .font(.headline)
@@ -889,6 +906,57 @@ struct KookmodusInhoud: View {
         .frame(maxWidth: .infinity)
         .overlay(alignment: .bottom) { spraakfeedback }
         .accessibilityAction(named: "Vorige stap") { sessie.vorige() }
+    }
+
+    /// Na "Gekookt": een rustige vraag, geen pop-up. "Nu niet" laat hem verdwijnen.
+    private var fotoVraag: some View {
+        VStack(spacing: 14) {
+            Text("Foto van je gerecht maken?")
+                .font(.title3.weight(.semibold))
+                .multilineTextAlignment(.center)
+            Text("Dan staat hij op de kaart in je bibliotheek.")
+                .font(.subheadline)
+                .foregroundStyle(Kookkleuren.gedimd)
+                .multilineTextAlignment(.center)
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) { fotoKnoppen }
+                VStack(spacing: 10) { fotoKnoppen }
+            }
+        }
+        .padding(20)
+        .frame(maxWidth: 460)
+        .background(Kookkleuren.kaart, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .padding(.top, 8)
+    }
+
+    @ViewBuilder private var fotoKnoppen: some View {
+        Button {
+            fotoMaken()
+            sluit()
+        } label: {
+            SwiftUI.Label("Foto maken", systemImage: "camera")
+                .font(.headline.weight(.bold))
+                .lineLimit(1)
+                .padding(.horizontal, 20)
+                .frame(minHeight: 52)
+                .background(Kookkleuren.accent, in: Capsule())
+                .foregroundStyle(.white)
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint("Sluit de kookmodus en opent de camera")
+        Button {
+            withAnimation { fotoVraagWeg = true }
+        } label: {
+            Text("Nu niet")
+                .font(.headline)
+                .lineLimit(1)
+                .padding(.horizontal, 20)
+                .frame(minHeight: 52)
+                .background(Kookkleuren.balkLeeg, in: Capsule())
+                .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - Afvinklijst (iPad)

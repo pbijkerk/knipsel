@@ -14,6 +14,7 @@
 		0F90ABEB9681DFA057ED0955 /* Knipsel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 505ED222FD53F0E1D9450FE9 /* Knipsel.xcdatamodeld */; };
 		16C4657DF374C61D4E114303 /* IngredientParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E25895FFF0EB680702572E /* IngredientParser.swift */; };
 		1A723DE3D53B135D4EFCB341 /* ReceptOpbouw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D29371C90818259BC8A361 /* ReceptOpbouw.swift */; };
+		1C5692984B791BD523F0E864 /* GerechtFotoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34FC0C7915749A131F9DE78 /* GerechtFotoTests.swift */; };
 		1C60906B522D1D4C439C02A2 /* ScanService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED5FDE532F047B2D40A7496 /* ScanService.swift */; };
 		2362EA9DE5E02E62AA467F52 /* Spraakbediening.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6649CEA3FA3A624A9FA2064E /* Spraakbediening.swift */; };
 		2776CB8B6DDEA346CE3E150B /* RegelIndeler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4AC70FA2ED8B187CB519B0B /* RegelIndeler.swift */; };
@@ -43,6 +44,7 @@
 		6EE3F87BE59578B724013FA4 /* Uitingbeslisser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC14DDC5B266DCB2B81DC4F /* Uitingbeslisser.swift */; };
 		6F601ABB2A179A0EED71F3CE /* Audiomotor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D6BF471F700505878E222C /* Audiomotor.swift */; };
 		75FB7E829A9C0A22AC5684FA /* KookmodusScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = F668CB4EF71739D016404873 /* KookmodusScherm.swift */; };
+		7609930B979CD3AD847075DF /* GerechtFotoKiezer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893C0E4CB8D5AACF1A1B5065 /* GerechtFotoKiezer.swift */; };
 		79E7E6006C9A3A696B61F555 /* Spraakweergave.swift in Sources */ = {isa = PBXBuildFile; fileRef = E55DDE6D13AF983174B115EF /* Spraakweergave.swift */; };
 		825658AFB313AB731ADD8E2C /* Inrichting.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9738D6AC28DD8918DF30498 /* Inrichting.swift */; };
 		83F01D480927D7557B12E9F0 /* PortieschalingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36AD665D6024011409607AEF /* PortieschalingTests.swift */; };
@@ -71,6 +73,7 @@
 		D411A1BA50A1A4111D4E4BC8 /* StappenEnClaudeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CB265982A24C2A3B0302B3 /* StappenEnClaudeTests.swift */; };
 		D500E8261F43F354A466E5AD /* Ingredientkoppeling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209E54A5306E6DFE80C487D5 /* Ingredientkoppeling.swift */; };
 		DE8568A51116983D6CA9DE82 /* SpraakInstellingen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1BD32BDD0BAF5D9D8AEFFFC /* SpraakInstellingen.swift */; };
+		DEC6563513861F3B066F3E2D /* GerechtFoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579E35F670326A740E862739 /* GerechtFoto.swift */; };
 		DED577EB1B67E5D05CE010C9 /* Uitspraakregels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1800D3286A33FA25D0CDB692 /* Uitspraakregels.swift */; };
 		DF3C4F1C3C8717F9F53C210E /* Weergave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 425CB2FC9C8FE0D0C29E8EBF /* Weergave.swift */; };
 		E12BCD6DA88B3D76A6178416 /* Bibliotheekbeheer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7F049FD6FEEBDD9A5DA3A40 /* Bibliotheekbeheer.swift */; };
@@ -129,6 +132,7 @@
 		5080A8C816A2DC91ED20E4C3 /* Portieschaling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Portieschaling.swift; sourceTree = "<group>"; };
 		529AD9C64E9BDB5E580A3E6C /* SchermAan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchermAan.swift; sourceTree = "<group>"; };
 		562F5390ADDD4A8F009B3BA9 /* KookSessie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookSessie.swift; sourceTree = "<group>"; };
+		579E35F670326A740E862739 /* GerechtFoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GerechtFoto.swift; sourceTree = "<group>"; };
 		5A3FE115062D432C76EB5842 /* VoorlezenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoorlezenTests.swift; sourceTree = "<group>"; };
 		60413F059A1031C88D3543B7 /* InrichtingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InrichtingTests.swift; sourceTree = "<group>"; };
 		63D37CDBE41110B502A9896C /* KnipselTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = KnipselTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -147,6 +151,7 @@
 		82315C270362977EC44642F1 /* ReceptBewerken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptBewerken.swift; sourceTree = "<group>"; };
 		8579C78469AD96BD3CD5D529 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
 		87F50F041C4CB953D585CFF4 /* KnipselApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipselApp.swift; sourceTree = "<group>"; };
+		893C0E4CB8D5AACF1A1B5065 /* GerechtFotoKiezer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GerechtFotoKiezer.swift; sourceTree = "<group>"; };
 		8ACA3B89B434F3EE963E7CDD /* VoorleesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoorleesService.swift; sourceTree = "<group>"; };
 		93D6BF471F700505878E222C /* Audiomotor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Audiomotor.swift; sourceTree = "<group>"; };
 		9AE93C8783545508E21C7C37 /* ClaudeIndeler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeIndeler.swift; sourceTree = "<group>"; };
@@ -165,6 +170,7 @@
 		C97CF0FA72B5D097AC41FAC0 /* Knipsel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Knipsel.entitlements; sourceTree = "<group>"; };
 		CC62418E320151F46A5D662F /* ReceptWeergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptWeergave.swift; sourceTree = "<group>"; };
 		D27E7F45AE46B4F8472FA56C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D34FC0C7915749A131F9DE78 /* GerechtFotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GerechtFotoTests.swift; sourceTree = "<group>"; };
 		D7F049FD6FEEBDD9A5DA3A40 /* Bibliotheekbeheer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bibliotheekbeheer.swift; sourceTree = "<group>"; };
 		D80C99AFFC80C26C1CE6B452 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DD32DDA41BF7995385751615 /* StapSplitser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StapSplitser.swift; sourceTree = "<group>"; };
@@ -174,6 +180,7 @@
 		EED5FDE532F047B2D40A7496 /* ScanService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanService.swift; sourceTree = "<group>"; };
 		F081E8818D35D9C314D32890 /* StandaardCategorieen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StandaardCategorieen.swift; sourceTree = "<group>"; };
 		F0971CECD87A1CAEA6333DB7 /* BibliotheekbeheerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibliotheekbeheerTests.swift; sourceTree = "<group>"; };
+		F1D03247D164C551E3B12FFF /* Knipsel 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Knipsel 2.xcdatamodel"; sourceTree = "<group>"; };
 		F34EB83CF845B3C050F02FD9 /* CommandoHerkennerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandoHerkennerTests.swift; sourceTree = "<group>"; };
 		F668CB4EF71739D016404873 /* KookmodusScherm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookmodusScherm.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -207,6 +214,7 @@
 			isa = PBXGroup;
 			children = (
 				9AE93C8783545508E21C7C37 /* ClaudeIndeler.swift */,
+				579E35F670326A740E862739 /* GerechtFoto.swift */,
 				021F75B011F22D7BDC256846 /* Indeler.swift */,
 				03E25895FFF0EB680702572E /* IngredientParser.swift */,
 				8579C78469AD96BD3CD5D529 /* KeychainService.swift */,
@@ -249,6 +257,7 @@
 				F0971CECD87A1CAEA6333DB7 /* BibliotheekbeheerTests.swift */,
 				BD497F957B3582290552826B /* ClaudeIndelerTests.swift */,
 				F34EB83CF845B3C050F02FD9 /* CommandoHerkennerTests.swift */,
+				D34FC0C7915749A131F9DE78 /* GerechtFotoTests.swift */,
 				C809330EC1D9D40DB9EA0701 /* IndelenTests.swift */,
 				C158ED0975594A23CD77C5AD /* IngredientParserTests.swift */,
 				60413F059A1031C88D3543B7 /* InrichtingTests.swift */,
@@ -341,6 +350,7 @@
 		B0C7A16F5EF8B78C5492516D /* Recept */ = {
 			isa = PBXGroup;
 			children = (
+				893C0E4CB8D5AACF1A1B5065 /* GerechtFotoKiezer.swift */,
 				790BF937A6F007903FA6296E /* Leesinstellingen.swift */,
 				82315C270362977EC44642F1 /* ReceptBewerken.swift */,
 				CC62418E320151F46A5D662F /* ReceptWeergave.swift */,
@@ -468,6 +478,7 @@
 				89662557847966E3755ECFD9 /* BibliotheekbeheerTests.swift in Sources */,
 				B23A98F49BCC31DED61DA5C8 /* ClaudeIndelerTests.swift in Sources */,
 				5D97C1A6A1620B7FCEF9727B /* CommandoHerkennerTests.swift in Sources */,
+				1C5692984B791BD523F0E864 /* GerechtFotoTests.swift in Sources */,
 				E1C576E48FC2F71B05A39B32 /* IndelenTests.swift in Sources */,
 				2D34BE6F79FE645833F62FE7 /* IngredientParserTests.swift in Sources */,
 				9C643EB7A3BDD2C596C5F80C /* InrichtingTests.swift in Sources */,
@@ -500,6 +511,8 @@
 				50AFB4967778F39A3E4D82C5 /* CommandoHerkenner.swift in Sources */,
 				F9A9534465BB3FE3E312FE6C /* ContentView.swift in Sources */,
 				FCEC1C0E9DEB19E603099D2D /* ControleScherm.swift in Sources */,
+				DEC6563513861F3B066F3E2D /* GerechtFoto.swift in Sources */,
+				7609930B979CD3AD847075DF /* GerechtFotoKiezer.swift in Sources */,
 				E482A35DA62B0DA757E8AF89 /* Indeler.swift in Sources */,
 				16C4657DF374C61D4E114303 /* IngredientParser.swift in Sources */,
 				D500E8261F43F354A466E5AD /* Ingredientkoppeling.swift in Sources */,
@@ -809,9 +822,10 @@
 		505ED222FD53F0E1D9450FE9 /* Knipsel.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				F1D03247D164C551E3B12FFF /* Knipsel 2.xcdatamodel */,
 				3EA097E619203BDB0BC9A209 /* Knipsel.xcdatamodel */,
 			);
-			currentVersion = 3EA097E619203BDB0BC9A209 /* Knipsel.xcdatamodel */;
+			currentVersion = F1D03247D164C551E3B12FFF /* Knipsel 2.xcdatamodel */;
 			path = Knipsel.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

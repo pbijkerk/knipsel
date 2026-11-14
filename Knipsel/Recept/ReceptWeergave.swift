@@ -28,12 +28,19 @@ struct ReceptWeergave: View {
     /// Gekozen aantal personen; 0 = zoals in het recept.
     @State private var gekozenPorties = 0
     @State private var kookSessie: KookSessie?
+    @State private var toonFotoBibliotheek = false
+    @State private var toonCamera = false
+    @State private var bevestigFotoVerwijderen = false
+    /// "Foto maken" na "Gekookt": de camera (of Foto's) opent zodra de kookmodus dicht is.
+    @State private var fotoNaKoken = false
 
     /// ±60–65 tekens per regel bij bodytekst in New York (Dyson, 2004); schaalt mee met de tekstgrootte.
     @ScaledMetric(relativeTo: .body) private var leesbreedte: CGFloat = 560
     @ScaledMetric(relativeTo: .body) private var ingredientenBreedte: CGFloat = 300
     /// Op iPad smaller en gecentreerd; op een iPhone vult de balk de breedte.
     @ScaledMetric(relativeTo: .body) private var balkBreedte: CGFloat = 480
+    /// Op iPad niet de halve hoogte vullen met de foto: de ingrediënten blijven in beeld.
+    private let fotoBreedteBreed: CGFloat = 440
 
     private var porties: Int { gekozenPorties > 0 ? gekozenPorties : Int(recept.porties) }
     private var factor: Double { Portieschaling.factor(van: Int(recept.porties), naar: porties) }
@@ -48,6 +55,7 @@ struct ReceptWeergave: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 28) {
+                gerechtFoto
                 kop
                 if naastElkaar {
                     HStack(alignment: .top, spacing: 40) {
@@ -81,13 +89,22 @@ struct ReceptWeergave: View {
                 Button("Weergave", systemImage: "textformat.size") { toonLeesinstellingen = true }
                 Menu("Meer", systemImage: "ellipsis") {
                     Button("Bewerk", systemImage: "pencil") { toonBewerken = true }
+                    fotoMenu
                     Button("Verwijder", systemImage: "trash", role: .destructive) { bevestigVerwijderen = true }
                 }
             }
         }
         .sheet(isPresented: $toonBewerken) { ReceptBewerken(recept: recept) }
-        .fullScreenCover(item: $kookSessie) { sessie in
-            KookmodusScherm(sessie: sessie, gekookt: legGekooktVast)
+        .fullScreenCover(item: $kookSessie, onDismiss: naKookmodus) { sessie in
+            KookmodusScherm(
+                sessie: sessie, gekookt: legGekooktVast, vraagFoto: !recept.heeftFoto,
+                fotoMaken: { fotoNaKoken = true })
+        }
+        .gerechtFotoKiezer(recept: recept, bibliotheek: $toonFotoBibliotheek, camera: $toonCamera)
+        .confirmationDialog("Foto verwijderen?", isPresented: $bevestigFotoVerwijderen, titleVisibility: .visible) {
+            Button("Verwijder foto", role: .destructive, action: verwijderFoto)
+        } message: {
+            Text("De foto van je gerecht verdwijnt van dit recept, ook op je andere toestellen.")
         }
         .sheet(isPresented: $toonLeesinstellingen) {
             LeesinstellingenView().presentationDetents([.medium, .large])
@@ -100,6 +117,38 @@ struct ReceptWeergave: View {
     }
 
     // MARK: Onderdelen
+
+    /// De eigen foto van het gerecht (3b), bovenaan in 4:3 met afgeronde hoeken.
+    @ViewBuilder private var gerechtFoto: some View {
+        if recept.heeftFoto {
+            GerechtFotoBeeld(recept: recept, maxPixels: Int(GerechtFoto.maxZijde))
+                .aspectRatio(GerechtFoto.verhouding, contentMode: .fit)
+                .frame(maxWidth: naastElkaar ? fotoBreedteBreed : leesbreedte)
+                .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+                .accessibilityElement()
+                .accessibilityLabel("Foto van je gerecht")
+                .accessibilityAddTraits(.isImage)
+        }
+    }
+
+    /// In het menu ⋯: foto toevoegen, of vervangen en verwijderen.
+    @ViewBuilder private var fotoMenu: some View {
+        if recept.heeftFoto {
+            Menu("Vervang foto", systemImage: "arrow.triangle.2.circlepath.camera") { fotoBronnen }
+            Button("Verwijder foto", systemImage: "trash", role: .destructive) {
+                bevestigFotoVerwijderen = true
+            }
+        } else {
+            Menu("Foto van je gerecht", systemImage: "camera") { fotoBronnen }
+        }
+    }
+
+    @ViewBuilder private var fotoBronnen: some View {
+        if CameraKiezer.isBeschikbaar {
+            Button("Maak een foto", systemImage: "camera") { toonCamera = true }
+        }
+        Button("Kies uit Foto's", systemImage: "photo.on.rectangle") { toonFotoBibliotheek = true }
+    }
 
     private func lettertype(_ stijl: Font.TextStyle) -> Font {
         .system(stijl, design: lettertype.ontwerp)
@@ -347,6 +396,26 @@ struct ReceptWeergave: View {
             context.rollback()
             Logger(subsystem: "com.peterbijkerk.knipsel", category: "Recept")
                 .error("Gekookt vastleggen mislukt: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    private func naKookmodus() {
+        guard fotoNaKoken else { return }
+        fotoNaKoken = false
+        if CameraKiezer.isBeschikbaar {
+            toonCamera = true
+        } else {
+            toonFotoBibliotheek = true
+        }
+    }
+
+    private func verwijderFoto() {
+        do {
+            try recept.zetFoto(nil)
+        } catch {
+            context.rollback()
+            Logger(subsystem: "com.peterbijkerk.knipsel", category: "Recept")
+                .error("Foto verwijderen mislukt: \(error.localizedDescription, privacy: .public)")
         }
     }
 

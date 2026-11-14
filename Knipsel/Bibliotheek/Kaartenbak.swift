@@ -17,13 +17,66 @@ enum BibliotheekWeergave: String, CaseIterable, Identifiable, Sendable {
 }
 
 /// Eén receptkaart (U1): kleur en symbool van de eerste categorie, titel in serif (max. 3 regels),
-/// daaronder de tijd en hoe vaak je het kookte.
+/// daaronder de tijd en hoe vaak je het kookte. Met een eigen gerechtfoto (3b) is die de
+/// achtergrond, met een donker verloop onderin en de titel in wit.
 struct ReceptKaart: View {
     @ObservedObject var recept: Recept
     @ScaledMetric(relativeTo: .headline) private var minHoogte: CGFloat = 168
     @ScaledMetric(relativeTo: .title2) private var symboolMaat: CGFloat = 28
 
+    private var vorm: RoundedRectangle { RoundedRectangle(cornerRadius: 18, style: .continuous) }
+
     var body: some View {
+        Group {
+            if recept.heeftFoto {
+                metFoto
+            } else {
+                zonderFoto
+            }
+        }
+        .contentShape(.contextMenuPreview, vorm)
+        .contentShape(vorm)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(recept.titelOfStandaard)
+        .accessibilityValue(toegankelijkeOmschrijving)
+    }
+
+    /// Wit op het verloop: ook op een wit bord haalt de vette titel ≥ 3:1 (grote tekst) en de
+    /// onderregel onderin ≥ 4,5:1; de schaduw helpt bij drukke foto's.
+    private var metFoto: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Spacer(minLength: 0)
+            Text(recept.titelOfStandaard)
+                .font(.system(.headline, design: .serif).weight(.bold))
+                .foregroundStyle(.white)
+                .lineLimit(3)
+                .multilineTextAlignment(.leading)
+                .fixedSize(horizontal: false, vertical: true)
+            if let onderregel {
+                Text(onderregel)
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.92))
+                    .lineLimit(2)
+            }
+        }
+        .shadow(color: .black.opacity(0.45), radius: 3, y: 1)
+        .padding(14)
+        .frame(maxWidth: .infinity, minHeight: minHoogte, alignment: .bottomLeading)
+        .background {
+            ZStack {
+                GerechtFotoBeeld(recept: recept, maxPixels: 720)
+                LinearGradient(
+                    stops: [
+                        .init(color: .black.opacity(0), location: 0.1),
+                        .init(color: .black.opacity(0.6), location: 0.4),
+                        .init(color: .black.opacity(0.85), location: 1),
+                    ], startPoint: .top, endPoint: .bottom)
+            }
+        }
+        .clipShape(vorm)
+    }
+
+    private var zonderFoto: some View {
         VStack(alignment: .leading, spacing: 8) {
             Image(systemName: recept.kaartSymbool)
                 .font(.system(size: symboolMaat, weight: .regular))
@@ -45,12 +98,7 @@ struct ReceptKaart: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, minHeight: minHoogte, alignment: .topLeading)
-        .background(recept.kaartkleur.kleur, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .contentShape(.contextMenuPreview, RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .contentShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(recept.titelOfStandaard)
-        .accessibilityValue(toegankelijkeOmschrijving)
+        .background(recept.kaartkleur.kleur, in: vorm)
     }
 
     private var onderregel: String? {
@@ -66,12 +114,24 @@ struct ReceptKaart: View {
     }
 }
 
-/// Het categoriesymbool op de kaartkleur, voor de lijstweergave (iPhone en iPad).
+/// Het categoriesymbool op de kaartkleur, voor de lijstweergave (iPhone en iPad); met een eigen
+/// gerechtfoto een miniatuur daarvan.
 struct CategorieIcoon: View {
     @ObservedObject var recept: Recept
     @ScaledMetric(relativeTo: .body) private var maat: CGFloat = 44
 
     var body: some View {
+        if recept.heeftFoto {
+            GerechtFotoBeeld(recept: recept, maxPixels: 200)
+                .frame(width: maat, height: maat)
+                .clipShape(RoundedRectangle(cornerRadius: maat * 0.24, style: .continuous))
+                .accessibilityHidden(true)
+        } else {
+            symbool
+        }
+    }
+
+    private var symbool: some View {
         RoundedRectangle(cornerRadius: maat * 0.24, style: .continuous)
             .fill(recept.kaartkleur.kleur)
             .frame(width: maat, height: maat)

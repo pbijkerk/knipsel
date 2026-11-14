@@ -1,6 +1,6 @@
 # Privacybeleid Knipsel
 
-*Laatst bijgewerkt: 13 november 2026*
+*Laatst bijgewerkt: 14 november 2026*
 
 Knipsel is een recepten-app voor iPhone en iPad, gemaakt door Peter Bijkerk voor eigen gebruik en een
 kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en waar ze blijven.
@@ -20,6 +20,7 @@ kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en wa
 | Recepten, categorieën, labels, notities | Op je toestel, gesynchroniseerd via je eigen iCloud-account (Apple CloudKit, privédatabase). De maker kan er niet bij. |
 | Gedeeld kookboek "Thuis" | In iCloud, alleen zichtbaar voor de mensen die jij uitnodigt. Je kunt delen altijd stoppen. |
 | Foto's van een krant- of tijdschriftpagina | Alleen gebruikt om de tekst te herkennen, op het toestel. De foto wordt daarna **niet bewaard**. |
+| Eigen foto van je gerecht (optioneel) | Alleen als je er zelf een maakt of kiest. Verkleind bewaard bij het recept, op je toestel en in je eigen iCloud (privédatabase; bij een recept in het gedeelde kookboek "Thuis" ook zichtbaar voor wie je hebt uitgenodigd). Gaat **nooit** naar Claude of de maker. Verwijder hem via ⋯ › Verwijder foto. |
 | Spraak (spraakbesturing in de kookmodus) | Herkend op het toestel. Er worden geen opnames bewaard of verstuurd. |
 | Voorlezen | Gebeurt op het toestel met de stemmen van iOS. |
 | Claude-sleutel (optioneel) | In de Keychain van je toestel. |
@@ -33,7 +34,9 @@ bereiding is. De foto gaat nooit mee. Daarop is het privacybeleid van Anthropic 
 
 ## Rechten die de app vraagt
 
-- **Camera / Foto's** — om een receptpagina vast te leggen.
+- **Camera / Foto's** — om een receptpagina vast te leggen, en als je dat wilt een foto van je eigen
+  gerecht. Een foto kiezen uit Foto's gebeurt via de systeemkiezer: Knipsel ziet alleen de foto die
+  je kiest en vraagt daarvoor geen toegang tot je hele fotobibliotheek.
 - **Microfoon en spraakherkenning** — voor bediening met je stem tijdens het koken.
 - **Meldingen / alarmen** — voor kooktimers.
 
