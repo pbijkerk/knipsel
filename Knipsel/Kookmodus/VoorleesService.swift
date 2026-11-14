@@ -82,9 +82,29 @@ extension Voorleestekst {
     /// "2 el olijfolie", geschaald; een regel zonder hoeveelheid zoals hij er staat.
     @MainActor
     private static func kortTekst(van ingredient: KookIngredient, in sessie: KookSessie) -> String {
-        guard let maat = sessie.maat(van: ingredient), let naam = ingredient.naam else { return ingredient.ruweTekst }
+        guard let maat = sessie.maat(van: ingredient), let naam = sessie.naam(van: ingredient) else {
+            return ingredient.ruweTekst
+        }
         return "\(maat) \(naam)"
     }
+
+    /// "Je hebt nodig: 2 uien, …" voor de huidige stap; `nil` als de stap geen ingrediënten noemt.
+    @MainActor
+    static func ingredientenVanHuidigeStap(van sessie: KookSessie) -> String? {
+        let nodig = sessie.ingredientenInHuidigeStap
+        guard !nodig.isEmpty else { return nil }
+        return "Je hebt nodig: "
+            + nodig.map { Uitspraakregels.uitspreekbaar(regel(kortTekst(van: $0, in: sessie))) }
+            .joined(separator: ", ") + "."
+    }
+
+    /// Antwoord op "hoeveel ‹ingrediënt›?": "anderhalve liter groentebouillon" (geschaald, uitspreekbaar).
+    @MainActor
+    static func hoeveelheid(van ingredient: KookIngredient, in sessie: KookSessie) -> String {
+        Uitspraakregels.uitspreekbaar(regel(kortTekst(van: ingredient, in: sessie)))
+    }
+
+    static let nietInRecept = "Dat staat niet in dit recept."
 
     @MainActor
     static func alleIngredienten(van sessie: KookSessie) -> String {
@@ -109,22 +129,46 @@ final class VoorleesService {
     /// De luidspreker in de kookmodus. Uit = niets voorlezen.
     private(set) var isAan: Bool
 
-    @ObservationIgnored private let spreker: any Spreker
+    /// De tekst die nu (of het laatst) voorgelezen wordt, voor het echofilter van de spraakbediening.
+    @ObservationIgnored private(set) var laatsteTekst: String?
+    /// Wanneer het laatste voorlezen ophield; `nil` zolang er gesproken wordt.
+    @ObservationIgnored private var gestoptOp: Date?
+
+    @ObservationIgnored let spreker: any Spreker
     @ObservationIgnored private let instellingen: () -> Voorleesinstellingen
+    @ObservationIgnored private let bewaarTempo: (Double) -> Void
+    @ObservationIgnored private let klok: () -> Date
     @ObservationIgnored private var onderbrekingswacht: Onderbrekingswacht?
 
     init(
         spreker: any Spreker = SysteemSpreker(), isAan: Bool = Voorleesinstellingen.standaardAan(),
-        instellingen: @escaping () -> Voorleesinstellingen = { .huidig() }
+        instellingen: @escaping () -> Voorleesinstellingen = { .huidig() },
+        bewaarTempo: @escaping (Double) -> Void = {
+            UserDefaults.standard.set($0, forKey: AppConfiguratie.sleutelVoorleesTempo)
+        },
+        klok: @escaping () -> Date = Date.init
     ) {
         self.spreker = spreker
         self.isAan = isAan
         self.instellingen = instellingen
-        spreker.klaar = { [weak self] in self?.status = .stil }
+        self.bewaarTempo = bewaarTempo
+        self.klok = klok
+        spreker.klaar = { [weak self] in
+            self?.status = .stil
+            self?.gestoptOp = self?.klok()
+        }
         onderbrekingswacht = Onderbrekingswacht { [weak self] in self?.onderbroken() }
     }
 
     var spreekt: Bool { status != .stil }
+
+    /// Wat Knipsel nu zegt, of tot `naloop` seconden geleden zei: de herkenning loopt iets achter.
+    func voorgelezenTekst(naloop: TimeInterval = 2) -> String? {
+        guard let laatsteTekst else { return nil }
+        if spreekt { return laatsteTekst }
+        guard let gestoptOp, klok().timeIntervalSince(gestoptOp) <= naloop else { return nil }
+        return laatsteTekst
+    }
 
     // MARK: - Kookmodus
 
@@ -154,6 +198,24 @@ final class VoorleesService {
         spreek(Voorleestekst.alleIngredienten(van: sessie), met: instellingen())
     }
 
+    /// De ingrediënten van de huidige stap ("Je hebt nodig: …"); heeft de stap er geen, dan de hele lijst.
+    func leesIngredientenVanStap(van sessie: KookSessie) {
+        if let tekst = Voorleestekst.ingredientenVanHuidigeStap(van: sessie) {
+            spreek(tekst, met: instellingen())
+        } else {
+            leesIngredienten(van: sessie)
+        }
+    }
+
+    /// Tempo een stapje langzamer (negatief) of sneller, binnen 0,8–1,2×; wordt bewaard. Geeft het
+    /// nieuwe tempo terug.
+    @discardableResult
+    func pasTempoAan(met stap: Double) -> Double {
+        let nieuw = Voorleestempo.begrensd(((instellingen().tempo + stap) * 10).rounded() / 10)
+        bewaarTempo(nieuw)
+        return nieuw
+    }
+
     /// Luidspreker aan of uit. Aan leest meteen de huidige stap; uit stopt direct.
     func zetAan(_ aan: Bool, sessie: KookSessie? = nil) {
         isAan = aan
@@ -170,6 +232,8 @@ final class VoorleesService {
     func spreek(_ tekst: String, met instellingen: Voorleesinstellingen? = nil) {
         let instellingen = instellingen ?? self.instellingen()
         if spreekt { spreker.stop() }
+        laatsteTekst = tekst
+        gestoptOp = nil
         spreker.spreek(tekst, stem: instellingen.stem, tempo: instellingen.tempo)
         status = .spreekt
     }
@@ -179,6 +243,7 @@ final class VoorleesService {
         guard spreekt else { return }
         spreker.stop()
         status = .stil
+        gestoptOp = klok()
     }
 
     func pauzeer() {

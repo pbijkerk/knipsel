@@ -230,7 +230,10 @@ struct ReceptWeergave: View {
                 hoeveelheid: hoeveelheid, tot: ingredient.hoeveelheidTot?.doubleValue, eenheid: ingredient.eenheid,
                 factor: factor) ?? ""
         let toelichting = ingredient.toelichting.map { Portieschaling.schaalToelichting($0, factor: factor) }
-        let rest = [naam, toelichting].compactMap { $0 }.joined(separator: ", ")
+        let geteld = Portieschaling.naam(
+            naam, hoeveelheid: hoeveelheid, tot: ingredient.hoeveelheidTot?.doubleValue, eenheid: ingredient.eenheid,
+            factor: factor)
+        let rest = [geteld, toelichting].compactMap { $0 }.joined(separator: ", ")
         return Text("\(Text(maat).bold()) \(rest)")
     }
 

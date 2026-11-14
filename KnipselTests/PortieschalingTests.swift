@@ -86,4 +86,43 @@ struct PortieschalingTests {
         #expect(Portieschaling.eenheid("blik", voor: 1.5) == "blikken")
         #expect(Portieschaling.eenheid("el", voor: 3) == "el")
     }
+
+    /// Bekend foutje uit fase 3: "1 uien" bij schalen naar ≤ 1.
+    static let telgevallen: [Geval] = [
+        Geval(regel: "2 uien, gesnipperd", van: 4, naar: 2, verwacht: "1 ui, gesnipperd"),
+        Geval(regel: "2 uien", van: 4, naar: 1, verwacht: "½ ui"),
+        Geval(regel: "1 ui", van: 2, naar: 4, verwacht: "2 uien"),
+        Geval(regel: "4 eieren", van: 4, naar: 1, verwacht: "1 ei"),
+        Geval(regel: "1 ei", van: 1, naar: 3, verwacht: "3 eieren"),
+        Geval(regel: "2 tomaten", van: 4, naar: 2, verwacht: "1 tomaat"),
+        Geval(regel: "1 tomaat", van: 2, naar: 4, verwacht: "2 tomaten"),
+        Geval(regel: "2 wortels", van: 2, naar: 1, verwacht: "1 wortel"),
+        Geval(regel: "4 aardappelen", van: 4, naar: 1, verwacht: "1 aardappel"),
+        Geval(regel: "1 aardappel", van: 1, naar: 2, verwacht: "2 aardappelen"),
+        Geval(regel: "2 sjalotten", van: 2, naar: 1, verwacht: "1 sjalot"),
+        Geval(regel: "1 citroen", van: 2, naar: 4, verwacht: "2 citroenen"),
+        Geval(regel: "2 limoenen", van: 4, naar: 2, verwacht: "1 limoen"),
+        Geval(regel: "2 paprika's", van: 4, naar: 2, verwacht: "1 paprika"),
+        Geval(regel: "1 rode paprika", van: 2, naar: 4, verwacht: "2 rode paprika's"),
+        // Met een eenheid blijft de naam staan: 500 g uien → 250 g uien.
+        Geval(regel: "500 g uien", van: 4, naar: 2, verwacht: "250 g uien"),
+        Geval(regel: "2 courgettes", van: 2, naar: 1, verwacht: "1 courgette"),
+        // Onbekende woorden blijven zoals ze zijn.
+        Geval(regel: "2 flespompoenen", van: 4, naar: 2, verwacht: "1 flespompoenen"),
+    ]
+
+    @Test(arguments: telgevallen)
+    func enkelvoudEnMeervoudVanDeNaam(_ geval: Geval) {
+        schaaltRegel(geval)
+    }
+
+    @Test func naamGetal() {
+        #expect(Portieschaling.getal("uien", voor: 1) == "ui")
+        #expect(Portieschaling.getal("Uien", voor: 1) == "Ui")
+        #expect(Portieschaling.getal("ui", voor: 2) == "uien")
+        #expect(Portieschaling.getal("uien", voor: 3) == "uien")
+        #expect(Portieschaling.getal("aardappels", voor: 1) == "aardappel")
+        #expect(Portieschaling.getal("kokosmelk", voor: 1) == "kokosmelk")
+        #expect(Portieschaling.naam("uien", hoeveelheid: 2, eenheid: "kg", factor: 0.5) == "uien")
+    }
 }

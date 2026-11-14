@@ -59,33 +59,100 @@ struct KookmodusScherm: View {
     @Environment(\.dynamicTypeSize) private var systeemgrootte
     @AppStorage(AppConfiguratie.sleutelExtraGrootte) private var extraGrootte = 0
     @AppStorage(AppConfiguratie.sleutelKookmodusDonker) private var altijdDonker = true
+    @AppStorage(AppConfiguratie.sleutelSpraakAan) private var spraakAan = true
 
     @State private var schermAan = SchermAan()
-    @State private var voorlezer = VoorleesService()
+    @State private var wissel: WisselSpreker
+    @State private var voorlezer: VoorleesService
+    @State private var spraak: Spraakbediening
+    @State private var luisteraar = LuisterService()
+    @State private var motorSpreker: MotorSpreker?
 
     init(sessie: KookSessie, gekookt: @escaping () -> Void = {}) {
         self.sessie = sessie
         self.gekookt = gekookt
+        let wissel = WisselSpreker()
+        let voorlezer = VoorleesService(spreker: wissel)
+        _wissel = State(initialValue: wissel)
+        _voorlezer = State(initialValue: voorlezer)
+        _spraak = State(initialValue: Spraakbediening(sessie: sessie, voorlezer: voorlezer))
     }
 
+    /// Luisteren alleen met de kookmodus open, op de voorgrond, en spraakbediening aan.
+    private var moetLuisteren: Bool { spraakAan && scenePhase == .active }
+
     var body: some View {
-        KookmodusInhoud(sessie: sessie, voorlezer: voorlezer, gekookt: gekookt, sluit: { dismiss() })
-            .dynamicTypeSize(Leesinstellingen.vergroot(systeemgrootte, met: extraGrootte))
-            .environment(\.colorScheme, altijdDonker ? .dark : systeemSchema)
-            .preferredColorScheme(altijdDonker ? .dark : nil)
-            .onAppear {
-                schermAan.kookmodusGeopend()
-                if voorlezer.isAan { voorlezer.leesHuidigeStap(van: sessie) }
+        KookmodusInhoud(
+            sessie: sessie, voorlezer: voorlezer, spraak: spraak, luisteraar: luisteraar, gekookt: gekookt,
+            sluit: { dismiss() }, toestemmingGevraagd: { Task { await vraagToestemming() } }
+        )
+        .dynamicTypeSize(Leesinstellingen.vergroot(systeemgrootte, met: extraGrootte))
+        .environment(\.colorScheme, altijdDonker ? .dark : systeemSchema)
+        .preferredColorScheme(altijdDonker ? .dark : nil)
+        .onAppear {
+            schermAan.kookmodusGeopend()
+            spraak.sluit = { dismiss() }
+            spraak.tik = { [luisteraar] in luisteraar.motor.speelTik() }
+            if voorlezer.isAan { voorlezer.leesHuidigeStap(van: sessie) }
+        }
+        .onDisappear {
+            schermAan.kookmodusGesloten()
+            stopLuisteren()
+            voorlezer.stop()
+        }
+        .onChange(of: scenePhase) { _, fase in
+            schermAan.faseGewijzigd(fase)
+            // Naar de achtergrond: stil. Doorlezen met vergrendeld scherm kan later (fase 6/7).
+            if fase == .background { voorlezer.stop() }
+        }
+        .task(id: moetLuisteren) {
+            if moetLuisteren {
+                await startLuisteren()
+            } else {
+                stopLuisteren()
             }
-            .onDisappear {
-                schermAan.kookmodusGesloten()
-                voorlezer.stop()
-            }
-            .onChange(of: scenePhase) { _, fase in
-                schermAan.faseGewijzigd(fase)
-                // Naar de achtergrond: stil. Doorlezen met vergrendeld scherm kan later (fase 6/7).
-                if fase == .background { voorlezer.stop() }
-            }
+        }
+    }
+
+    // MARK: - Luisteren
+
+    private func startLuisteren() async {
+        spraak.instellingen = Spraakinstellingen.herkenner()
+        luisteraar.resultaat = { [spraak] tekst, segment, definitief, nu in
+            spraak.verwerk(tekst, segment: segment, definitief: definitief, nu: nu)
+        }
+        luisteraar.tik = { [spraak] nu in spraak.controleer(nu: nu) }
+        var lasNet = false
+        luisteraar.voorMicrofoon = { [voorlezer, wissel, luisteraar] in
+            // Vanaf nu gaat de stem door de audiomotor, anders hoort de microfoon hem.
+            lasNet = voorlezer.status == .spreekt
+            voorlezer.stop()
+            let spreker = motorSpreker ?? MotorSpreker(motor: luisteraar.motor)
+            motorSpreker = spreker
+            wissel.gebruik(spreker)
+        }
+        await luisteraar.start(contextwoorden: spraak.contextwoorden)
+        if luisteraar.status != .luistert, wissel.gebruiktMotor {
+            wissel.gebruik(nil)
+        }
+        // Was Knipsel aan het voorlezen toen de microfoon opende: opnieuw, nu via de motor.
+        if lasNet { voorlezer.leesHuidigeStap(van: sessie) }
+    }
+
+    private func stopLuisteren() {
+        if wissel.gebruiktMotor {
+            voorlezer.stop()
+            wissel.gebruik(nil)
+        }
+        luisteraar.stop()
+    }
+
+    /// Na de uitleg: toestemming vragen en, als die er is, beginnen.
+    private func vraagToestemming() async {
+        UserDefaults.standard.set(true, forKey: AppConfiguratie.sleutelSpraakUitlegGezien)
+        if await luisteraar.vraagToestemming(), moetLuisteren {
+            await startLuisteren()
+        }
     }
 }
 
@@ -93,12 +160,20 @@ struct KookmodusScherm: View {
 struct KookmodusInhoud: View {
     let sessie: KookSessie
     let voorlezer: VoorleesService
+    /// Spraakbediening (fase 5); `nil` in renders zonder spraak.
+    var spraak: Spraakbediening?
+    var luisteraar: LuisterService?
     var gekookt: () -> Void = {}
     var sluit: () -> Void = {}
+    /// "Doorgaan" na de uitleg over de microfoon.
+    var toestemmingGevraagd: () -> Void = {}
 
     @Environment(\.dynamicTypeSize) private var tekstgrootte
+    @Environment(\.openURL) private var openURL
     @AppStorage(AppConfiguratie.sleutelLettertype) private var lettertype: Lettertype = .serif
     @AppStorage(AppConfiguratie.sleutelVoorlezenAan) private var voorlezenStandaardAan = true
+    @AppStorage(AppConfiguratie.sleutelSpraakAan) private var spraakAan = true
+    @State private var spraakmelding: Spraakbediening.Melding?
 
     @State private var breedte: CGFloat = 0
     @State private var bevestiging: Bevestiging?
@@ -129,13 +204,23 @@ struct KookmodusInhoud: View {
                     VStack(spacing: 0) {
                         kopbalk
                         tikvlak { stapKolomBreed }
+                        spraakbalk
                     }
                 }
             } else {
                 VStack(spacing: 0) {
                     kopbalk
                     tikvlak { stapKolomSmal }
+                    spraakbalk
                 }
+            }
+            if luisterstatus == .uitlegNodig, spraakAan {
+                Spraakuitleg(
+                    doorgaan: toestemmingGevraagd,
+                    nietNu: {
+                        spraakAan = false
+                        luisteraar?.stop()
+                    })
             }
             if let bevestiging {
                 Text(bevestiging.tekst)
@@ -195,6 +280,7 @@ struct KookmodusInhoud: View {
                 }
                 .accessibilityElement(children: .combine)
                 Spacer(minLength: 0)
+                microfoon
                 luidspreker
             }
             voortgang
@@ -248,6 +334,7 @@ struct KookmodusInhoud: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollBounceBehavior(.basedOnSize)
+            .overlay(alignment: .bottom) { spraakfeedback }
             voorleesbalk
             zonewijzer
         }
@@ -274,6 +361,7 @@ struct KookmodusInhoud: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             .scrollBounceBehavior(.basedOnSize)
+            .overlay(alignment: .bottom) { spraakfeedback }
             voorleesbalk
             zonewijzer
         }
@@ -359,7 +447,7 @@ struct KookmodusInhoud: View {
 
     /// Hoeveelheid vet, geschaald naar het gekozen aantal porties.
     private func ingredientTekst(_ ingredient: KookIngredient) -> Text {
-        guard let maat = sessie.maat(van: ingredient), let naam = ingredient.naam else {
+        guard let maat = sessie.maat(van: ingredient), let naam = sessie.naam(van: ingredient) else {
             return Text(ingredient.ruweTekst)
         }
         let toelichting = ingredient.toelichting.map { Portieschaling.schaalToelichting($0, factor: sessie.factor) }
@@ -463,6 +551,144 @@ struct KookmodusInhoud: View {
         .buttonStyle(.plain)
     }
 
+    // MARK: - Spraak
+
+    private var luisterstatus: LuisterService.Status { luisteraar?.status ?? .uit }
+
+    /// Microfoon aan/uit: luisteren naar spraakcommando's. De keuze wordt onthouden.
+    private var microfoon: some View {
+        Button {
+            spraakAan.toggle()
+        } label: {
+            Image(systemName: spraakAan ? "mic.fill" : "mic.slash.fill")
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(spraakAan ? Kookkleuren.accent : Kookkleuren.gedimd)
+                .frame(width: 48, height: 48)
+                .background(Kookkleuren.kaart, in: Circle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Spraakbediening")
+        .accessibilityValue(spraakAan ? "aan" : "uit")
+        .accessibilityHint(
+            spraakAan ? "Tik om niet meer te luisteren" : "Tik om Knipsel naar je stem te laten luisteren")
+    }
+
+    /// Onderin: luistert Knipsel, laadt hij het spraakmodel, of mag hij niet?
+    @ViewBuilder private var spraakbalk: some View {
+        if spraakAan, let inhoud = spraakbalkInhoud {
+            HStack(spacing: 10) {
+                inhoud
+            }
+            .font(.subheadline)
+            .foregroundStyle(Kookkleuren.gedimd)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 8)
+            .background(Kookkleuren.kaart.opacity(0.6))
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        }
+    }
+
+    private var spraakbalkInhoud: AnyView? {
+        switch luisterstatus {
+        case .luistert:
+            return AnyView(
+                Group {
+                    Circle().fill(Color.green).frame(width: 10, height: 10)
+                        .accessibilityHidden(true)
+                    Text("Luistert · zeg \"volgende\", \"herhaal\", \"hoeveel …?\"")
+                        .font(.footnote)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .accessibilityLabel("Knipsel luistert. Zeg volgende, herhaal of hoeveel.")
+                    Spacer(minLength: 0)
+                    Image(systemName: "waveform")
+                        .symbolEffect(.variableColor.iterative, isActive: true)
+                        .foregroundStyle(Color.green)
+                        .accessibilityHidden(true)
+                })
+        case .start, .vraagtToestemming:
+            return AnyView(
+                Group {
+                    ProgressView().controlSize(.small)
+                    Text("Microfoon gaat aan…")
+                })
+        case .modelLaden(let voortgang):
+            let procent = voortgang.map { " \(Int(($0 * 100).rounded())) %" } ?? ""
+            return AnyView(
+                Group {
+                    ProgressView().controlSize(.small)
+                    Text("Spraakmodel wordt gedownload…\(procent) Tikken werkt al.")
+                        .lineLimit(2)
+                })
+        case .geweigerd:
+            return AnyView(
+                Group {
+                    Image(systemName: "mic.slash.fill")
+                        .foregroundStyle(Kookkleuren.markering)
+                        .accessibilityHidden(true)
+                    Text("Knipsel mag de microfoon niet gebruiken. Tikken werkt gewoon.")
+                        .lineLimit(3)
+                    Spacer(minLength: 0)
+                    Button("Instellingen") {
+                        if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+                    }
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Kookkleuren.accent)
+                    .accessibilityHint(
+                        "Opent de instellingen van Knipsel, om microfoon en spraakherkenning toe te staan")
+                })
+        case .nietBeschikbaar(let reden):
+            return AnyView(
+                Group {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(Kookkleuren.markering)
+                        .accessibilityHidden(true)
+                    Text("\(reden) Tikken werkt gewoon.")
+                        .lineLimit(3)
+                })
+        case .uit, .uitlegNodig:
+            return nil
+        }
+    }
+
+    /// "✓ volgende" (1,5 s) en het antwoord op "hoeveel …?", boven de spraakbalk.
+    private var spraakfeedback: some View {
+        VStack(spacing: 12) {
+            if let antwoord = spraak?.antwoord {
+                Antwoordkaart(antwoord: antwoord, lettertype: lettertype) { spraak?.sluitAntwoord() }
+                    .transition(.opacity.combined(with: .move(edge: .bottom)))
+                    .task(id: antwoord.nummer) {
+                        try? await Task.sleep(for: .seconds(8))
+                        guard !Task.isCancelled else { return }
+                        withAnimation { spraak?.sluitAntwoord() }
+                    }
+            }
+            if let spraakmelding {
+                Text(spraakmelding.tekst)
+                    .font(.headline)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 10)
+                    .background(Kookkleuren.tekst, in: Capsule())
+                    .foregroundStyle(Kookkleuren.achtergrond)
+                    .transition(.opacity.combined(with: .scale(scale: 0.9)))
+                    .accessibilityHidden(true)
+            }
+        }
+        .padding(.horizontal, 20)
+        .padding(.bottom, 12)
+        .frame(maxWidth: 560)
+        .frame(maxWidth: .infinity, alignment: .bottom)
+        .task(id: spraak?.melding?.nummer) {
+            guard let melding = spraak?.melding else { return }
+            withAnimation(.easeOut(duration: 0.15)) { spraakmelding = melding }
+            AccessibilityNotification.Announcement(melding.tekst).post()
+            try? await Task.sleep(for: .milliseconds(1500))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeIn(duration: 0.3)) { spraakmelding = nil }
+        }
+    }
+
     // MARK: - Klaar
 
     private var eetSmakelijk: some View {
@@ -504,6 +730,7 @@ struct KookmodusInhoud: View {
         }
         .padding(24)
         .frame(maxWidth: .infinity)
+        .overlay(alignment: .bottom) { spraakfeedback }
         .accessibilityAction(named: "Vorige stap") { sessie.vorige() }
     }
 

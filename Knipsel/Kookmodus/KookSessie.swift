@@ -180,6 +180,15 @@ final class KookSessie: Identifiable {
             eenheid: ingredient.eenheid, naam: ingredient.naam, toelichting: ingredient.toelichting, factor: factor)
     }
 
+    /// De naam in enkelvoud of meervoud bij de geschaalde hoeveelheid: "1 ui", "3 uien".
+    func naam(van ingredient: KookIngredient) -> String? {
+        ingredient.naam.map {
+            Portieschaling.naam(
+                $0, hoeveelheid: ingredient.hoeveelheid, tot: ingredient.hoeveelheidTot, eenheid: ingredient.eenheid,
+                factor: factor)
+        }
+    }
+
     /// Alleen hoeveelheid en eenheid ("1½ l"), voor vette opmaak; `nil` zonder hoeveelheid.
     func maat(van ingredient: KookIngredient) -> String? {
         guard ingredient.hoeveelheid != nil, ingredient.naam != nil else { return nil }
