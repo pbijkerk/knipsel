@@ -81,19 +81,19 @@ struct ReceptFilterTests {
     @Test func categorieEnLabelCombineren() throws {
         let context = try bibliotheek()
         var filter = ReceptFilter()
-        filter.categorie = .categorie(try categorie("Hoofdgerechten", in: context).objectID)
+        filter.categorie = .categorie(try categorie("Hoofdgerechten", in: context).naamOfStandaard)
         #expect(try titels(filter, context) == ["Prei-quiche", "Stamppot andijvie"])
 
-        filter.labels = [try label("Vegetarisch", in: context).objectID]
+        filter.labels = [try label("Vegetarisch", in: context).naamOfStandaard]
         #expect(try titels(filter, context) == ["Prei-quiche"])
 
         // Labels zijn EN: vegetarisch én snel.
         filter.categorie = .alles
-        filter.labels.insert(try label("Snel (< 30 min)", in: context).objectID)
+        filter.labels.insert(try label("Snel (< 30 min)", in: context).naamOfStandaard)
         #expect(try titels(filter, context) == ["Prei-quiche"])
 
         // Met zoekterm erbij.
-        filter.labels = [try label("Vegetarisch", in: context).objectID]
+        filter.labels = [try label("Vegetarisch", in: context).naamOfStandaard]
         filter.zoekterm = "aardappel"
         #expect(try titels(filter, context) == ["Romige aardappelsoep"])
     }

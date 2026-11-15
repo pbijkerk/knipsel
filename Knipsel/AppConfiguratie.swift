@@ -10,6 +10,9 @@ enum AppConfiguratie {
     /// UserDefaults: zijn de standaardcategorieën en -labels op dit toestel al eens aangemaakt?
     static let sleutelStandaardIngericht = "standaardIngericht"
 
+    /// Is de uitleg bij "Verplaats naar Thuis" al eens getoond (fase 8)?
+    static let sleutelThuisUitlegGezien = "thuisUitlegGezien"
+
     /// Bibliotheek (iPhone en iPad): "kaarten" (standaard) of "lijst" (`BibliotheekWeergave`).
     static let sleutelBibliotheekWeergave = "bibliotheekWeergave"
 

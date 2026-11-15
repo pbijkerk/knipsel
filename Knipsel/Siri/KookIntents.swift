@@ -46,7 +46,7 @@ struct KookReceptIntent: AppIntent {
         guard !recept.gesorteerdeStappen.isEmpty else {
             return "\(recept.titelOfStandaard) heeft nog geen stappen om te koken."
         }
-        router.kook(recept: recept.objectID.uriRepresentation(), porties: porties)
+        router.kook(recept: recept.sleutelURL, porties: porties)
         return "Kookmodus voor \(recept.titelOfStandaard)."
     }
 }
@@ -68,7 +68,7 @@ struct OpenReceptIntent: OpenIntent {
     @MainActor
     func perform() async throws -> some IntentResult {
         if let recept = ReceptZoeker.recept(id: target.id, in: Opslag.gedeeld.context) {
-            KookRouter.gedeeld.toon(recept: recept.objectID.uriRepresentation())
+            KookRouter.gedeeld.toon(recept: recept.sleutelURL)
         }
         return .result()
     }

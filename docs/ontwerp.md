@@ -190,11 +190,43 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
   alleen met de privé-database; delen met een andere Apple ID (CloudKit *shared database*) kan alleen via
   Core Data (Apple DTS op de developer-forums, 2024–2026). Twee stores: privé ("Mijn recepten") en gedeeld
   ("Thuis", gedeelde *record zone* via `UICloudSharingController`).
+- **Thuis delen (fase 8, #9)** volgt Apple's voorbeeld *Sharing Core Data objects between iCloud users*:
+  - Eén `NSPersistentCloudKitContainer` met twee stores: `Knipsel.sqlite` (bestaand, `databaseScope =
+    .private`) en `Knipsel-gedeeld.sqlite` (nieuw, `.shared`). Beide met persistent history en remote
+    change notifications. Een bestaande database opent ongewijzigd: alles staat in "Mijn recepten".
+  - Eén zone-brede `CKShare` "Knipsel · Thuis" (`CKShare.SystemFieldKey.title`, geen openbare link,
+    deelnemers lezen en schrijven). Als **eigenaar** staan de Thuis-recepten in je *privéstore*, in de
+    record zone van de share (`container.share(_:to:)` verhuist ze daarheen); als **deelnemer** staan ze
+    in de *gedeelde store* (`acceptShareInvitations(from:into:)`). Een recept, categorie of label weet zijn
+    kookboek via het veld `kookboek` ("mijn"/"thuis").
+  - Core Data kent geen relaties tussen stores, en `share(_:to:)` neemt de hele objectgraaf mee (een
+    recept → zijn categorie → álle recepten in die categorie). Daarom heeft Thuis **eigen categorieën en
+    labels** met dezelfde namen. Naar Thuis verplaatsen = een volledige kopie (ingrediënten, stappen, foto,
+    kooklog, beoordeling, dezelfde `uuid`) aan de gelijknamige Thuis-categorieën (zo nodig aangemaakt),
+    het origineel weg, in één bewaarbeurt (`Kookboeken`). Terug idem. Vóór elke bewaarbeurt zet
+    `Kookboeken.herstel` nieuwe objecten in de juiste store en een keuze uit het andere kookboek om naar
+    de gelijknamige. De standaardset zaait alleen in Mijn recepten; ontdubbelen gaat per store en kookboek.
+  - De bibliotheek leest beide stores; categorieën en labels met dezelfde naam zijn één chip/regel
+    (filter op naam). Zijbalk en Filter: Alles / Mijn recepten / Thuis (alleen als er Thuis-recepten zijn).
+  - "Verder met…", Siri en Spotlight verwijzen naar de `uuid` (`Recept.verwijzing`), niet naar het
+    objectID; oude standen worden bij het starten omgezet.
+  - **Stoppen.** `purgeObjectsAndRecordsInZone(with:in:)` haalt de zone uit CloudKit **en** de objecten
+    uit de store (Apple: "apps that need to keep the object graph can make a deep copy … and save it").
+    Daarom verplaatst de eigenaar bij *Stop met delen* eerst alles uit Thuis naar Mijn recepten, en kan
+    een deelnemer bij *Verlaat Thuis* eerst een kopie maken (standaard aan). Bij de huisgenoot
+    verdwijnen de Thuis-recepten; open scherm, *Verder met…*, Siri en Spotlight vangen dat op.
+  - Accepteren: `CKSharingSupported` in Info.plist; een `UIWindowSceneDelegate` (via
+    `UIApplicationDelegateAdaptor`) ontvangt `windowScene(_:userDidAcceptCloudKitShareWith:)`.
+  - CloudKit-kant achter het protocol `DeelDienst` (nep in tests); modelversie 3 voegt `kookboek` toe
+    aan `Categorie` en `Label` (optioneel met standaard "mijn"). **CloudKit-schema opnieuw naar
+    Production uitrollen** (CloudKit Console › Deploy Schema Changes); het schema geldt voor de privé- en
+    gedeelde database samen.
   - CloudKit-eisen: alle attributen optioneel of met standaardwaarde, geen unieke constraints,
     relaties met inverse.
 - **Model (eerste versie):**
   - `Recept`: titel, intro, porties, bereidingstijd, totale tijd, notities, bronNaam, bronDatum, bronPagina,
     beoordeling, laatstGekooktOp, aangemaaktOp, kookboek (Mijn recepten / Thuis); veel-op-veel met `Categorie`.
+    Modelversie 3 (#9): `kookboek` ook op `Categorie` en `Label`.
     Modelversie 2 (#23, 3b): `fotoData` (eigen gerechtfoto, JPEG 4:3 ≤ 1600 px, *Allows External Storage*,
     in CloudKit een asset) en `fotoGewijzigdOp` (`nil` = geen foto). Nooit de krantenfoto (B7).
   - `Ingredient`: volgorde, groep, ruweTekst, hoeveelheid, hoeveelheidTot, eenheid, naam, toelichting
@@ -238,7 +270,7 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 | 5 | Spraakbesturing in de app | Grootste UX-winst, hoogste risico (S4) |
 | 6 | Siri, App Shortcuts, Spotlight, AirPods/Watch (proef); Actieknop geparkeerd | Bouwt op de `KookSessie` van 3–5. Gebouwd (#7); `ZetTimer` hoort bij fase 7 |
 | 7 | Timers (AlarmKit) en Live Activity | Los te bouwen na fase 3 |
-| 8 | Delen met huisgenoot | Raakt het datamodel; na stabiel gebruik |
+| 8 | Delen met huisgenoot | Raakt het datamodel; na stabiel gebruik. Gebouwd (#9): kookboek Thuis, modelversie 3 |
 
 ## 10. Eigen suggesties (nog niet ingepland)
 

@@ -26,6 +26,8 @@
 	<string>In de kookmodus luistert Knipsel naar korte opdrachten als "volgende", "herhaal" of "hoeveel boter?", zodat je het scherm niet hoeft aan te raken. Knipsel luistert alleen zolang de kookmodus open is; er wordt niets opgenomen of bewaard.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Knipsel zet wat je in de kookmodus zegt op dit toestel om in tekst om je opdrachten te herkennen. Er gaat geen geluid naar internet.</string>
+	<key>CKSharingSupported</key>
+	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>

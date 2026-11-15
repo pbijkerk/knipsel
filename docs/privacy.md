@@ -1,6 +1,6 @@
 # Privacybeleid Knipsel
 
-*Laatst bijgewerkt: 15 november 2026*
+*Laatst bijgewerkt: 15 november 2026 (Thuis delen)*
 
 Knipsel is een recepten-app voor iPhone en iPad, gemaakt door Peter Bijkerk voor eigen gebruik en een
 kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en waar ze blijven.
@@ -20,7 +20,7 @@ kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en wa
 | Gegeven | Waar het blijft |
 |---|---|
 | Recepten, categorieën, labels, notities | Op je toestel, gesynchroniseerd via je eigen iCloud-account (Apple CloudKit, privédatabase). De maker kan er niet bij. |
-| Gedeeld kookboek "Thuis" | In iCloud, alleen zichtbaar voor de mensen die jij uitnodigt. Je kunt delen altijd stoppen. |
+| Gedeeld kookboek "Thuis" | Alleen de recepten die jij in Thuis zet (of bewaart met *Bewaar in: Thuis*), in iCloud (Apple CloudKit, gedeelde zone), zichtbaar voor de mensen die jij uitnodigt — niemand anders, ook de maker niet. Zij zien en bewerken van die recepten alles: titel, ingrediënten, stappen, notities, bron, beoordeling, de foto van je gerecht en het kooklog (hoe vaak en wanneer het gekookt is), plus de categorieën en labels die eraan hangen. Recepten in "Mijn recepten" blijven privé. Wie uitnodigt ziet de naam en het e-mailadres of telefoonnummer van de deelnemers (en andersom), zoals iCloud dat bij delen toont. Stop je met delen, dan gaan de Thuis-recepten terug naar jouw Mijn recepten en verdwijnen ze bij de anderen; vertrekt een huisgenoot, dan kan die eerst een kopie maken. Spotlight-index en *Verder met…* blijven per toestel. |
 | Foto's van een krant- of tijdschriftpagina | Alleen gebruikt om de tekst te herkennen, op het toestel. De foto wordt daarna **niet bewaard**. |
 | Eigen foto van je gerecht (optioneel) | Alleen als je er zelf een maakt of kiest. Verkleind bewaard bij het recept, op je toestel en in je eigen iCloud (privédatabase; bij een recept in het gedeelde kookboek "Thuis" ook zichtbaar voor wie je hebt uitgenodigd). Gaat **nooit** naar Claude of de maker. Verwijder hem via ⋯ › Verwijder foto. |
 | Spraak (spraakbesturing in de kookmodus) | Herkend op het toestel. Er worden geen opnames bewaard of verstuurd. |

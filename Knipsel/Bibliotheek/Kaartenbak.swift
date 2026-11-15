@@ -34,6 +34,9 @@ struct ReceptKaart: View {
                 zonderFoto
             }
         }
+        .overlay(alignment: .topTrailing) {
+            if recept.isThuis { ThuisTeken(opFoto: recept.heeftFoto).padding(10) }
+        }
         .contentShape(.contextMenuPreview, vorm)
         .contentShape(vorm)
         .accessibilityElement(children: .ignore)
@@ -110,7 +113,26 @@ struct ReceptKaart: View {
     }
 
     private var toegankelijkeOmschrijving: String {
-        [recept.kaartCategorie?.naamOfStandaard, onderregel].compactMap { $0 }.joined(separator: ", ")
+        [recept.isThuis ? "Thuis" : nil, recept.kaartCategorie?.naamOfStandaard, onderregel].compactMap { $0 }
+            .joined(separator: ", ")
+    }
+}
+
+/// Klein teken op kaart en regel: dit recept staat in Thuis (gedeeld met een huisgenoot).
+struct ThuisTeken: View {
+    /// Op een foto: wit op een donker rondje; anders in de inktkleur van de kaart.
+    var opFoto = false
+    @ScaledMetric(relativeTo: .caption) private var maat: CGFloat = 26
+
+    var body: some View {
+        Image(systemName: Kookboek.thuis.symbool)
+            .font(.caption2.weight(.semibold))
+            .foregroundStyle(opFoto ? Color.white : Kaartkleuren.titel.kleur.opacity(0.8))
+            .frame(width: maat, height: maat)
+            .background(
+                opFoto ? AnyShapeStyle(.black.opacity(0.45)) : AnyShapeStyle(.background.opacity(0.55)), in: Circle()
+            )
+            .accessibilityLabel("Thuis")
     }
 }
 
@@ -168,10 +190,11 @@ struct KnipKnop: View {
     }
 }
 
-/// Labels aan/uit (achter de chip "Filter"), combineerbaar met de categorie; zoals de tweede
-/// chiprij van voorheen.
+/// Achter de chip "Filter": het kookboek (als er Thuis-recepten zijn) en de labels aan/uit,
+/// combineerbaar met de categorie; zoals de tweede chiprij van voorheen. Gelijknamige labels uit
+/// beide kookboeken staan er één keer.
 struct LabelFilter: View {
-    @Binding var labels: Set<NSManagedObjectID>
+    @Binding var filter: ReceptFilter
     @Environment(\.dismiss) private var dismiss
 
     @FetchRequest(sortDescriptors: [
@@ -179,45 +202,66 @@ struct LabelFilter: View {
             key: "naam", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare(_:)))
     ])
     private var alleLabels: FetchedResults<ReceptLabel>
+    @FetchRequest(sortDescriptors: [], predicate: NSPredicate(format: "kookboek == %@", Kookboek.thuis.rawValue))
+    private var thuisRecepten: FetchedResults<Recept>
 
     var body: some View {
         NavigationStack {
             List {
-                Section {
-                    ForEach(alleLabels, id: \.objectID) { label in
-                        let gekozen = labels.contains(label.objectID)
-                        Button {
-                            if gekozen {
-                                labels.remove(label.objectID)
-                            } else {
-                                labels.insert(label.objectID)
+                if Bibliotheekkookboeken.toon(aantalThuis: thuisRecepten.count, gekozen: filter.kookboek) {
+                    Section("Kookboek") {
+                        Picker("Kookboek", selection: $filter.kookboek) {
+                            Text("Alles").tag(Kookboek?.none)
+                            ForEach(Kookboek.allCases) { boek in
+                                Text(boek.naam).tag(Optional(boek))
                             }
-                        } label: {
-                            HStack {
-                                Image(systemName: gekozen ? "checkmark.circle.fill" : "circle")
-                                    .foregroundStyle(gekozen ? Color.accentColor : .secondary)
-                                    .font(.title3)
-                                Text(label.naamOfStandaard)
-                                    .foregroundStyle(.primary)
-                                Spacer()
-                                Text(label.aantalRecepten, format: .number)
-                                    .foregroundStyle(.secondary)
-                            }
-                            .contentShape(Rectangle())
                         }
-                        .buttonStyle(.plain)
-                        .accessibilityAddTraits(gekozen ? .isSelected : [])
+                        .pickerStyle(.segmented)
+                        .labelsHidden()
                     }
-                } footer: {
-                    Text("Kies je meer labels, dan zie je recepten met al die labels.")
+                }
+                if !labelGroepen.isEmpty {
+                    Section {
+                        ForEach(labelGroepen) { label in
+                            let gekozen = filter.labels.contains(label.naam)
+                            Button {
+                                if gekozen {
+                                    filter.labels.remove(label.naam)
+                                } else {
+                                    filter.labels.insert(label.naam)
+                                }
+                            } label: {
+                                HStack {
+                                    Image(systemName: gekozen ? "checkmark.circle.fill" : "circle")
+                                        .foregroundStyle(gekozen ? Color.accentColor : .secondary)
+                                        .font(.title3)
+                                    Text(label.naam)
+                                        .foregroundStyle(.primary)
+                                    Spacer()
+                                    Text(label.aantal, format: .number)
+                                        .foregroundStyle(.secondary)
+                                }
+                                .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityAddTraits(gekozen ? .isSelected : [])
+                        }
+                    } header: {
+                        Text("Labels")
+                    } footer: {
+                        Text("Kies je meer labels, dan zie je recepten met al die labels.")
+                    }
                 }
             }
-            .navigationTitle("Labels")
+            .navigationTitle("Filter")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Wis") { labels.removeAll() }
-                        .disabled(labels.isEmpty)
+                    Button("Wis") {
+                        filter.labels.removeAll()
+                        filter.kookboek = nil
+                    }
+                    .disabled(filter.labels.isEmpty && filter.kookboek == nil)
                 }
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Klaar") { dismiss() }
@@ -225,4 +269,6 @@ struct LabelFilter: View {
             }
         }
     }
+
+    private var labelGroepen: [LabelGroep] { LabelGroep.groepeer(Array(alleLabels), kookboek: filter.kookboek) }
 }

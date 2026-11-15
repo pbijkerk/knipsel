@@ -9,8 +9,16 @@ struct ReceptRij: View {
         HStack(alignment: .top, spacing: 12) {
             CategorieIcoon(recept: recept)
             VStack(alignment: .leading, spacing: 3) {
-                Text(recept.titelOfStandaard)
-                    .font(.system(.headline, design: .serif))
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text(recept.titelOfStandaard)
+                        .font(.system(.headline, design: .serif))
+                    if recept.isThuis {
+                        Image(systemName: Kookboek.thuis.symbool)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            .accessibilityLabel("Thuis")
+                    }
+                }
                 if let onderregel {
                     Text(onderregel)
                         .font(.subheadline)
@@ -166,10 +174,15 @@ struct ReceptScherm: View {
     @Environment(\.managedObjectContext) private var context
     let id: NSManagedObjectID
     var naVerwijderen: () -> Void = {}
+    /// Na verplaatsen naar het andere kookboek (nieuw objectID).
+    var naVerplaatsen: (NSManagedObjectID) -> Void = { _ in }
 
     var body: some View {
-        if let recept = try? context.existingObject(with: id) as? Recept, !recept.isDeleted {
-            ReceptWeergave(recept: recept, naVerwijderen: naVerwijderen)
+        // Ook weg als het recept uit de store verdween (Thuis gestopt): dan geen context meer.
+        if let recept = try? context.existingObject(with: id) as? Recept, !recept.isDeleted,
+            recept.managedObjectContext != nil
+        {
+            ReceptWeergave(recept: recept, naVerwijderen: naVerwijderen, naVerplaatsen: naVerplaatsen)
         } else {
             ContentUnavailableView("Recept niet gevonden", systemImage: "scissors")
         }

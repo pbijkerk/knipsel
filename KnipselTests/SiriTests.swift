@@ -113,7 +113,7 @@ struct SiriTests {
 
         let verzoek = try #require(router.neemKookVerzoekAf())
         #expect(router.kookVerzoek == nil)
-        #expect(verzoek.recept == soep.objectID.uriRepresentation())
+        #expect(verzoek.recept == soep.sleutelURL)
         #expect(verzoek.porties == 6)
 
         let keuze = try #require(KookRouter.keuze(voor: verzoek, in: context))

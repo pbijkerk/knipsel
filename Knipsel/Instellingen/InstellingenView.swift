@@ -12,6 +12,11 @@ struct InstellingenView: View {
             List {
                 Section("Bibliotheek") {
                     NavigationLink {
+                        ThuisDelenScherm()
+                    } label: {
+                        SwiftUI.Label("Thuis delen", systemImage: Kookboek.thuis.symbool)
+                    }
+                    NavigationLink {
                         CategorieBeheer()
                     } label: {
                         SwiftUI.Label("Categorieën", systemImage: "square.grid.2x2")
@@ -142,7 +147,9 @@ struct ClaudeInstellingen: View {
 /// Hernoemen, symbool kiezen, slepen, verbergen, toevoegen en verwijderen (met bevestiging).
 struct CategorieBeheer: View {
     @Environment(\.managedObjectContext) private var context
-    @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "volgorde", ascending: true)])
+    /// Alleen "Mijn recepten": Thuis heeft gelijknamige exemplaren die meeveranderen.
+    @FetchRequest(
+        sortDescriptors: [NSSortDescriptor(key: "volgorde", ascending: true)], predicate: Bibliotheekbeheer.alleenMijn)
     private var categorieen: FetchedResults<Categorie>
 
     @State private var bewerk: Categorie?
@@ -359,10 +366,11 @@ struct CategorieBewerken: View {
 
 struct LabelBeheer: View {
     @Environment(\.managedObjectContext) private var context
-    @FetchRequest(sortDescriptors: [
-        NSSortDescriptor(
-            key: "naam", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare(_:)))
-    ])
+    @FetchRequest(
+        sortDescriptors: [
+            NSSortDescriptor(
+                key: "naam", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare(_:)))
+        ], predicate: Bibliotheekbeheer.alleenMijn)
     private var labels: FetchedResults<ReceptLabel>
 
     /// `nil` = nieuw label; anders het label dat hernoemd wordt.

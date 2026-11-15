@@ -5,16 +5,32 @@ import CoreData
 // attribuut optioneel of met standaardwaarde, geen unieke constraints, elke relatie optioneel met
 // inverse en ongeordend (volgorde staat in een eigen attribuut).
 
-/// Kookboek waar een recept bij hoort (B8). In fase 1 bestaat alleen "Mijn recepten".
-enum Kookboek: String, CaseIterable, Sendable {
+/// Kookboek waar een recept bij hoort (B8): "Mijn recepten" (privé) of "Thuis" (gedeeld met een
+/// huisgenoot, fase 8). Recepten, categorieën en labels dragen het in hun veld `kookboek`; ingrediënten,
+/// stappen en het kooklog volgen hun recept. Zie `Kookboeken` voor welke store en zone daarbij horen.
+enum Kookboek: String, CaseIterable, Sendable, Identifiable {
     case mijn
     case thuis
+
+    var id: String { rawValue }
 
     var naam: String {
         switch self {
         case .mijn: "Mijn recepten"
         case .thuis: "Thuis"
         }
+    }
+
+    var symbool: String {
+        switch self {
+        case .mijn: "person.fill"
+        case .thuis: "person.2.fill"
+        }
+    }
+
+    /// Onbekende of lege waarden (oude data) tellen als "Mijn recepten".
+    init(veld: String?) {
+        self = veld.flatMap(Kookboek.init(rawValue:)) ?? .mijn
     }
 }
 
@@ -99,6 +115,9 @@ final class Categorie: NSManagedObject {
     @NSManaged var volgorde: Int16
     @NSManaged var verborgen: Bool
     @NSManaged var isStandaard: Bool
+    /// Ruwe waarde van `Kookboek` (modelversie 3); standaard "mijn". Een Thuis-recept hangt alleen
+    /// aan Thuis-categorieën: CloudKit deelt een recept met alles waar het aan vastzit.
+    @NSManaged var kookboek: String
     @NSManaged var recepten: Set<Recept>?
 
     static func verzoek() -> NSFetchRequest<Categorie> { NSFetchRequest(entityName: "Categorie") }
@@ -114,6 +133,8 @@ final class Categorie: NSManagedObject {
 final class ReceptLabel: NSManagedObject {
     @NSManaged var uuid: UUID?
     @NSManaged var naam: String?
+    /// Ruwe waarde van `Kookboek` (modelversie 3); standaard "mijn".
+    @NSManaged var kookboek: String
     @NSManaged var recepten: Set<Recept>?
 
     static func verzoek() -> NSFetchRequest<ReceptLabel> { NSFetchRequest(entityName: "Label") }
@@ -131,6 +152,50 @@ final class Kooklog: NSManagedObject {
     @NSManaged var recept: Recept?
 
     static func verzoek() -> NSFetchRequest<Kooklog> { NSFetchRequest(entityName: "Kooklog") }
+}
+
+// MARK: - Kookboek
+
+extension NSManagedObject {
+    /// Het kookboek uit het veld `kookboek`, veilig: een object dat intussen uit de store verdween
+    /// (bijv. gedeelde recepten nadat het delen stopte) geeft `nil` terug in plaats van te crashen.
+    var kookboekVeld: String? {
+        guard managedObjectContext != nil, !isDeleted, entity.attributesByName["kookboek"] != nil else { return nil }
+        return value(forKey: "kookboek") as? String
+    }
+}
+
+extension Recept {
+    var kookboekWaarde: Kookboek { Kookboek(veld: kookboekVeld) }
+    var isThuis: Bool { kookboekWaarde == .thuis }
+
+    /// Vaste verwijzing naar dit recept, ook als het van store wisselt (naar Thuis en terug): op de
+    /// `uuid`, niet op het objectID. Voor "Verder met…" (`KookVoortgang`) en `KookRouter`.
+    var verwijzing: URL? { uuid.map(Recept.verwijzing(uuid:)) }
+
+    static let verwijzingVoorvoegsel = "knipsel://recept/"
+
+    static func verwijzing(uuid: UUID) -> URL {
+        URL(string: verwijzingVoorvoegsel + uuid.uuidString)!
+    }
+
+    /// De uuid uit een verwijzing; `nil` voor iets anders (bijv. een oude objectID-URI).
+    /// De verwijzing, of (zonder uuid, alleen bij heel oude data) de objectID-URI.
+    var sleutelURL: URL { verwijzing ?? objectID.uriRepresentation() }
+
+    static func uuid(uitVerwijzing url: URL) -> UUID? {
+        let tekst = url.absoluteString
+        guard tekst.hasPrefix(verwijzingVoorvoegsel) else { return nil }
+        return UUID(uuidString: String(tekst.dropFirst(verwijzingVoorvoegsel.count)))
+    }
+}
+
+extension Categorie {
+    var kookboekWaarde: Kookboek { Kookboek(veld: kookboekVeld) }
+}
+
+extension ReceptLabel {
+    var kookboekWaarde: Kookboek { Kookboek(veld: kookboekVeld) }
 }
 
 // MARK: - Gemak voor de weergave

@@ -46,7 +46,9 @@ struct ReceptBewerken: View {
                     NavigationLink {
                         Keuzelijst(
                             titel: "Categorieën",
-                            items: categorieen.map {
+                            items: Keuzeopties.uniek(
+                                Array(categorieen), gekozen: invoer.categorieen, kookboek: invoer.kookboek
+                            ).map {
                                 Keuzelijst.Item(
                                     id: $0.objectID, naam: $0.naamOfStandaard, symbool: $0.symboolOfStandaard,
                                     toelichting: $0.verborgen ? "verborgen" : nil)
@@ -61,14 +63,31 @@ struct ReceptBewerken: View {
                     NavigationLink {
                         Keuzelijst(
                             titel: "Labels",
-                            items: labels.map {
-                                Keuzelijst.Item(id: $0.objectID, naam: $0.naamOfStandaard, symbool: "tag")
-                            },
+                            items: Keuzeopties.uniek(Array(labels), gekozen: invoer.labels, kookboek: invoer.kookboek)
+                                .map {
+                                    Keuzelijst.Item(id: $0.objectID, naam: $0.naamOfStandaard, symbool: "tag")
+                                },
                             gekozen: $invoer.labels)
                     } label: {
                         LabeledContent(
                             "Labels",
                             value: samenvatting(invoer.labels, uit: labels.map { ($0.objectID, $0.naamOfStandaard) }))
+                    }
+                }
+
+                if recept == nil {
+                    Section {
+                        Picker("Bewaar in", selection: $invoer.kookboek) {
+                            ForEach(Kookboek.allCases) { boek in
+                                Text(boek.naam).tag(boek)
+                            }
+                        }
+                        .pickerStyle(.segmented)
+                        .accessibilityLabel("Bewaar in")
+                    } header: {
+                        Text("Bewaar in")
+                    } footer: {
+                        Text(ControleInvoer.kookboekUitleg(invoer.kookboek))
                     }
                 }
 
