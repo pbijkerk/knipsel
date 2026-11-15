@@ -25,8 +25,23 @@ struct KookStap: Identifiable, Equatable, Sendable {
     /// Positie in de bereiding (0 = stap 1).
     let id: Int
     var tekst: String
+    /// De tijd voor de timer (`Stap.timerSeconden`, anders uit de tekst); 0 = geen tijd.
     var timerSeconden: Int = 0
     var groep: String?
+
+    /// Alle tijden in de staptekst ("bak 2 minuten mee … laat 20 minuten koken"), voor de timerknoppen.
+    var tijden: [Tijdvermelding] { TijdHerkenner.tijden(in: tekst) }
+
+    /// De tijd waar Knipsel na het voorlezen een timer voor aanbiedt: de opgeslagen timer als die in
+    /// de tekst staat, anders de langste tijd in de tekst.
+    var hoofdtijd: Tijdvermelding? {
+        let alle = tijden
+        if timerSeconden > 0, let opgeslagen = alle.first(where: { $0.seconden == timerSeconden }) { return opgeslagen }
+        return TijdHerkenner.hoofdtijd(in: tekst)
+    }
+
+    /// Seconden voor de timer van deze stap; 0 = geen.
+    var hoofdtijdSeconden: Int { timerSeconden > 0 ? timerSeconden : (hoofdtijd?.seconden ?? 0) }
 }
 
 /// Eén kookbeurt: welke stap, wat is afgevinkt, voor hoeveel personen. Een toestandsmachine zonder
@@ -232,7 +247,7 @@ extension KookSessie {
                 naam: ingredient.naam, toelichting: ingredient.toelichting, groep: ingredient.groep)
         }
         let stappen = recept.gesorteerdeStappen.enumerated().map { index, stap in
-            KookStap(id: index, tekst: stap.tekst ?? "", timerSeconden: Int(stap.timerSeconden), groep: stap.groep)
+            KookStap(id: index, tekst: stap.tekst ?? "", timerSeconden: stap.hoofdtijdSeconden, groep: stap.groep)
         }
         self.init(
             titel: recept.titelOfStandaard, ingredienten: ingredienten, stappen: stappen,

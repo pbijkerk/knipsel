@@ -20,10 +20,14 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>NSAlarmKitUsageDescription</key>
+	<string>Knipsel zet kooktimers als alarm, zodat je ze hoort als het scherm op slot zit of je telefoon op stil staat. De naam van het recept en de stap staan in het alarm; er gaat niets van het toestel af.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Knipsel gebruikt de camera om een receptpagina uit een krant of tijdschrift te scannen (alleen de herkende tekst wordt bewaard, de foto van de pagina niet) en, als je dat wilt, om een foto van je eigen gerecht bij het recept te maken.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>In de kookmodus luistert Knipsel naar korte opdrachten als "volgende", "herhaal" of "hoeveel boter?", zodat je het scherm niet hoeft aan te raken. Knipsel luistert alleen zolang de kookmodus open is; er wordt niets opgenomen of bewaard.</string>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>Knipsel zet wat je in de kookmodus zegt op dit toestel om in tekst om je opdrachten te herkennen. Er gaat geen geluid naar internet.</string>
 	<key>CKSharingSupported</key>

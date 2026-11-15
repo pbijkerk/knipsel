@@ -44,6 +44,9 @@ targets:
       # De deel-extensie zit in de app (PlugIns/KnipselDelen.appex).
       - target: KnipselDelen
         embed: true
+      # De Live Activities (kookmodus en timers) zitten in PlugIns/KnipselWidgets.appex (fase 7).
+      - target: KnipselWidgets
+        embed: true
     scheme:
       testTargets:
         - KnipselTests
@@ -65,6 +68,28 @@ targets:
         PRODUCT_BUNDLE_IDENTIFIER: com.peterbijkerk.knipsel.delen
         INFOPLIST_FILE: KnipselDelen/Info.plist
         CODE_SIGN_ENTITLEMENTS: KnipselDelen/KnipselDelen.entitlements
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 68K8BCC3DL
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
+
+  # Live Activities op het vergrendelscherm en in het Dynamic Island (#8): de kookmodus (stap, timer,
+  # knoppen) en elke kooktimer (AlarmKit). Eigen app-ID com.peterbijkerk.knipsel.widgets, zonder
+  # entitlements of capabilities; versie en buildnummer zoals de app.
+  KnipselWidgets:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: KnipselWidgets
+      # Gedeeld met de app: de ActivityAttributes, de knoppen (LiveActivityIntent) en de weergaven.
+      # Niets anders uit de app.
+      - path: Knipsel/Gedeeld
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.peterbijkerk.knipsel.widgets
+        INFOPLIST_FILE: KnipselWidgets/Info.plist
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 68K8BCC3DL
         APPLICATION_EXTENSION_API_ONLY: YES

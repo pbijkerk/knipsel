@@ -43,6 +43,15 @@ final class Spraakbediening {
 
     @ObservationIgnored let sessie: KookSessie
     @ObservationIgnored let voorlezer: VoorleesService
+    /// De kooktimers (fase 7); `nil` in tests en renders zonder timers.
+    @ObservationIgnored let timers: TimerService?
+    /// De uiting (segment) die begon terwijl de timervraag open stond: komt het eindresultaat ("ja")
+    /// pas na het venster binnen, dan telt het toch als antwoord.
+    @ObservationIgnored private var antwoordSegment: Int?
+    /// Net beantwoord (bijvoorbeeld met een tik): een "ja" dat er vlak achteraan komt, gaat niet naar
+    /// de volgende stap.
+    @ObservationIgnored private var beantwoordOp: Date?
+    static let naAntwoordNegeren: TimeInterval = 3
     @ObservationIgnored private var beslisser: Uitingbeslisser
     /// "Stoppen met koken": de kookmodus sluiten.
     @ObservationIgnored var sluit: () -> Void = {}
@@ -54,10 +63,11 @@ final class Spraakbediening {
 
     init(
         sessie: KookSessie, voorlezer: VoorleesService,
-        instellingen: CommandoHerkenner.Instellingen = Spraakinstellingen.herkenner()
+        instellingen: CommandoHerkenner.Instellingen = Spraakinstellingen.herkenner(), timers: TimerService? = nil
     ) {
         self.sessie = sessie
         self.voorlezer = voorlezer
+        self.timers = timers
         beslisser = Uitingbeslisser(
             herkenner: CommandoHerkenner(
                 ingredientnamen: sessie.ingredienten.map(\.koppelnaam), instellingen: instellingen))
@@ -77,18 +87,25 @@ final class Spraakbediening {
     static let commandowoorden = [
         "volgende", "vorige", "terug", "herhaal", "nog een keer", "stop", "stil", "pauze", "lees voor", "ga door",
         "langzamer", "sneller", "ingrediënten", "wat heb ik nodig", "hoeveel", "stap", "stoppen met koken", "oké",
-        "klaar", "gedaan", "Knipsel",
+        "klaar", "gedaan", "Knipsel", "timer", "zet de timer", "hoe lang nog", "stop de timer", "ja", "nee",
     ]
 
     // MARK: - Resultaten van de herkenner
 
     /// Een (deel)resultaat. `nu` in seconden (monotone klok).
     func verwerk(_ tekst: String, segment: Int, definitief: Bool, nu: TimeInterval) {
+        // De timervraag: binnen het venster (of in een uiting die binnen het venster begon) is "ja" of
+        // "oké" een antwoord en geen "volgende".
+        if voorlezer.openTimervraag() != nil { antwoordSegment = antwoordSegment ?? segment }
+        let isAntwoord = voorlezer.timervraag != nil && antwoordSegment == segment
+        if antwoordSegment.map({ $0 < segment }) ?? false, voorlezer.openTimervraag() == nil { antwoordSegment = nil }
+        beslisser.herkenner.instellingen.antwoordVerwacht = isAntwoord
         if let commando = beslisser.verwerk(
             tekst, segment: segment, definitief: definitief, nu: nu, voorgelezen: voorlezer.voorgelezenTekst())
         {
-            voerUit(commando)
+            voerUit(commando, alsAntwoord: isAntwoord)
         }
+        if definitief, antwoordSegment == segment { antwoordSegment = nil }
     }
 
     /// Periodiek: een voorlopig resultaat dat stabiel bleef.
@@ -98,15 +115,41 @@ final class Spraakbediening {
 
     // MARK: - Uitvoeren
 
-    func voerUit(_ commando: Commando) {
+    /// - Parameter alsAntwoord: de uiting begon terwijl de timervraag open stond; standaard: staat hij
+    ///   nu open.
+    func voerUit(_ commando: Commando, alsAntwoord: Bool? = nil) {
         laatsteCommando = commando
+        let isAntwoord = alsAntwoord ?? (voorlezer.openTimervraag() != nil)
         switch commando {
         case .volgende:
             sessie.volgende()
             meld("✓ volgende")
         case .impliciet(let woord):
-            sessie.volgende()
-            meld("✓ Volgende (\(woord))")
+            if isAntwoord, let vraag = voorlezer.timervraag {
+                beantwoordTimervraag(ja: true, vraag: vraag)
+            } else if isAntwoord || isNetBeantwoord {
+                // Al beantwoord (met een tik): niets doen, en zeker niet naar de volgende stap.
+                break
+            } else {
+                sessie.volgende()
+                meld("✓ Volgende (\(woord))")
+            }
+        case .weiger:
+            if isAntwoord, let vraag = voorlezer.timervraag { beantwoordTimervraag(ja: false, vraag: vraag) }
+        case .zetTimer(let seconden):
+            voorlezer.sluitTimervraag()
+            zetTimer(seconden: seconden)
+        case .hoeLangNog:
+            let zin = Timerzinnen.hoeLangNog(timers?.timers ?? [], nu: timers?.nu() ?? Date())
+            voorlezer.spreek(zin)
+            meld("✓ hoe lang nog?")
+        case .stopTimer:
+            if let timer = timers?.eerstvolgende {
+                timers?.stop(timer.id)
+                meld("✓ timer \(timer.kort.lowercased()) gestopt")
+            } else {
+                meld(Timerzinnen.geenTimer)
+            }
         case .vorige:
             sessie.vorige()
             meld("✓ vorige")
@@ -146,6 +189,53 @@ final class Spraakbediening {
             sluit()
         }
         if !isHoeveel(commando) { antwoord = nil }
+    }
+
+    // MARK: - Timers
+
+    /// Ja of nee op "Zal ik een timer van 20 minuten zetten?" (gesproken of getikt in de banner).
+    func beantwoordTimervraag(ja: Bool) {
+        guard let vraag = voorlezer.timervraag else { return }
+        beantwoordTimervraag(ja: ja, vraag: vraag)
+    }
+
+    private var isNetBeantwoord: Bool {
+        guard let beantwoordOp else { return false }
+        return voorlezer.nu().timeIntervalSince(beantwoordOp) <= Self.naAntwoordNegeren
+    }
+
+    private func beantwoordTimervraag(ja: Bool, vraag: Timervraag) {
+        voorlezer.sluitTimervraag()
+        antwoordSegment = nil
+        beantwoordOp = voorlezer.nu()
+        guard ja else {
+            meld("✓ geen timer")
+            return
+        }
+        let stap = sessie.stappen.indices.contains(vraag.stapIndex) ? sessie.stappen[vraag.stapIndex] : nil
+        start(seconden: vraag.seconden, stap: stap, tijd: stap?.hoofdtijd)
+    }
+
+    /// "Zet de timer" (tijd van deze stap) of "timer 10 minuten".
+    private func zetTimer(seconden: Int?) {
+        let stap = sessie.isAfgerond ? nil : sessie.huidigeStap
+        if let seconden {
+            let tijd = stap?.tijden.first { $0.seconden == seconden }
+            start(seconden: seconden, stap: tijd == nil ? nil : stap, tijd: tijd)
+        } else if let stap, stap.hoofdtijdSeconden > 0 {
+            start(seconden: stap.hoofdtijdSeconden, stap: stap, tijd: stap.hoofdtijd)
+        } else {
+            voorlezer.spreek(Timerzinnen.geenTijdInStap)
+            meld("Geen tijd in deze stap")
+        }
+    }
+
+    /// Start de timer via `KookTimers`, met een melding meteen (AlarmKit antwoordt asynchroon).
+    private func start(seconden: Int, stap: KookStap?, tijd: Tijdvermelding?) {
+        meld("✓ Timer \(Tijdweergave.kort(seconden))")
+        guard let timers else { return }
+        let sessie = sessie
+        Task { await KookTimers.start(seconden: seconden, stap: stap, tijd: tijd, in: sessie, timers: timers) }
     }
 
     private func isHoeveel(_ commando: Commando) -> Bool {
