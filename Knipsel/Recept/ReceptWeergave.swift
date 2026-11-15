@@ -7,10 +7,18 @@ import SwiftUI
 struct ReceptWeergave: View {
     @ObservedObject var recept: Recept
     var naVerwijderen: () -> Void = {}
+    /// Na verplaatsen naar het andere kookboek: het recept heeft een nieuw objectID (zelfde uuid).
+    var naVerplaatsen: (NSManagedObjectID) -> Void = { _ in }
+    var delen: ThuisDelen = .gedeeld
 
-    init(recept: Recept, porties: Int? = nil, naVerwijderen: @escaping () -> Void = {}) {
+    init(
+        recept: Recept, porties: Int? = nil, naVerwijderen: @escaping () -> Void = {},
+        naVerplaatsen: @escaping (NSManagedObjectID) -> Void = { _ in }, delen: ThuisDelen = .gedeeld
+    ) {
         self.recept = recept
         self.naVerwijderen = naVerwijderen
+        self.naVerplaatsen = naVerplaatsen
+        self.delen = delen
         _gekozenPorties = State(initialValue: porties ?? 0)
     }
 
@@ -30,6 +38,10 @@ struct ReceptWeergave: View {
     @State private var toonFotoBibliotheek = false
     @State private var toonCamera = false
     @State private var bevestigFotoVerwijderen = false
+    @State private var bevestigVerplaatsen = false
+    @State private var foutmelding: String?
+    /// De eerste keer een langere uitleg bij "Verplaats naar Thuis".
+    @AppStorage(AppConfiguratie.sleutelThuisUitlegGezien) private var thuisUitlegGezien = false
 
     /// ±60–65 tekens per regel bij bodytekst in New York (Dyson, 2004); schaalt mee met de tekstgrootte.
     @ScaledMetric(relativeTo: .body) private var leesbreedte: CGFloat = 560
@@ -87,6 +99,7 @@ struct ReceptWeergave: View {
                 Menu("Meer", systemImage: "ellipsis") {
                     Button("Bewerk", systemImage: "pencil") { toonBewerken = true }
                     fotoMenu
+                    verplaatsKnop
                     Button("Verwijder", systemImage: "trash", role: .destructive) { bevestigVerwijderen = true }
                 }
             }
@@ -100,6 +113,20 @@ struct ReceptWeergave: View {
         }
         .sheet(isPresented: $toonLeesinstellingen) {
             LeesinstellingenView().presentationDetents([.medium, .large])
+        }
+        .confirmationDialog(
+            ReceptVerplaatsen.vraag(naar: doelKookboek), isPresented: $bevestigVerplaatsen, titleVisibility: .visible
+        ) {
+            Button(ReceptVerplaatsen.knop(naar: doelKookboek), action: verplaats)
+        } message: {
+            Text(ReceptVerplaatsen.uitleg(naar: doelKookboek, eersteKeer: !thuisUitlegGezien))
+        }
+        .alert(
+            "Er ging iets mis", isPresented: Binding(get: { foutmelding != nil }, set: { if !$0 { foutmelding = nil } })
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(foutmelding ?? "")
         }
         .confirmationDialog("Recept verwijderen?", isPresented: $bevestigVerwijderen, titleVisibility: .visible) {
             Button("Verwijder \u{201C}\(recept.titelOfStandaard)\u{201D}", role: .destructive, action: verwijder)
@@ -120,6 +147,27 @@ struct ReceptWeergave: View {
                 .accessibilityElement()
                 .accessibilityLabel("Foto van je gerecht")
                 .accessibilityAddTraits(.isImage)
+        }
+    }
+
+    /// Het andere kookboek dan waar het recept nu in staat.
+    private var doelKookboek: Kookboek { recept.isThuis ? .mijn : .thuis }
+
+    /// In het menu ⋯: naar Thuis (gedeeld) of terug naar Mijn recepten.
+    private var verplaatsKnop: some View {
+        Button(ReceptVerplaatsen.menu(naar: doelKookboek), systemImage: doelKookboek.symbool) {
+            bevestigVerplaatsen = true
+        }
+    }
+
+    private func verplaats() {
+        let id = recept.objectID
+        do {
+            let nieuw = try delen.verplaats(recept, naar: doelKookboek)
+            thuisUitlegGezien = true
+            if nieuw.objectID != id { naVerplaatsen(nieuw.objectID) }
+        } catch {
+            foutmelding = "Verplaatsen lukte niet: \(error.localizedDescription)"
         }
     }
 
@@ -164,8 +212,14 @@ struct ReceptWeergave: View {
                 .font(.subheadline)
             }
             tijdblokken
-            if !(recept.categorieen ?? []).isEmpty || !(recept.labels ?? []).isEmpty || recept.aantalKeerGekookt > 0 {
+            if !(recept.categorieen ?? []).isEmpty || !(recept.labels ?? []).isEmpty || recept.aantalKeerGekookt > 0
+                || recept.isThuis
+            {
                 Stroomopmaak {
+                    if recept.isThuis {
+                        Kenmerk(titel: Kookboek.thuis.naam, symbool: Kookboek.thuis.symbool)
+                            .accessibilityLabel("In Thuis, gedeeld")
+                    }
                     ForEach(recept.gesorteerdeCategorieen, id: \.objectID) { categorie in
                         Kenmerk(titel: categorie.naamOfStandaard, symbool: categorie.symboolOfStandaard)
                     }
@@ -246,7 +300,7 @@ struct ReceptWeergave: View {
     private var kookKnop: some View {
         Button {
             // De bibliotheek toont de kookmodus (`VerderMet`), net als bij Siri en *Verder met…*.
-            KookRouter.gedeeld.kook(recept: recept.objectID.uriRepresentation(), porties: porties > 0 ? porties : nil)
+            KookRouter.gedeeld.kook(recept: recept.sleutelURL, porties: porties > 0 ? porties : nil)
         } label: {
             SwiftUI.Label("Kook dit", systemImage: "play.fill")
                 .font(.headline.weight(.bold))

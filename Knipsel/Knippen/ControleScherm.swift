@@ -25,6 +25,15 @@ struct ControleInvoer: Equatable {
     var bronNaam = ""
     var bronDatum = Date.now
     var bronPagina = ""
+    /// "Bewaar in" (B8): Mijn recepten (privé) of Thuis (gedeeld met je huisgenoot).
+    var kookboek = Kookboek.mijn
+
+    static func kookboekUitleg(_ kookboek: Kookboek) -> String {
+        switch kookboek {
+        case .mijn: "Alleen voor jou, op al je toestellen."
+        case .thuis: "Gedeeld met wie Thuis met je deelt: die ziet en bewerkt dit recept ook."
+        }
+    }
 
     var twijfelAantal: Int {
         concept.ingredienten.filter { ReceptOpbouw.isTwijfel($0, isIngredient: true) }.count
@@ -43,6 +52,7 @@ struct ControleInvoer: Equatable {
         invoer.bronPagina = bronPagina
         invoer.categorieen = categorieen
         invoer.labels = labels
+        invoer.kookboek = kookboek
         invoer.ingredientenTekst = concept.ingredienten.map(\.tekst).joined(separator: "\n")
         // Een stap per alinea; regeleinden binnen een stap worden spaties. Een stapgroep (van een
         // website) wordt een kopregel met dubbele punt, die `ReceptInvoer` weer als groep leest.
@@ -251,7 +261,10 @@ struct ControleScherm: View {
 
             Section {
                 Stroom(afstand: 8) {
-                    ForEach(categorieen, id: \.objectID) { categorie in
+                    ForEach(
+                        Keuzeopties.uniek(Array(categorieen), gekozen: invoer.categorieen, kookboek: invoer.kookboek),
+                        id: \.objectID
+                    ) { categorie in
                         keuzeChip(
                             categorie.naamOfStandaard, id: categorie.objectID, in: $invoer.categorieen,
                             voorstel: invoer.voorgesteldeCategorieen)
@@ -270,7 +283,10 @@ struct ControleScherm: View {
             if !labels.isEmpty {
                 Section {
                     Stroom(afstand: 8) {
-                        ForEach(labels, id: \.objectID) { label in
+                        ForEach(
+                            Keuzeopties.uniek(Array(labels), gekozen: invoer.labels, kookboek: invoer.kookboek),
+                            id: \.objectID
+                        ) { label in
                             keuzeChip(
                                 label.naamOfStandaard, id: label.objectID, in: $invoer.labels,
                                 voorstel: invoer.voorgesteldeLabels)
@@ -300,11 +316,24 @@ struct ControleScherm: View {
                         .textInputAutocapitalization(invoer.soort == .website ? .never : nil)
                         .lineLimit(1)
                 }
-                LabeledContent("Kookboek", value: Kookboek.mijn.naam)
             } header: {
                 Text("Bron")
             } footer: {
                 Text(bronUitleg)
+            }
+
+            Section {
+                Picker("Bewaar in", selection: $invoer.kookboek) {
+                    ForEach(Kookboek.allCases) { boek in
+                        Text(boek.naam).tag(boek)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .accessibilityLabel("Bewaar in")
+            } header: {
+                Text("Bewaar in")
+            } footer: {
+                Text(ControleInvoer.kookboekUitleg(invoer.kookboek))
             }
         }
     }

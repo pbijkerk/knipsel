@@ -3,10 +3,18 @@ import OSLog
 
 /// De Core Data-opslag van Knipsel.
 ///
-/// `NSPersistentCloudKitContainer` (niet SwiftData), omdat alleen Core Data later een gedeelde
-/// CloudKit-database met een andere Apple ID ondersteunt (fase 8, docs/ontwerp.md §7). Sync met
-/// iCloud gaat aan als `AppConfiguratie.cloudKitContainer` gezet is én er een iCloud-account op het
-/// toestel is; anders (en altijd in het geheugen) werkt de container als gewone lokale store.
+/// `NSPersistentCloudKitContainer` (niet SwiftData), omdat alleen Core Data een gedeelde
+/// CloudKit-database met een andere Apple ID ondersteunt (docs/ontwerp.md §7). Twee stores in één
+/// container (fase 8, zoals Apple's voorbeeld *Sharing Core Data objects between iCloud users*):
+///
+/// - **privé** (`Knipsel.sqlite`, de bestaande store; CloudKit `databaseScope = .private`): je eigen
+///   recepten, en als je Thuis zelf deelt (eigenaar) ook de Thuis-recepten — die staan dan in de
+///   record zone van de share in je privédatabase;
+/// - **gedeeld** (`Knipsel-gedeeld.sqlite`, nieuw; `databaseScope = .shared`): de Thuis-recepten van
+///   iemand anders die jou heeft uitgenodigd (deelnemer).
+///
+/// Sync met iCloud gaat aan als `AppConfiguratie.cloudKitContainer` gezet is én er een iCloud-account
+/// op het toestel is; anders (en altijd in het geheugen) werken beide als gewone lokale stores.
 @MainActor
 final class Opslag {
     /// Onder unit-tests start de app (testhost) met een lege opslag in het geheugen, zonder iCloud.
@@ -25,6 +33,9 @@ final class Opslag {
         return model
     }()
 
+    /// Bestandsnaam van de gedeelde store, naast de bestaande `Knipsel.sqlite`.
+    static let gedeeldeStoreNaam = "Knipsel-gedeeld.sqlite"
+
     let container: NSPersistentCloudKitContainer
     /// `true` als deze opslag met iCloud synchroniseert.
     let synchroniseert: Bool
@@ -35,34 +46,65 @@ final class Opslag {
 
     var context: NSManagedObjectContext { container.viewContext }
 
+    /// De privéstore ("Mijn recepten", en Thuis als je zelf de eigenaar bent).
+    var priveStore: NSPersistentStore? { Kookboeken.store(.prive, in: container.persistentStoreCoordinator) }
+    /// De gedeelde store (Thuis van een ander).
+    var gedeeldeStore: NSPersistentStore? { Kookboeken.store(.gedeeld, in: container.persistentStoreCoordinator) }
+
     /// - Parameters:
+    ///   - map: map voor de twee sqlite-bestanden; `nil` = de standaardmap van Core Data (waar de
+    ///     bestaande `Knipsel.sqlite` al staat). Voor tests met echte bestanden.
     ///   - inGeheugen: voor tests en previews; niets wordt bewaard.
     ///   - cloudKitContainer: identifier van de CloudKit-container, of `nil` voor alleen lokaal.
-    init(inGeheugen: Bool = false, cloudKitContainer: String? = AppConfiguratie.cloudKitContainer) {
+    init(map: URL? = nil, inGeheugen: Bool = false, cloudKitContainer: String? = AppConfiguratie.cloudKitContainer) {
         container = NSPersistentCloudKitContainer(name: "Knipsel", managedObjectModel: Self.model)
 
-        let beschrijving = container.persistentStoreDescriptions.first ?? NSPersistentStoreDescription()
+        let prive = container.persistentStoreDescriptions.first ?? NSPersistentStoreDescription()
         if inGeheugen {
             // SQLite in het geheugen: ondersteunt (anders dan NSInMemoryStoreType) persistent history.
-            beschrijving.url = URL(fileURLWithPath: "/dev/null")
+            prive.url = URL(fileURLWithPath: "/dev/null")
+        } else if let map {
+            prive.url = map.appendingPathComponent("Knipsel.sqlite")
         }
-        beschrijving.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
-        beschrijving.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+        let gedeeld = NSPersistentStoreDescription()
+        if inGeheugen {
+            // Een tweede store op /dev/null mag niet ("Can't add the same store twice"); met een
+            // fragment is het een andere URL en blijft het SQLite in het geheugen.
+            gedeeld.url = URL(string: "file:///dev/null#gedeeld")
+        } else {
+            let basis = prive.url?.deletingLastPathComponent() ?? NSPersistentContainer.defaultDirectoryURL()
+            gedeeld.url = basis.appendingPathComponent(Self.gedeeldeStoreNaam)
+        }
+
+        for (beschrijving, soort) in [(prive, Kookboeken.StoreSoort.prive), (gedeeld, .gedeeld)] {
+            beschrijving.type = NSSQLiteStoreType
+            beschrijving.shouldMigrateStoreAutomatically = true
+            beschrijving.shouldInferMappingModelAutomatically = true
+            beschrijving.setOption(true as NSNumber, forKey: NSPersistentHistoryTrackingKey)
+            beschrijving.setOption(true as NSNumber, forKey: NSPersistentStoreRemoteChangeNotificationPostOptionKey)
+            beschrijving.setOption(soort.rawValue as NSString, forKey: Kookboeken.storeOptie)
+        }
 
         // Zonder expliciete `nil` pakt de container zelf de eerste container uit de entitlements.
         if !inGeheugen, let cloudKitContainer, FileManager.default.ubiquityIdentityToken != nil {
-            beschrijving.cloudKitContainerOptions = NSPersistentCloudKitContainerOptions(
-                containerIdentifier: cloudKitContainer)
+            let priveOpties = NSPersistentCloudKitContainerOptions(containerIdentifier: cloudKitContainer)
+            priveOpties.databaseScope = .private
+            prive.cloudKitContainerOptions = priveOpties
+            let gedeeldOpties = NSPersistentCloudKitContainerOptions(containerIdentifier: cloudKitContainer)
+            gedeeldOpties.databaseScope = .shared
+            gedeeld.cloudKitContainerOptions = gedeeldOpties
             synchroniseert = true
         } else {
-            beschrijving.cloudKitContainerOptions = nil
+            prive.cloudKitContainerOptions = nil
+            gedeeld.cloudKitContainerOptions = nil
             synchroniseert = false
         }
-        container.persistentStoreDescriptions = [beschrijving]
+        // De privéstore eerst: objecten zonder expliciete store komen daar (zoals vóór fase 8).
+        container.persistentStoreDescriptions = [prive, gedeeld]
 
         var fout: (any Error)?
         container.loadPersistentStores { _, error in
-            fout = error
+            if let error { fout = fout ?? error }
         }
         laadfout = fout
         if let fout {
@@ -74,6 +116,17 @@ final class Opslag {
         context.mergePolicy = NSMergePolicy.mergeByPropertyObjectTrump
         context.transactionAuthor = AppConfiguratie.transactieAuteur
         context.name = "viewContext"
+
+        // Vóór elke bewaarbeurt van de app: nieuwe objecten in de juiste store, en een Thuis-recept
+        // alleen aan Thuis-categorieën en -labels (Core Data kent geen relaties tussen stores, en
+        // CloudKit deelt alles waar een recept aan vastzit). Alleen de viewContext: de contexten
+        // van de CloudKit-import blijven ongemoeid.
+        NotificationCenter.default.addObserver(
+            forName: .NSManagedObjectContextWillSave, object: context, queue: nil
+        ) { melding in
+            guard let context = melding.object as? NSManagedObjectContext else { return }
+            Kookboeken.herstel(in: context)
+        }
 
         // Een toestel dat via iCloud de categorieën van een ander toestel binnenkrijgt, kan dubbelen
         // hebben (beide hebben bij de eerste start gezaaid). Na elke wijziging van buiten ontdubbelen.
@@ -87,7 +140,8 @@ final class Opslag {
         }
     }
 
-    /// Eerste start: standaardcategorieën en -labels aanmaken (één keer per toestel) en ontdubbelen.
+    /// Eerste start: standaardcategorieën en -labels aanmaken (één keer per toestel, alleen in
+    /// "Mijn recepten") en ontdubbelen.
     func richIn(defaults: UserDefaults = .standard) {
         do {
             if !defaults.bool(forKey: AppConfiguratie.sleutelStandaardIngericht) {

@@ -1,6 +1,8 @@
 import CoreData
 
-/// Beheer van categorieën en labels (Instellingen › Categorieën / Labels).
+/// Beheer van categorieën en labels (Instellingen › Categorieën / Labels). Je beheert die van "Mijn
+/// recepten"; Thuis heeft eigen exemplaren met dezelfde namen (`Kookboeken`). Hernoem je er een, dan
+/// krijgt de gelijknamige in Thuis de nieuwe naam (en het symbool) mee, zodat ze samen blijven.
 enum Bibliotheekbeheer {
     enum Fout: LocalizedError, Equatable {
         case legeNaam
@@ -24,26 +26,57 @@ enum Bibliotheekbeheer {
         return (StandaardCategorieen.alle.map(\.symbool) + extra).filter { gezien.insert($0).inserted }
     }()
 
+    // MARK: Kookboek
+
+    /// Predicaat voor de beheerlijsten: alleen de categorieën of labels van "Mijn recepten".
+    static var alleenMijn: NSPredicate { NSPredicate(format: "kookboek == %@", Kookboek.mijn.rawValue) }
+
+    private static func mijn<T: NSManagedObject>(_ verzoek: NSFetchRequest<T>) -> NSFetchRequest<T> {
+        verzoek.predicate = alleenMijn
+        return verzoek
+    }
+
+    /// De gelijknamige in het andere kookboek (Thuis), in welke store ook.
+    private static func naamgenoten<T: NSManagedObject>(
+        _ verzoek: NSFetchRequest<T>, naam: String?, in context: NSManagedObjectContext
+    ) throws -> [T] {
+        let sleutel = Inrichting.sleutel(naam ?? "")
+        verzoek.predicate = NSPredicate(format: "kookboek != %@", Kookboek.mijn.rawValue)
+        return try context.fetch(verzoek).filter {
+            Inrichting.sleutel($0.value(forKey: "naam") as? String ?? "") == sleutel
+        }
+    }
+
     // MARK: Categorieën
 
     @discardableResult
     static func nieuweCategorie(naam: String, symbool: String, in context: NSManagedObjectContext) throws -> Categorie {
         let naam = try controleerNaam(
-            naam, bestaand: try context.fetch(Categorie.verzoek()).map { ($0.objectID, $0.naam) })
-        let volgorde = (try context.fetch(Categorie.verzoek()).map(\.volgorde).max() ?? -1) + 1
+            naam, bestaand: try context.fetch(mijn(Categorie.verzoek())).map { ($0.objectID, $0.naam) })
+        let volgorde = (try context.fetch(mijn(Categorie.verzoek())).map(\.volgorde).max() ?? -1) + 1
         let categorie = Categorie(context: context)
         categorie.naam = naam
         categorie.symbool = symbool
         categorie.volgorde = volgorde
+        categorie.kookboek = Kookboek.mijn.rawValue
         try context.save()
         return categorie
     }
 
-    /// Wijzigt naam, symbool en zichtbaarheid in één keer.
+    /// Wijzigt naam, symbool en zichtbaarheid in één keer; naam en symbool ook van de gelijknamige
+    /// in Thuis.
     static func wijzig(_ categorie: Categorie, naam: String, symbool: String, verborgen: Bool) throws {
         guard let context = categorie.managedObjectContext else { return }
-        let bestaand = try context.fetch(Categorie.verzoek()).map { ($0.objectID, $0.naam) }
-        categorie.naam = try controleerNaam(naam, bestaand: bestaand, behalve: categorie.objectID)
+        let bestaand = try context.fetch(mijn(Categorie.verzoek())).map { ($0.objectID, $0.naam) }
+        let oudeNaam = categorie.naam
+        let nieuweNaam = try controleerNaam(naam, bestaand: bestaand, behalve: categorie.objectID)
+        if categorie.kookboekWaarde == .mijn {
+            for genoot in try naamgenoten(Categorie.verzoek(), naam: oudeNaam, in: context) {
+                if genoot.naam != nieuweNaam { genoot.naam = nieuweNaam }
+                if genoot.symbool != symbool { genoot.symbool = symbool }
+            }
+        }
+        categorie.naam = nieuweNaam
         categorie.symbool = symbool
         categorie.verborgen = verborgen
         try context.bewaarIndienNodig()
@@ -96,17 +129,26 @@ enum Bibliotheekbeheer {
     @discardableResult
     static func nieuwLabel(naam: String, in context: NSManagedObjectContext) throws -> ReceptLabel {
         let naam = try controleerNaam(
-            naam, bestaand: try context.fetch(ReceptLabel.verzoek()).map { ($0.objectID, $0.naam) })
+            naam, bestaand: try context.fetch(mijn(ReceptLabel.verzoek())).map { ($0.objectID, $0.naam) })
         let label = ReceptLabel(context: context)
         label.naam = naam
+        label.kookboek = Kookboek.mijn.rawValue
         try context.save()
         return label
     }
 
     static func hernoem(_ label: ReceptLabel, naar naam: String) throws {
         guard let context = label.managedObjectContext else { return }
-        let bestaand = try context.fetch(ReceptLabel.verzoek()).map { ($0.objectID, $0.naam) }
-        label.naam = try controleerNaam(naam, bestaand: bestaand, behalve: label.objectID)
+        let bestaand = try context.fetch(mijn(ReceptLabel.verzoek())).map { ($0.objectID, $0.naam) }
+        let oudeNaam = label.naam
+        let nieuweNaam = try controleerNaam(naam, bestaand: bestaand, behalve: label.objectID)
+        if label.kookboekWaarde == .mijn {
+            for genoot in try naamgenoten(ReceptLabel.verzoek(), naam: oudeNaam, in: context)
+            where genoot.naam != nieuweNaam {
+                genoot.naam = nieuweNaam
+            }
+        }
+        label.naam = nieuweNaam
         try context.bewaarIndienNodig()
     }
 

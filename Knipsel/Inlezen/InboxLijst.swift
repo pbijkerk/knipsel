@@ -210,12 +210,14 @@ struct InleesInvoer: ViewModifier {
 
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(key: "volgorde", ascending: true)],
-        predicate: NSPredicate(format: "verborgen == NO"))
+        // De voorstellen van de indeler komen uit Mijn recepten (Thuis heeft gelijknamige).
+        predicate: NSPredicate(format: "verborgen == NO AND kookboek == %@", Kookboek.mijn.rawValue))
     private var categorieen: FetchedResults<Categorie>
-    @FetchRequest(sortDescriptors: [
-        NSSortDescriptor(
-            key: "naam", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare(_:)))
-    ])
+    @FetchRequest(
+        sortDescriptors: [
+            NSSortDescriptor(
+                key: "naam", ascending: true, selector: #selector(NSString.localizedCaseInsensitiveCompare(_:)))
+        ], predicate: Bibliotheekbeheer.alleenMijn)
     private var labels: FetchedResults<ReceptLabel>
 
     func body(content: Content) -> some View {

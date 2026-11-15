@@ -12,7 +12,7 @@ final class KookRouter {
 
     struct Verzoek: Identifiable, Equatable, Sendable {
         let id = UUID()
-        /// `URIRepresentation` van het objectID van het recept.
+        /// `Recept.verwijzing` (op de uuid; oude objectID-URI's werken ook).
         let recept: URL
         /// Voor hoeveel personen; `nil` = zoals in het recept.
         var porties: Int?

@@ -1,7 +1,10 @@
+import CoreData
 import Foundation
 
 /// Waar je bent gebleven in een afgebroken kookmodus, per recept (U8). Lokaal in `UserDefaults`
-/// (hoeft niet te syncen); de sleutel is de `URIRepresentation` van het recept-objectID.
+/// (hoeft niet te syncen). De sleutel is de `Recept.verwijzing` (op de uuid, fase 8): die blijft
+/// geldig als een recept naar Thuis verhuist en dus een ander objectID krijgt. Oudere standen met de
+/// objectID-URI zet `migreer` om.
 struct KookVoortgang {
     /// Eén afgebroken kookbeurt.
     struct Stand: Codable, Equatable, Sendable {
@@ -87,6 +90,29 @@ struct KookVoortgang {
         }
     }
 
+    /// Zet standen met een oude sleutel (objectID-URI) om met `vertaal`; wat niet te vertalen is
+    /// (recept bestaat niet meer), valt weg. Geeft het aantal omgezette standen terug.
+    @discardableResult
+    func migreer(_ vertaal: (URL) -> URL?) -> Int {
+        let standen = alle
+        var omgezet = 0
+        var nieuw: [Stand] = []
+        for stand in standen {
+            if Recept.uuid(uitVerwijzing: stand.recept) != nil {
+                nieuw.append(stand)
+            } else if let sleutel = vertaal(stand.recept) {
+                nieuw.removeAll { $0.recept == sleutel }
+                nieuw.append(
+                    Stand(
+                        recept: sleutel, stapIndex: stand.stapIndex, aantalStappen: stand.aantalStappen,
+                        porties: stand.porties, datum: stand.datum))
+                omgezet += 1
+            }
+        }
+        if nieuw != standen { schrijf(nieuw) }
+        return omgezet
+    }
+
     private func schrijf(_ standen: [Stand]) {
         if standen.isEmpty {
             defaults.removeObject(forKey: sleutel)
@@ -97,6 +123,13 @@ struct KookVoortgang {
 }
 
 extension KookVoortgang {
+    /// Oude standen (objectID-URI, vóór fase 8) omzetten naar de uuid-verwijzing van hun recept.
+    @MainActor
+    @discardableResult
+    func migreer(in context: NSManagedObjectContext) -> Int {
+        migreer { VerderKeuze.recept(bij: $0, in: context)?.verwijzing }
+    }
+
     /// Na het sluiten van de kookmodus voor `sessie`.
     @MainActor
     func naSluiten(_ sessie: KookSessie, recept: URL, nu: Date = .now) {

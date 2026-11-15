@@ -52,7 +52,9 @@ struct BibliotheekCompact: View {
             .navigationTitle("Recepten")
             .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
             .navigationDestination(for: NSManagedObjectID.self) { id in
-                ReceptScherm(id: id) { pad.removeAll { $0 == id } }
+                ReceptScherm(
+                    id: id, naVerwijderen: { pad.removeAll { $0 == id } },
+                    naVerplaatsen: { nieuw in pad = pad.map { $0 == id ? nieuw : $0 } })
             }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -67,21 +69,20 @@ struct BibliotheekCompact: View {
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
         .sheet(isPresented: $toonKnippen) { KnipStart() }
         .sheet(isPresented: $toonLabels) {
-            LabelFilter(labels: $filter.labels)
+            LabelFilter(filter: $filter)
                 .presentationDetents([.medium, .large])
         }
     }
 }
 
 /// Eén horizontale rij chips met categorieën (of Alles / Zonder categorie), en rechts vast de chip
-/// "Filter" die de labels opent; het aantal gekozen labels staat erop.
+/// "Filter" die de labels (en, met Thuis-recepten, het kookboek) opent; het aantal gekozen filters
+/// staat erop. Gelijknamige categorieën uit Mijn recepten en Thuis zijn één chip.
 struct FilterChips: View {
     @Binding var filter: ReceptFilter
     @Binding var toonLabels: Bool
 
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(key: "volgorde", ascending: true)],
-        predicate: NSPredicate(format: "verborgen == NO"))
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "volgorde", ascending: true)])
     private var categorieen: FetchedResults<Categorie>
     @FetchRequest(sortDescriptors: []) private var labels: FetchedResults<ReceptLabel>
     @FetchRequest(sortDescriptors: []) private var recepten: FetchedResults<Recept>
@@ -90,16 +91,18 @@ struct FilterChips: View {
         HStack(spacing: 0) {
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    Chip(titel: "Alles", aantal: recepten.count, gekozen: filter.categorie == .alles) {
+                    Chip(
+                        titel: filter.kookboek?.naam ?? "Alles", symbool: filter.kookboek?.symbool,
+                        aantal: inKookboek.count, gekozen: filter.categorie == .alles
+                    ) {
                         filter.categorie = .alles
                     }
-                    ForEach(zichtbareCategorieen, id: \.objectID) { categorie in
-                        let keuze = CategorieKeuze.categorie(categorie.objectID)
+                    ForEach(zichtbareCategorieen) { groep in
                         Chip(
-                            titel: categorie.naamOfStandaard, symbool: categorie.symboolOfStandaard,
-                            aantal: categorie.aantalRecepten, gekozen: filter.categorie == keuze
+                            titel: groep.naam, symbool: groep.symbool, aantal: groep.aantal,
+                            gekozen: filter.categorie == groep.keuze
                         ) {
-                            filter.categorie = filter.categorie == keuze ? .alles : keuze
+                            filter.categorie = filter.categorie == groep.keuze ? .alles : groep.keuze
                         }
                     }
                     if aantalZonderCategorie > 0 || filter.categorie == .zonderCategorie {
@@ -122,32 +125,40 @@ struct FilterChips: View {
                         .frame(width: 20)
                 }
             }
-            if !labels.isEmpty || !filter.labels.isEmpty {
+            if !labels.isEmpty || aantalFilters > 0 || toonKookboeken {
                 Chip(
                     titel: "Filter", symbool: "line.3.horizontal.decrease",
-                    aantal: filter.labels.isEmpty ? nil : filter.labels.count, gekozen: !filter.labels.isEmpty
+                    aantal: aantalFilters == 0 ? nil : aantalFilters, gekozen: aantalFilters > 0
                 ) {
                     toonLabels = true
                 }
-                .accessibilityLabel(
-                    filter.labels.isEmpty ? "Filter op labels" : "Filter op labels, \(filter.labels.count) gekozen"
-                )
+                .accessibilityLabel(aantalFilters == 0 ? "Filter" : "Filter, \(aantalFilters) gekozen")
                 .padding(.leading, 4)
                 .padding(.trailing)
             }
         }
     }
 
+    private var aantalFilters: Int { filter.labels.count + (filter.kookboek == nil ? 0 : 1) }
+
+    private var toonKookboeken: Bool {
+        Bibliotheekkookboeken.toon(aantalThuis: recepten.filter(\.isThuis).count, gekozen: filter.kookboek)
+    }
+
+    private var inKookboek: [Recept] {
+        recepten.filter { filter.kookboek == nil || $0.kookboekWaarde == filter.kookboek }
+    }
+
     /// Lege categorieën staan niet in de rij; de gekozen categorie blijft staan, ook als hij leeg raakt.
-    private var zichtbareCategorieen: [Categorie] {
-        categorieen.filter {
-            Self.toonInRij(aantal: $0.aantalRecepten, gekozen: filter.categorie == .categorie($0.objectID))
+    private var zichtbareCategorieen: [CategorieGroep] {
+        CategorieGroep.groepeer(Array(categorieen), kookboek: filter.kookboek).filter {
+            Self.toonInRij(aantal: $0.aantal, gekozen: filter.categorie == $0.keuze)
         }
     }
 
     static func toonInRij(aantal: Int, gekozen: Bool) -> Bool { aantal > 0 || gekozen }
 
     private var aantalZonderCategorie: Int {
-        recepten.filter { ($0.categorieen ?? []).isEmpty }.count
+        inKookboek.filter { ($0.categorieen ?? []).isEmpty }.count
     }
 }

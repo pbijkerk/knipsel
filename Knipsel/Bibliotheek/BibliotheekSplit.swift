@@ -9,7 +9,7 @@ import SwiftUI
 struct BibliotheekSplit: View {
     @Environment(\.managedObjectContext) private var context
     @State private var filter = ReceptFilter()
-    @State private var zijbalkKeuze: CategorieKeuze? = .alles
+    @State private var zijbalkKeuze: ZijbalkKeuze? = .kookboek(nil)
     @State private var pad: [NSManagedObjectID] = []
     @State private var toonInstellingen = false
     @State private var toonNieuw = false
@@ -24,7 +24,7 @@ struct BibliotheekSplit: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $kolommen) {
-            Zijbalk(keuze: $zijbalkKeuze, labels: $filter.labels)
+            Zijbalk(keuze: $zijbalkKeuze, labels: $filter.labels, kookboek: filter.kookboek)
                 .navigationTitle("Knipsel")
                 .toolbar {
                     ToolbarItem(placement: .topBarTrailing) {
@@ -45,13 +45,23 @@ struct BibliotheekSplit: View {
                     .navigationTitle(lijstTitel)
                     .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
                     .navigationDestination(for: NSManagedObjectID.self) { id in
-                        ReceptScherm(id: id) { pad.removeAll { $0 == id } }
+                        ReceptScherm(
+                            id: id, naVerwijderen: { pad.removeAll { $0 == id } },
+                            naVerplaatsen: { nieuw in pad = pad.map { $0 == id ? nieuw : $0 } })
                     }
                     .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox, slepen: true)
             }
         }
         .onChange(of: zijbalkKeuze) { _, nieuw in
-            filter.categorie = nieuw ?? .alles
+            switch nieuw ?? .kookboek(nil) {
+            case .kookboek(let kookboek):
+                // Een kookboek kiezen begint met al zijn recepten.
+                filter.kookboek = kookboek
+                filter.categorie = .alles
+            case .categorie(let categorie):
+                // Binnen het gekozen kookboek.
+                filter.categorie = categorie
+            }
             // Een andere categorie: terug naar het raster.
             pad.removeAll()
         }
@@ -94,23 +104,38 @@ struct BibliotheekSplit: View {
     }
 
     private var lijstTitel: String {
-        switch filter.categorie {
-        case .alles: return "Alle recepten"
-        case .zonderCategorie: return "Zonder categorie"
-        case .categorie(let id):
-            return (try? context.existingObject(with: id) as? Categorie)?.naamOfStandaard ?? "Recepten"
+        let categorie: String? =
+            switch filter.categorie {
+            case .alles: nil
+            case .zonderCategorie: "Zonder categorie"
+            case .categorie(let naam): naam
+            }
+        switch (filter.kookboek, categorie) {
+        case (nil, nil): return "Alle recepten"
+        case (nil, let categorie?): return categorie
+        case (let kookboek?, nil): return kookboek.naam
+        case (let kookboek?, let categorie?): return "\(kookboek.naam) · \(categorie)"
         }
     }
 }
 
-/// Zijbalk: kookboek, categorieën met aantallen en labels (aan/uit, combineerbaar met de categorie).
-struct Zijbalk: View {
-    @Binding var keuze: CategorieKeuze?
-    @Binding var labels: Set<NSManagedObjectID>
+/// Wat er in de zijbalk gekozen is: een kookboek (Alles, Mijn recepten, Thuis) of een categorie
+/// binnen het gekozen kookboek.
+enum ZijbalkKeuze: Hashable {
+    case kookboek(Kookboek?)
+    case categorie(CategorieKeuze)
+}
 
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(key: "volgorde", ascending: true)],
-        predicate: NSPredicate(format: "verborgen == NO"))
+/// Zijbalk: kookboeken (Alles, en met Thuis-recepten ook Mijn recepten en Thuis), categorieën met
+/// aantallen en labels (aan/uit, combineerbaar met de categorie). Gelijknamige categorieën en labels
+/// uit beide kookboeken staan er één keer.
+struct Zijbalk: View {
+    @Binding var keuze: ZijbalkKeuze?
+    @Binding var labels: Set<String>
+    /// Het gekozen kookboek: de aantallen tellen alleen daarin.
+    var kookboek: Kookboek?
+
+    @FetchRequest(sortDescriptors: [NSSortDescriptor(key: "volgorde", ascending: true)])
     private var categorieen: FetchedResults<Categorie>
     @FetchRequest(sortDescriptors: [
         NSSortDescriptor(
@@ -124,36 +149,42 @@ struct Zijbalk: View {
             Section("Kookboeken") {
                 SwiftUI.Label("Alles", systemImage: "books.vertical")
                     .badge(recepten.count)
-                    .tag(CategorieKeuze.alles)
+                    .tag(ZijbalkKeuze.kookboek(nil))
+                if Bibliotheekkookboeken.toon(aantalThuis: aantal(in: .thuis), gekozen: kookboek) {
+                    ForEach(Kookboek.allCases) { boek in
+                        SwiftUI.Label(boek.naam, systemImage: boek.symbool)
+                            .badge(aantal(in: boek))
+                            .tag(ZijbalkKeuze.kookboek(boek))
+                    }
+                }
             }
             Section("Categorieën") {
-                ForEach(zichtbareCategorieen, id: \.objectID) { categorie in
-                    SwiftUI.Label(categorie.naamOfStandaard, systemImage: categorie.symboolOfStandaard)
-                        .badge(categorie.aantalRecepten)
-                        .tag(CategorieKeuze.categorie(categorie.objectID))
+                ForEach(zichtbareCategorieen) { groep in
+                    SwiftUI.Label(groep.naam, systemImage: groep.symbool)
+                        .badge(groep.aantal)
+                        .tag(ZijbalkKeuze.categorie(groep.keuze))
                 }
                 if aantalZonderCategorie > 0 {
                     SwiftUI.Label("Zonder categorie", systemImage: "tray")
                         .badge(aantalZonderCategorie)
-                        .tag(CategorieKeuze.zonderCategorie)
+                        .tag(ZijbalkKeuze.categorie(.zonderCategorie))
                 }
             }
-            if !alleLabels.isEmpty {
+            if !labelGroepen.isEmpty {
                 Section("Labels") {
-                    ForEach(alleLabels, id: \.objectID) { label in
-                        let gekozen = labels.contains(label.objectID)
+                    ForEach(labelGroepen) { label in
+                        let gekozen = labels.contains(label.naam)
                         Button {
                             if gekozen {
-                                labels.remove(label.objectID)
+                                labels.remove(label.naam)
                             } else {
-                                labels.insert(label.objectID)
+                                labels.insert(label.naam)
                             }
                         } label: {
                             HStack {
-                                SwiftUI.Label(
-                                    label.naamOfStandaard, systemImage: gekozen ? "checkmark.circle.fill" : "tag")
+                                SwiftUI.Label(label.naam, systemImage: gekozen ? "checkmark.circle.fill" : "tag")
                                 Spacer()
-                                Text(label.aantalRecepten, format: .number).foregroundStyle(.secondary)
+                                Text(label.aantal, format: .number).foregroundStyle(.secondary)
                             }
                         }
                         .accessibilityAddTraits(gekozen ? .isSelected : [])
@@ -163,14 +194,26 @@ struct Zijbalk: View {
         }
     }
 
+    private func aantal(in boek: Kookboek) -> Int {
+        recepten.filter { $0.kookboekWaarde == boek }.count
+    }
+
+    private var labelGroepen: [LabelGroep] { LabelGroep.groepeer(Array(alleLabels), kookboek: kookboek) }
+
     /// Zoals de chiprij op de iPhone: lege categorieën niet tonen, de gekozen categorie wel.
-    private var zichtbareCategorieen: [Categorie] {
-        categorieen.filter {
-            FilterChips.toonInRij(aantal: $0.aantalRecepten, gekozen: keuze == .categorie($0.objectID))
+    private var zichtbareCategorieen: [CategorieGroep] {
+        CategorieGroep.groepeer(Array(categorieen), kookboek: kookboek).filter {
+            FilterChips.toonInRij(aantal: $0.aantal, gekozen: keuze == .categorie($0.keuze))
         }
     }
 
     private var aantalZonderCategorie: Int {
-        recepten.filter { ($0.categorieen ?? []).isEmpty }.count
+        recepten.filter { ($0.categorieen ?? []).isEmpty && (kookboek == nil || $0.kookboekWaarde == kookboek) }.count
     }
+}
+
+/// Wanneer de bibliotheek de keuze tussen de kookboeken toont: alleen als er iets in Thuis staat
+/// (of Thuis/Mijn recepten nog gekozen is) — zonder Thuis is er niets te kiezen.
+enum Bibliotheekkookboeken {
+    static func toon(aantalThuis: Int, gekozen: Kookboek?) -> Bool { aantalThuis > 0 || gekozen != nil }
 }

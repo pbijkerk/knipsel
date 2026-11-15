@@ -18,6 +18,9 @@ struct ReceptInvoer: Equatable {
     var labels: Set<NSManagedObjectID> = []
     var ingredientenTekst = ""
     var stappenTekst = ""
+    /// Voor een nieuw recept: in welk kookboek het komt (B8). Een bestaand recept verplaats je met
+    /// `Kookboeken.verplaats`.
+    var kookboek = Kookboek.mijn
 
     init() {}
 
@@ -31,6 +34,7 @@ struct ReceptInvoer: Equatable {
         bronDatum = recept.bronDatum
         bronPagina = recept.bronPagina ?? ""
         notities = recept.notities ?? ""
+        kookboek = recept.kookboekWaarde
         categorieen = Set((recept.categorieen ?? []).map(\.objectID))
         labels = Set((recept.labels ?? []).map(\.objectID))
         // Groepen terug als kopregel ("Voor de saus:"), zodat bewaren ze weer herkent.
@@ -66,9 +70,17 @@ struct ReceptInvoer: Equatable {
     }
 
     /// Schrijft de invoer naar `recept`, of naar een nieuw recept als dat `nil` is, en bewaart.
+    /// Gekozen categorieën en labels uit het andere kookboek worden bij het bewaren de gelijknamige
+    /// uit het kookboek van het recept (`Kookboeken.herstel`).
     @discardableResult
     func bewaar(in context: NSManagedObjectContext, recept bestaand: Recept? = nil) throws -> Recept {
-        let recept = bestaand ?? Recept(context: context)
+        let recept =
+            bestaand
+            ?? {
+                let nieuw = Recept(context: context)
+                nieuw.kookboek = kookboek.rawValue
+                return nieuw
+            }()
         recept.titel = Self.schoon(titel)
         recept.intro = Self.leegIsNil(intro)
         recept.porties = Int16(clamping: max(0, porties))

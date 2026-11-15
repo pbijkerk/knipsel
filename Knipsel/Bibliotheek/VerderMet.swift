@@ -19,9 +19,21 @@ struct VerderKeuze: Identifiable {
         return VerderKeuze(recept: recept, stand: stand)
     }
 
+    /// Het recept bij een `Recept.verwijzing` (uuid) of, van vóór fase 8, een objectID-URI; `nil` als
+    /// het niet (meer) bestaat — bijvoorbeeld een Thuis-recept nadat het delen stopte.
     @MainActor
     static func recept(bij uri: URL, in context: NSManagedObjectContext) -> Recept? {
-        guard let id = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: uri),
+        if let uuid = Recept.uuid(uitVerwijzing: uri) {
+            let verzoek = Recept.verzoek()
+            verzoek.predicate = NSPredicate(format: "uuid == %@", uuid as CVarArg)
+            // Twee met dezelfde uuid kan kort (kopie bij "Verlaat Thuis"): Mijn recepten eerst.
+            let gevonden = ((try? context.fetch(verzoek)) ?? []).filter {
+                !$0.isDeleted && $0.managedObjectContext != nil
+            }
+            return gevonden.first { $0.kookboekWaarde == .mijn } ?? gevonden.first
+        }
+        guard uri.scheme == "x-coredata",
+            let id = context.persistentStoreCoordinator?.managedObjectID(forURIRepresentation: uri),
             let recept = try? context.existingObject(with: id) as? Recept, !recept.isDeleted
         else { return nil }
         return recept
@@ -183,7 +195,7 @@ struct VerderMet: ViewModifier {
     }
 
     private func legGekooktVast(_ recept: Recept) {
-        KookVoortgang().wis(recept: recept.objectID.uriRepresentation())
+        KookVoortgang().wis(recept: recept.sleutelURL)
         do {
             try recept.legGekooktVast()
         } catch {
