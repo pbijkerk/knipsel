@@ -1,6 +1,6 @@
 # Privacybeleid Knipsel
 
-*Laatst bijgewerkt: 14 november 2026*
+*Laatst bijgewerkt: 15 november 2026*
 
 Knipsel is een recepten-app voor iPhone en iPad, gemaakt door Peter Bijkerk voor eigen gebruik en een
 kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en waar ze blijven.
@@ -26,7 +26,8 @@ kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en wa
 | Spraak (spraakbesturing in de kookmodus) | Herkend op het toestel. Er worden geen opnames bewaard of verstuurd. |
 | Voorlezen | Gebeurt op het toestel met de stemmen van iOS. |
 | Claude-sleutel (optioneel) | In de Keychain van je toestel. |
-| Ingelezen recepten die nog niet gecontroleerd zijn ("Nog te controleren") | Alleen op je toestel, in de app. Na bewaren of annuleren verdwijnen ze, met de bijbehorende bestanden (schermafdruk, PDF, foto). |
+| Ingelezen recepten die nog niet gecontroleerd zijn ("Nog te controleren") | Alleen op je toestel, in een map die alleen Knipsel en zijn deelmenu-onderdeel kunnen lezen (App Group). Na bewaren of annuleren verdwijnen ze, met de bijbehorende bestanden (schermafdruk, PDF, foto). |
+| Delen via het deelmenu ("Knipsel" in het deelmenu van Safari, een krantenapp, Foto's of Bestanden) | Knipsel leest alleen wat je zelf deelt: de link, de tekst, de afbeelding(en) of de PDF. Het deelmenu haalt niets op en stuurt niets weg; het zet het item alleen lokaal in *Nog te controleren*. Pas als je Knipsel opent, wordt het ingelezen (een link wordt dan rechtstreeks bij de website opgehaald), en het wordt pas een recept als je het hebt gecontroleerd. |
 | Webpagina's van een link | Je toestel haalt de pagina rechtstreeks bij de website op (met de gewone gegevens die elke browser meestuurt, zoals je IP-adres). Knipsel bewaart alleen het recept dat je na controle bewaart, met de naam van de site, de link en de datum. |
 | Foto van een receptsite (optioneel, standaard aan) | Eén foto van het gerecht van de site, verkleind bewaard bij het recept (op je toestel en in je eigen iCloud). Uit te zetten in Instellingen › Inlezen. |
 | Inloggen bij een site met een betaalmuur | Als je een pagina in Knipsel opent en daar zelf inlogt, bewaart de site haar cookies in de webopslag van Knipsel op dit toestel, zoals in een browser. Knipsel bewaart of ziet **geen wachtwoorden** en stuurt die cookies nergens anders heen. Wis ze door Knipsel te verwijderen. |
