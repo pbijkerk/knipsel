@@ -30,16 +30,44 @@ targets:
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         INFOPLIST_FILE: Knipsel/Info.plist
-        # iCloud (CloudKit-container iCloud.com.peterbijkerk.knipsel) + push voor sync-meldingen.
+        # iCloud (CloudKit-container iCloud.com.peterbijkerk.knipsel) + push voor sync-meldingen, en
+        # App Group group.com.peterbijkerk.knipsel (gedeeld met de deel-extensie).
         CODE_SIGN_ENTITLEMENTS: Knipsel/Knipsel.entitlements
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: 68K8BCC3DL
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.food-and-drink
         ENABLE_PREVIEWS: YES
         SWIFT_EMIT_LOC_STRINGS: YES
+    dependencies:
+      # De deel-extensie zit in de app (PlugIns/KnipselDelen.appex).
+      - target: KnipselDelen
+        embed: true
     scheme:
       testTargets:
         - KnipselTests
+
+  # "Knipsel" in het deelmenu (#18): zet links, tekst, afbeeldingen en PDF's via de App Group in
+  # "Nog te controleren". Eigen app-ID com.peterbijkerk.knipsel.delen; versie en buildnummer komen
+  # uit de projectinstellingen hierboven, gelijk aan de app.
+  KnipselDelen:
+    type: app-extension
+    platform: iOS
+    deploymentTarget: "26.0"
+    sources:
+      - path: KnipselDelen
+      # Gedeeld met de app: DeelPost/DeelBus, DeelLezer en het bevestigingsscherm. Niets anders uit
+      # de app (geen Core Data, geen netwerk) — de extensie heeft weinig geheugen.
+      - path: Knipsel/Delen
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.peterbijkerk.knipsel.delen
+        INFOPLIST_FILE: KnipselDelen/Info.plist
+        CODE_SIGN_ENTITLEMENTS: KnipselDelen/KnipselDelen.entitlements
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: 68K8BCC3DL
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SKIP_INSTALL: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
 
   KnipselTests:
     type: bundle.unit-test

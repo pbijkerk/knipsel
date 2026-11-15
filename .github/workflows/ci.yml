@@ -31,10 +31,10 @@ jobs:
       - name: Opmaak
         run: |
           swift format --version
-          swift format -i -r Knipsel KnipselTests
+          swift format -i -r Knipsel KnipselDelen KnipselTests
           if ! git diff --exit-code -- '*.swift'; then
             echo "::error::De broncode is niet opgemaakt met swift-format."
-            echo "Draai lokaal 'swift format -i -r Knipsel KnipselTests' en commit het resultaat."
+            echo "Draai lokaal 'swift format -i -r Knipsel KnipselDelen KnipselTests' en commit het resultaat."
             exit 1
           fi
 
