@@ -11,12 +11,15 @@ struct ConceptRegel: Identifiable, Equatable, Sendable {
     let laagVertrouwen: Bool
     /// Regelnummers in de herkenning, voor de uitsnede uit de foto.
     let regels: [Int]
+    /// Kopje boven deze stap ("Voor de saus"), bijvoorbeeld uit een `HowToSection` van een website.
+    var groep: String?
 
-    init(tekst: String, laagVertrouwen: Bool = false, regels: [Int] = []) {
+    init(tekst: String, laagVertrouwen: Bool = false, regels: [Int] = [], groep: String? = nil) {
         self.tekst = tekst
         self.herkend = tekst
         self.laagVertrouwen = laagVertrouwen
         self.regels = regels
+        self.groep = groep
     }
 }
 

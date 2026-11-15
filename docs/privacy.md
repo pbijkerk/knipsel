@@ -12,6 +12,8 @@ kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en wa
 - Je recepten staan op je toestel en in **jouw eigen iCloud**.
 - Eén uitzondering die je zelf aanzet: als je een eigen Claude-sleutel invult, gaat de herkende
   recepttekst naar Anthropic om in te delen (zie hieronder).
+- Lees je een recept in vanaf een link, dan haalt je toestel die pagina **rechtstreeks** bij de
+  website op, zoals Safari dat doet. Er zit geen server van Knipsel tussen.
 
 ## Welke gegevens en waar
 
@@ -24,12 +26,19 @@ kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en wa
 | Spraak (spraakbesturing in de kookmodus) | Herkend op het toestel. Er worden geen opnames bewaard of verstuurd. |
 | Voorlezen | Gebeurt op het toestel met de stemmen van iOS. |
 | Claude-sleutel (optioneel) | In de Keychain van je toestel. |
+| Ingelezen recepten die nog niet gecontroleerd zijn ("Nog te controleren") | Alleen op je toestel, in de app. Na bewaren of annuleren verdwijnen ze, met de bijbehorende bestanden (schermafdruk, PDF, foto). |
+| Webpagina's van een link | Je toestel haalt de pagina rechtstreeks bij de website op (met de gewone gegevens die elke browser meestuurt, zoals je IP-adres). Knipsel bewaart alleen het recept dat je na controle bewaart, met de naam van de site, de link en de datum. |
+| Foto van een receptsite (optioneel, standaard aan) | Eén foto van het gerecht van de site, verkleind bewaard bij het recept (op je toestel en in je eigen iCloud). Uit te zetten in Instellingen › Inlezen. |
+| Inloggen bij een site met een betaalmuur | Als je een pagina in Knipsel opent en daar zelf inlogt, bewaart de site haar cookies in de webopslag van Knipsel op dit toestel, zoals in een browser. Knipsel bewaart of ziet **geen wachtwoorden** en stuurt die cookies nergens anders heen. Wis ze door Knipsel te verwijderen. |
+| Geplakte tekst, schermafdrukken en PDF's | Alleen op het toestel gelezen (tekstherkenning op het toestel). Bij plakken vraagt iOS eerst of Knipsel het klembord mag lezen. |
 
 ## Optioneel: indelen met Claude
 
 Als je in Instellingen een eigen API-sleutel van Anthropic invult, stuurt Knipsel bij het knippen van
 een recept **alleen de herkende tekst** naar Anthropic, om te bepalen wat titel, ingrediënten en
-bereiding is. De foto gaat nooit mee. Daarop is het privacybeleid van Anthropic van toepassing:
+bereiding is. Dat geldt ook voor de tekst van een webpagina zonder receptgegevens, geplakte tekst of
+een PDF; een recept dat een site al als receptgegevens (schema.org) meestuurt, gaat nooit naar
+Claude. De foto gaat nooit mee. Daarop is het privacybeleid van Anthropic van toepassing:
 <https://www.anthropic.com/legal/privacy>. Zonder sleutel gebeurt alles op het toestel.
 
 ## Rechten die de app vraagt

@@ -4,7 +4,8 @@ import SwiftUI
 /// iPad (en brede vensters): twee kolommen — de zijbalk met categorieën en labels, en rechts een
 /// `NavigationStack` met het kaartenraster (of de lijst, Instellingen › Weergave). Een recept opent
 /// over het raster (push); er is geen lege kolom "Kies een recept" meer (U6). Bovenaan "Verder met…"
-/// (U8), en *Knip* zweeft rechtsonder zoals op de iPhone.
+/// (U8) met daarnaast "Nog te controleren" (#18), en *Knip* zweeft rechtsonder zoals op de iPhone.
+/// Een link of tekst uit Safari kun je op het raster slepen.
 struct BibliotheekSplit: View {
     @Environment(\.managedObjectContext) private var context
     @State private var filter = ReceptFilter()
@@ -15,6 +16,8 @@ struct BibliotheekSplit: View {
     @State private var toonKnippen = false
     @State private var verder: VerderKeuze?
     @State private var verderGestart: VerderKeuze?
+    @State private var toonInbox = false
+    @Environment(InleesInbox.self) private var inbox
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
     /// Zijbalk standaard zichtbaar, zoals in de schets.
     @State private var kolommen: NavigationSplitViewVisibility = .all
@@ -44,11 +47,7 @@ struct BibliotheekSplit: View {
                     .navigationDestination(for: NSManagedObjectID.self) { id in
                         ReceptScherm(id: id) { pad.removeAll { $0 == id } }
                     }
-                    .toolbar {
-                        ToolbarItem(placement: .primaryAction) {
-                            Button("Nieuw recept", systemImage: "plus") { toonNieuw = true }
-                        }
-                    }
+                    .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox, slepen: true)
             }
         }
         .onChange(of: zijbalkKeuze) { _, nieuw in
@@ -62,17 +61,35 @@ struct BibliotheekSplit: View {
         .sheet(isPresented: $toonKnippen) { KnipStart() }
     }
 
-    /// "Verder met…" boven het raster; niet tijdens het zoeken.
+    /// "Verder met…" en "Nog te controleren" boven het raster, naast elkaar als er ruimte is; niet
+    /// tijdens het zoeken.
     private var kop: AnyView? {
-        guard let verder, filter.zoekterm.isEmpty else { return nil }
+        let inboxZichtbaar = !inbox.items.isEmpty
+        guard verder != nil || inboxZichtbaar, filter.zoekterm.isEmpty else { return nil }
         return AnyView(
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 12) { kopKaarten }
+                VStack(spacing: 10) { kopKaarten }
+            }
+            .padding(.horizontal, weergave == .kaarten ? 24 : 16)
+            .padding(.top, 4)
+            .padding(.bottom, 12))
+    }
+
+    @ViewBuilder private var kopKaarten: some View {
+        if let verder {
             VerderMetKaart(
                 keuze: verder, verder: { verderGestart = verder },
                 vergeet: { KookVoortgang().wis(recept: verder.stand.recept) }
             )
-            .padding(.horizontal, weergave == .kaarten ? 24 : 16)
-            .padding(.top, 4)
-            .padding(.bottom, 12))
+            .frame(minWidth: 420)
+        }
+        if !inbox.items.isEmpty {
+            NogTeControlerenKaart(
+                aantal: inbox.items.count, bezig: inbox.items.contains { $0.status == .bezig }
+            ) { toonInbox = true }
+            .frame(minWidth: 320)
+        }
     }
 
     private var lijstTitel: String {

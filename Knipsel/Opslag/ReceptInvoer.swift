@@ -45,7 +45,17 @@ struct ReceptInvoer: Equatable {
         }
         ingredientenTekst = regels.joined(separator: "\n")
         // Lege regel tussen stappen: leest prettiger in het invoerveld; `regels(_:)` slaat hem over.
-        stappenTekst = recept.gesorteerdeStappen.compactMap(\.tekst).joined(separator: "\n\n")
+        // Een stapgroep (van een website) komt terug als kopregel met dubbele punt.
+        var stapRegels: [String] = []
+        var stapGroep: String?
+        for stap in recept.gesorteerdeStappen {
+            if let nieuw = stap.groep, !nieuw.isEmpty, nieuw != stapGroep {
+                stapRegels.append(nieuw + ":")
+            }
+            stapGroep = stap.groep
+            if let tekst = stap.tekst { stapRegels.append(tekst) }
+        }
+        stappenTekst = stapRegels.joined(separator: "\n\n")
     }
 
     var isGeldig: Bool { !Self.schoon(titel).isEmpty }
@@ -98,11 +108,20 @@ struct ReceptInvoer: Equatable {
             context.delete(overbodig)
         }
 
-        let stapRegels = Self.regels(stappenTekst)
+        var stapRegels: [(tekst: String, groep: String?)] = []
+        var stapGroep: String?
+        for regel in Self.regels(stappenTekst) {
+            if let kop = Self.stapGroepskop(regel) {
+                stapGroep = kop
+            } else {
+                stapRegels.append((regel, stapGroep))
+            }
+        }
         let stappen = recept.gesorteerdeStappen
         for (index, regel) in stapRegels.enumerated() {
             let stap = index < stappen.count ? stappen[index] : Stap(context: context)
-            stap.tekst = regel
+            stap.tekst = regel.tekst
+            if stap.groep != regel.groep { stap.groep = regel.groep }
             stap.volgorde = Int16(clamping: index)
             stap.recept = recept
         }
@@ -112,6 +131,13 @@ struct ReceptInvoer: Equatable {
 
         try context.save()
         return recept
+    }
+
+    /// Een kopregel tussen de stappen ("Voor de saus:"): kort en met een dubbele punt aan het eind;
+    /// de stappen eronder krijgen die groep. Zonder dubbele punt is het gewoon een stap.
+    static func stapGroepskop(_ regel: String) -> String? {
+        guard regel.hasSuffix(":"), !regel.dropLast().contains(".") else { return nil }
+        return IngredientParser.groepskop(regel)
     }
 
     private static func schoon(_ tekst: String) -> String {

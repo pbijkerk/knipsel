@@ -520,8 +520,8 @@ extension ReceptConcept {
         stappen.replaceSubrange(
             index...index,
             with: [
-                ConceptRegel(tekst: eerste, laagVertrouwen: twijfel, regels: stap.regels),
-                ConceptRegel(tekst: tweede, laagVertrouwen: twijfel, regels: stap.regels),
+                ConceptRegel(tekst: eerste, laagVertrouwen: twijfel, regels: stap.regels, groep: stap.groep),
+                ConceptRegel(tekst: tweede, laagVertrouwen: twijfel, regels: stap.regels, groep: stap.groep),
             ])
     }
 
@@ -536,7 +536,7 @@ extension ReceptConcept {
             tekst: ReceptOpbouw.plak([vorige.tekst, stap.tekst]),
             laagVertrouwen: ReceptOpbouw.isTwijfel(vorige, isIngredient: false)
                 || ReceptOpbouw.isTwijfel(stap, isIngredient: false),
-            regels: regels)
+            regels: regels, groep: vorige.groep)
         stappen.replaceSubrange((index - 1)...index, with: [samen])
     }
 }

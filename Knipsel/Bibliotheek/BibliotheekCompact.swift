@@ -3,7 +3,7 @@ import SwiftUI
 
 /// iPhone: kaarten (of een lijst) met zoekveld, één chiprij met categorieën, de labels achter
 /// "Filter" en een zwevende knop "Knip" onderin (U1, U2, U5). Bovenaan "Verder met…" als je een
-/// kookmodus halverwege sloot (U8).
+/// kookmodus halverwege sloot (U8), en "Nog te controleren" als er ingelezen recepten wachten (#18).
 struct BibliotheekCompact: View {
     @State private var filter = ReceptFilter()
     @State private var pad: [NSManagedObjectID] = []
@@ -13,6 +13,8 @@ struct BibliotheekCompact: View {
     @State private var toonLabels = false
     @State private var verder: VerderKeuze?
     @State private var verderGestart: VerderKeuze?
+    @State private var toonInbox = false
+    @Environment(InleesInbox.self) private var inbox
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
 
     var body: some View {
@@ -28,6 +30,13 @@ struct BibliotheekCompact: View {
                             )
                             .padding(.horizontal, 16)
                             .padding(.top, 4)
+                        }
+                        if !inbox.items.isEmpty, filter.zoekterm.isEmpty {
+                            NogTeControlerenKaart(
+                                aantal: inbox.items.count, bezig: inbox.items.contains { $0.status == .bezig }
+                            ) { toonInbox = true }
+                            .padding(.horizontal, 16)
+                            .padding(.top, verder == nil ? 4 : 10)
                         }
                         FilterChips(filter: $filter, toonLabels: $toonLabels).padding(.vertical, 8)
                     })
@@ -49,10 +58,8 @@ struct BibliotheekCompact: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Instellingen", systemImage: "gearshape") { toonInstellingen = true }
                 }
-                ToolbarItem(placement: .primaryAction) {
-                    Button("Nieuw recept", systemImage: "plus") { toonNieuw = true }
-                }
             }
+            .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox)
         }
         .verderMet($verder, gestart: $verderGestart)
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }

@@ -25,5 +25,6 @@ struct ContentView: View {
     #Preview {
         ContentView()
             .environment(\.managedObjectContext, Opslag.voorbeeld.context)
+            .environment(InleesInbox.gedeeld)
     }
 #endif

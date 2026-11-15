@@ -67,7 +67,13 @@ enum Weergave {
             delen.append(
                 datum.formatted(.dateTime.day().month(.abbreviated).year().locale(Locale(identifier: "nl_NL"))))
         }
-        if let pagina, !pagina.isEmpty { delen.append("p. \(pagina)") }
+        if let pagina, !pagina.isEmpty, link(pagina: pagina) == nil { delen.append("p. \(pagina)") }
         return delen.isEmpty ? nil : delen.joined(separator: " · ")
+    }
+
+    /// Bij een recept van een website staat de link in `bronPagina` (#18): die is dan een webadres.
+    static func link(pagina: String?) -> URL? {
+        guard let pagina = pagina?.trimmingCharacters(in: .whitespaces), !pagina.isEmpty else { return nil }
+        return ReceptInlezer.link(in: pagina)
     }
 }
