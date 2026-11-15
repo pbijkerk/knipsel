@@ -62,6 +62,7 @@ struct BibliotheekCompact: View {
             .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox)
         }
         .verderMet($verder, gestart: $verderGestart)
+        .toonReceptVerzoek(pad: $pad)
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
         .sheet(isPresented: $toonKnippen) { KnipStart() }

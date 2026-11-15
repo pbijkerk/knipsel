@@ -154,8 +154,12 @@ struct KookmodusScherm: View {
         _spraak = State(initialValue: Spraakbediening(sessie: sessie, voorlezer: voorlezer))
     }
 
-    /// Luisteren alleen met de kookmodus open, op de voorgrond, en spraakbediening aan.
-    private var moetLuisteren: Bool { spraakAan && scenePhase == .active }
+    /// Luisteren alleen met de kookmodus open en spraakbediening aan. Starten alleen op de voorgrond;
+    /// luistert hij al, dan blijft hij luisteren als de app naar de achtergrond gaat of het scherm op
+    /// slot gaat (achtergrondmodus `audio`, fase 6).
+    private var moetLuisteren: Bool {
+        spraakAan && (scenePhase == .active || luisteraar.status == .luistert)
+    }
 
     var body: some View {
         KookmodusInhoud(
@@ -170,19 +174,25 @@ struct KookmodusScherm: View {
             schermAan.kookmodusGeopend()
             spraak.sluit = { dismiss() }
             spraak.tik = { [luisteraar] in luisteraar.motor.speelTik() }
+            // Voor Siri, Opdrachten en AirPods (fase 6): die vinden de sessie hier, ook op de achtergrond.
+            ActieveKookSessie.gedeeld.registreer(spraak) { NuSpeeltBediening.gedeeld.werkBij() }
+            NuSpeeltBediening.gedeeld.start()
             if voorlezer.isAan { voorlezer.leesHuidigeStap(van: sessie) }
         }
         .onDisappear {
+            NuSpeeltBediening.gedeeld.stop()
+            ActieveKookSessie.gedeeld.meldAf(sessie)
             schermAan.kookmodusGesloten()
             stopLuisteren()
             voorlezer.stop()
             gesloten()
         }
         .onChange(of: scenePhase) { _, fase in
+            // Naar de achtergrond of op slot: de stap wordt uitgelezen, en Siri en AirPods kunnen
+            // verder (achtergrondmodus `audio`, alleen zolang de kookmodus open is).
             schermAan.faseGewijzigd(fase)
-            // Naar de achtergrond: stil. Doorlezen met vergrendeld scherm kan later (fase 6/7).
-            if fase == .background { voorlezer.stop() }
         }
+        .onChange(of: voorlezer.status) { NuSpeeltBediening.gedeeld.werkBij() }
         .task(id: moetLuisteren) {
             if moetLuisteren {
                 await startLuisteren()
@@ -331,9 +341,9 @@ struct KookmodusInhoud: View {
         .background { toetsenbord }
         .onAppear { if alVastgelegd { isVastgelegd = true } }
         .onChange(of: sessie.gebeurtenisNummer) {
+            // Het voorlezen van de nieuwe stap gebeurt al in de sessie zelf (`opGebeurtenis`, gezet
+            // door `ActieveKookSessie`), zodat het ook op de achtergrond werkt; hier alleen in beeld.
             bevestig()
-            // Nieuwe stap: de vorige uitspraak stopt en de nieuwe stap wordt voorgelezen; daarna wacht hij.
-            voorlezer.reageer(op: sessie.gebeurtenis, in: sessie)
         }
     }
 

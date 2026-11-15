@@ -10,6 +10,7 @@
 		04D69F4EEBC95458623E127C /* KaartkleurenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129BF70483D327699E4C49C0 /* KaartkleurenTests.swift */; };
 		087C1209F9A42A5A9ABF5F25 /* InleesInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B42E9457C61334527D4484D /* InleesInbox.swift */; };
 		0B0429404EFF7C1862F6714F /* Portieschaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5080A8C816A2DC91ED20E4C3 /* Portieschaling.swift */; };
+		0BD0653242D219B7668DBF17 /* KnipselOpdrachten.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43DED447E3765D41102FF685 /* KnipselOpdrachten.swift */; };
 		0CC038C87866B533DE503329 /* StandaardCategorieen.swift in Sources */ = {isa = PBXBuildFile; fileRef = F081E8818D35D9C314D32890 /* StandaardCategorieen.swift */; };
 		0F6D1C64CFB543AA0F7315FF /* KnipselApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F50F041C4CB953D585CFF4 /* KnipselApp.swift */; };
 		0F90ABEB9681DFA057ED0955 /* Knipsel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 505ED222FD53F0E1D9450FE9 /* Knipsel.xcdatamodeld */; };
@@ -28,7 +29,9 @@
 		34AFD6F178602A420C7F0695 /* StapSplitser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD32DDA41BF7995385751615 /* StapSplitser.swift */; };
 		3AE1588F0AE1FB8638591CFD /* InlezenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC59B032309D233A1AD40249 /* InlezenTests.swift */; };
 		3C2C46FBDC45FF8DF51FF3AA /* ReceptWeergave.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC62418E320151F46A5D662F /* ReceptWeergave.swift */; };
+		3EA3682E950C57DA4808A1A6 /* KookRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56E2F4A1F974EEB4A780B2E8 /* KookRouter.swift */; };
 		3F4FD1FFE27E833F03FE2AE3 /* StappenHerindelen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 660AF298EB9CEB75CFDE7422 /* StappenHerindelen.swift */; };
+		421E45A979D84361386E592C /* NuSpeelt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB74B4ED2A2E3EF41E2587B /* NuSpeelt.swift */; };
 		427784EFE93E1404E9C8F1E5 /* ModelIndeler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0059719A9B2CB0E15C31E9 /* ModelIndeler.swift */; };
 		450719FC3AA154174CE23D97 /* kookzender.html in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CC84520EBEC57921E15 /* kookzender.html */; };
 		458D5796AF86AE9BEDADB5D6 /* testpagina.png in Resources */ = {isa = PBXBuildFile; fileRef = 0610FBAD74DF1C4D24580715 /* testpagina.png */; };
@@ -68,16 +71,19 @@
 		8D7227BD4DEEC98F185EBFDE /* DeelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C121839FFB8A6DF425BABC7 /* DeelViewController.swift */; };
 		91060DEE56D43C5338C835C8 /* StapSplitserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A02B0F5AF954E0650120592 /* StapSplitserTests.swift */; };
 		92EC088BE4622F64AE5E497A /* ReceptFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 035E0626CDC05262823C6028 /* ReceptFilterTests.swift */; };
+		966A3E967B7A742DCB4DFF27 /* SiriTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32CEA0AD4FCBC1DB56546151 /* SiriTests.swift */; };
 		9900D98F6630ACCD2E880602 /* Opmaak.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CDD09785EEFE89D17A7188D /* Opmaak.swift */; };
 		9958265122AC0BC0143D6456 /* BibliotheekSplit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70348AEE499D0174DF2070DD /* BibliotheekSplit.swift */; };
 		9C643EB7A3BDD2C596C5F80C /* InrichtingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60413F059A1031C88D3543B7 /* InrichtingTests.swift */; };
 		9DE66E63367D0D53E95912CF /* KookVoortgang.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356210E76021417EAA9C7A59 /* KookVoortgang.swift */; };
 		A3A95563BFFB12A3DA9A18CB /* VerderMet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD90A42F8677539465BCBF /* VerderMet.swift */; };
 		A61A610DFC1F0EA4AF7DCF2C /* Onderdelen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A14448637693678765D2F37 /* Onderdelen.swift */; };
+		A6ED7160A6A1D28C92D4680C /* ReceptEntiteit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3E0E386DC84E412E8F73FE /* ReceptEntiteit.swift */; };
 		AC350BC54EF98A58A0D6DA15 /* ReceptBewerken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82315C270362977EC44642F1 /* ReceptBewerken.swift */; };
 		B04DCBB86E573F05D5F7DEC9 /* StandaardCategorieenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 373D3A65F0AF1A9503628800 /* StandaardCategorieenTests.swift */; };
 		B211156F21975D64BBDD7330 /* BibliotheekCompact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13043F6A124766992A9EC92C /* BibliotheekCompact.swift */; };
 		B23A98F49BCC31DED61DA5C8 /* ClaudeIndelerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD497F957B3582290552826B /* ClaudeIndelerTests.swift */; };
+		B7309805AC938E05943FF8FF /* KookIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B94C367AB288EE152943E1B /* KookIntents.swift */; };
 		BCB99531A5CA1B10C7B5A7EA /* PerenInRodeWijn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F13650094C100D28D45EBD5 /* PerenInRodeWijn.swift */; };
 		BDBB4B05B921FC1E3FA88333 /* MotorSpreker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65806BA221489972A5A9EED0 /* MotorSpreker.swift */; };
 		BE2CCBC8A8140209BF370CC0 /* ReceptLijst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4920C55C5B359D793E921673 /* ReceptLijst.swift */; };
@@ -88,6 +94,7 @@
 		C411FC10E36DBEE66DFEECDC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D27E7F45AE46B4F8472FA56C /* Assets.xcassets */; };
 		C9461080674151D62D98BC2E /* ReceptInvoerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 319BEDB91D05615EF3CF9377 /* ReceptInvoerTests.swift */; };
 		C9D2F86DE36049CC692E9754 /* zonder-schema.html in Resources */ = {isa = PBXBuildFile; fileRef = EDA79A77815710C15060AF76 /* zonder-schema.html */; };
+		CEA9D207193D8E231324DF58 /* ReceptIndex.swift in Sources */ = {isa = PBXBuildFile; fileRef = 42CF62E78CF2F1A8B36C22AF /* ReceptIndex.swift */; };
 		D16E7E05B3301A3E5D7837C7 /* graph-supermarkt.html in Resources */ = {isa = PBXBuildFile; fileRef = 1037123520AFE480EC0A2F41 /* graph-supermarkt.html */; };
 		D2757A8FE14C6F0E0D11AA9D /* LuisterService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA24908B87C0EA221AED05C8 /* LuisterService.swift */; };
 		D30E192477AD60342F38D01F /* InboxLijst.swift in Sources */ = {isa = PBXBuildFile; fileRef = D26E22081E007AD5CE470348 /* InboxLijst.swift */; };
@@ -105,6 +112,7 @@
 		EC9BA076A279ADA45768BE84 /* DeelPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338811B4E1B60B7BC8542FE5 /* DeelPost.swift */; };
 		ED0F4E32B56D3C565CCE0069 /* supermarkt-lijst.html in Resources */ = {isa = PBXBuildFile; fileRef = 154104563D12D62C31FDFF04 /* supermarkt-lijst.html */; };
 		F0D356FFDDE2970823C8DD5B /* DeelBevestiging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2399AB91613E2B8960E397D /* DeelBevestiging.swift */; };
+		F33E88489191C6A7FDB5DBD9 /* AppShortcuts.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = BF744DAB1F878B9209054F7E /* AppShortcuts.xcstrings */; };
 		F493953F23DD2A04C598F73E /* DeelPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 338811B4E1B60B7BC8542FE5 /* DeelPost.swift */; };
 		F653DCEDB21019311F29A9D1 /* Modelklassen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B819CBA06804B17BA932703 /* Modelklassen.swift */; };
 		F8CE6C632744CE804247E030 /* KookSessieTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3019367133896088877E6FEB /* KookSessieTests.swift */; };
@@ -112,6 +120,7 @@
 		F9A9534465BB3FE3E312FE6C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D18DBE8B82454B97537FC3A /* ContentView.swift */; };
 		F9AB8BAB3EC84EDEA91EBE97 /* microdata.html in Resources */ = {isa = PBXBuildFile; fileRef = ABB34EB3A84428D675FD6061 /* microdata.html */; };
 		F9EA9D9AB0097A22D182896C /* AppConfiguratie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F2601E1FF2BB430F5C3CB02 /* AppConfiguratie.swift */; };
+		FC304514D17E8AB62E692B3B /* SiriInstellingen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E2EA310696D39FC0F54C71 /* SiriInstellingen.swift */; };
 		FCEC1C0E9DEB19E603099D2D /* ControleScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE9C8B7966041B2EE3CBE9A /* ControleScherm.swift */; };
 		FDC2E1DC7D16EBCB8D8C5D9B /* DeelLezer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DD0044B4A01309F9EDC9DF /* DeelLezer.swift */; };
 		FEE8A464D1C206106FDAE1BA /* HTMLTekst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1349CCA6120F7D327342988E /* HTMLTekst.swift */; };
@@ -163,18 +172,22 @@
 		1349CCA6120F7D327342988E /* HTMLTekst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLTekst.swift; sourceTree = "<group>"; };
 		154104563D12D62C31FDFF04 /* supermarkt-lijst.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "supermarkt-lijst.html"; sourceTree = "<group>"; };
 		171A25B1BCB38B52FB9ABA51 /* KnipselScherm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipselScherm.swift; sourceTree = "<group>"; };
+		17E2EA310696D39FC0F54C71 /* SiriInstellingen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriInstellingen.swift; sourceTree = "<group>"; };
 		1800D3286A33FA25D0CDB692 /* Uitspraakregels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Uitspraakregels.swift; sourceTree = "<group>"; };
 		1906B3BBF381AE42E508DFD8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1B54162573059F6F84A4F70A /* UitspraakregelsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UitspraakregelsTests.swift; sourceTree = "<group>"; };
+		1B94C367AB288EE152943E1B /* KookIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookIntents.swift; sourceTree = "<group>"; };
 		1E8BD8AE303F6F0F02868C2A /* KnipSessie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipSessie.swift; sourceTree = "<group>"; };
 		209E54A5306E6DFE80C487D5 /* Ingredientkoppeling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ingredientkoppeling.swift; sourceTree = "<group>"; };
 		2A0A091AC7276F0B6291F3A6 /* SpraakbedieningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpraakbedieningTests.swift; sourceTree = "<group>"; };
 		2C121839FFB8A6DF425BABC7 /* DeelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeelViewController.swift; sourceTree = "<group>"; };
 		2D5F73E4CA132A999C4584E7 /* ReceptFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptFilter.swift; sourceTree = "<group>"; };
+		2DB74B4ED2A2E3EF41E2587B /* NuSpeelt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NuSpeelt.swift; sourceTree = "<group>"; };
 		2EA044344176564A029BC0F7 /* InleesScherm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InleesScherm.swift; sourceTree = "<group>"; };
 		2F2601E1FF2BB430F5C3CB02 /* AppConfiguratie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguratie.swift; sourceTree = "<group>"; };
 		3019367133896088877E6FEB /* KookSessieTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookSessieTests.swift; sourceTree = "<group>"; };
 		319BEDB91D05615EF3CF9377 /* ReceptInvoerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptInvoerTests.swift; sourceTree = "<group>"; };
+		32CEA0AD4FCBC1DB56546151 /* SiriTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriTests.swift; sourceTree = "<group>"; };
 		338811B4E1B60B7BC8542FE5 /* DeelPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeelPost.swift; sourceTree = "<group>"; };
 		356210E76021417EAA9C7A59 /* KookVoortgang.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookVoortgang.swift; sourceTree = "<group>"; };
 		36AD665D6024011409607AEF /* PortieschalingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortieschalingTests.swift; sourceTree = "<group>"; };
@@ -184,6 +197,8 @@
 		3D18DBE8B82454B97537FC3A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		3EA097E619203BDB0BC9A209 /* Knipsel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Knipsel.xcdatamodel; sourceTree = "<group>"; };
 		425CB2FC9C8FE0D0C29E8EBF /* Weergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weergave.swift; sourceTree = "<group>"; };
+		42CF62E78CF2F1A8B36C22AF /* ReceptIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptIndex.swift; sourceTree = "<group>"; };
+		43DED447E3765D41102FF685 /* KnipselOpdrachten.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipselOpdrachten.swift; sourceTree = "<group>"; };
 		4920C55C5B359D793E921673 /* ReceptLijst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptLijst.swift; sourceTree = "<group>"; };
 		4A14448637693678765D2F37 /* Onderdelen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onderdelen.swift; sourceTree = "<group>"; };
 		4A1EA27EE30E578BAF348892 /* Kaartenbak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Kaartenbak.swift; sourceTree = "<group>"; };
@@ -194,6 +209,7 @@
 		529AD9C64E9BDB5E580A3E6C /* SchermAan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchermAan.swift; sourceTree = "<group>"; };
 		5569E093902EB8BB640A9E60 /* SchemaReceptLezer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaReceptLezer.swift; sourceTree = "<group>"; };
 		562F5390ADDD4A8F009B3BA9 /* KookSessie.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookSessie.swift; sourceTree = "<group>"; };
+		56E2F4A1F974EEB4A780B2E8 /* KookRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookRouter.swift; sourceTree = "<group>"; };
 		579E35F670326A740E862739 /* GerechtFoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GerechtFoto.swift; sourceTree = "<group>"; };
 		57A4556C4DD100088C5AED8B /* secties.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = secties.html; sourceTree = "<group>"; };
 		5A3FE115062D432C76EB5842 /* VoorlezenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoorlezenTests.swift; sourceTree = "<group>"; };
@@ -224,12 +240,14 @@
 		93D6BF471F700505878E222C /* Audiomotor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Audiomotor.swift; sourceTree = "<group>"; };
 		9AE93C8783545508E21C7C37 /* ClaudeIndeler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeIndeler.swift; sourceTree = "<group>"; };
 		9CDD09785EEFE89D17A7188D /* Opmaak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opmaak.swift; sourceTree = "<group>"; };
+		9F3E0E386DC84E412E8F73FE /* ReceptEntiteit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptEntiteit.swift; sourceTree = "<group>"; };
 		A47550B28B74FB224C6205EB /* Knipsel.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Knipsel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB79EBDFADD9D84884EA2AA3 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		ABB34EB3A84428D675FD6061 /* microdata.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = microdata.html; sourceTree = "<group>"; };
 		B6D051E99ED2C3EB3C0DD66D /* Opslag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opslag.swift; sourceTree = "<group>"; };
 		BA24908B87C0EA221AED05C8 /* LuisterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LuisterService.swift; sourceTree = "<group>"; };
 		BD497F957B3582290552826B /* ClaudeIndelerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeIndelerTests.swift; sourceTree = "<group>"; };
+		BF744DAB1F878B9209054F7E /* AppShortcuts.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = AppShortcuts.xcstrings; sourceTree = "<group>"; };
 		C158ED0975594A23CD77C5AD /* IngredientParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientParserTests.swift; sourceTree = "<group>"; };
 		C1BD32BDD0BAF5D9D8AEFFFC /* SpraakInstellingen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpraakInstellingen.swift; sourceTree = "<group>"; };
 		C4AC70FA2ED8B187CB519B0B /* RegelIndeler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RegelIndeler.swift; sourceTree = "<group>"; };
@@ -268,6 +286,7 @@
 			isa = PBXGroup;
 			children = (
 				2F2601E1FF2BB430F5C3CB02 /* AppConfiguratie.swift */,
+				BF744DAB1F878B9209054F7E /* AppShortcuts.xcstrings */,
 				D27E7F45AE46B4F8472FA56C /* Assets.xcassets */,
 				3D18DBE8B82454B97537FC3A /* ContentView.swift */,
 				D80C99AFFC80C26C1CE6B452 /* Info.plist */,
@@ -285,6 +304,7 @@
 				A26EDC281C94613D55213FE7 /* Kookmodus */,
 				7A05DB7C890A22F10B950073 /* Opslag */,
 				B0C7A16F5EF8B78C5492516D /* Recept */,
+				AAC633AC7E127F35B8AF1117 /* Siri */,
 				6D3EAEF7B6DC6E0F3054ACA2 /* Spraak */,
 			);
 			path = Knipsel;
@@ -363,6 +383,7 @@
 				36AD665D6024011409607AEF /* PortieschalingTests.swift */,
 				035E0626CDC05262823C6028 /* ReceptFilterTests.swift */,
 				319BEDB91D05615EF3CF9377 /* ReceptInvoerTests.swift */,
+				32CEA0AD4FCBC1DB56546151 /* SiriTests.swift */,
 				2A0A091AC7276F0B6291F3A6 /* SpraakbedieningTests.swift */,
 				373D3A65F0AF1A9503628800 /* StandaardCategorieenTests.swift */,
 				11CB265982A24C2A3B0302B3 /* StappenEnClaudeTests.swift */,
@@ -386,6 +407,7 @@
 			isa = PBXGroup;
 			children = (
 				0BB7B04DB132CC61614ED998 /* InstellingenView.swift */,
+				17E2EA310696D39FC0F54C71 /* SiriInstellingen.swift */,
 				C1BD32BDD0BAF5D9D8AEFFFC /* SpraakInstellingen.swift */,
 				6EFD1678E71CED6C2D45F8FB /* VoorleesInstellingen.swift */,
 			);
@@ -471,14 +493,27 @@
 			children = (
 				209E54A5306E6DFE80C487D5 /* Ingredientkoppeling.swift */,
 				F668CB4EF71739D016404873 /* KookmodusScherm.swift */,
+				56E2F4A1F974EEB4A780B2E8 /* KookRouter.swift */,
 				562F5390ADDD4A8F009B3BA9 /* KookSessie.swift */,
 				356210E76021417EAA9C7A59 /* KookVoortgang.swift */,
+				2DB74B4ED2A2E3EF41E2587B /* NuSpeelt.swift */,
 				529AD9C64E9BDB5E580A3E6C /* SchermAan.swift */,
 				6649CEA3FA3A624A9FA2064E /* Spraakbediening.swift */,
 				E55DDE6D13AF983174B115EF /* Spraakweergave.swift */,
 				8ACA3B89B434F3EE963E7CDD /* VoorleesService.swift */,
 			);
 			path = Kookmodus;
+			sourceTree = "<group>";
+		};
+		AAC633AC7E127F35B8AF1117 /* Siri */ = {
+			isa = PBXGroup;
+			children = (
+				43DED447E3765D41102FF685 /* KnipselOpdrachten.swift */,
+				1B94C367AB288EE152943E1B /* KookIntents.swift */,
+				9F3E0E386DC84E412E8F73FE /* ReceptEntiteit.swift */,
+				42CF62E78CF2F1A8B36C22AF /* ReceptIndex.swift */,
+			);
+			path = Siri;
 			sourceTree = "<group>";
 		};
 		AB05E7C6C3677A4877AF0219 = {
@@ -601,11 +636,11 @@
 				};
 			};
 			buildConfigurationList = 8EEE69B03138B89AF036219C /* Build configuration list for PBXProject "Knipsel" */;
-			developmentRegion = en;
+			developmentRegion = nl;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				Base,
-				en,
+				nl,
 			);
 			mainGroup = AB05E7C6C3677A4877AF0219;
 			minimizedProjectReferenceProxies = 1;
@@ -626,6 +661,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F33E88489191C6A7FDB5DBD9 /* AppShortcuts.xcstrings in Resources */,
 				C411FC10E36DBEE66DFEECDC /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -670,6 +706,7 @@
 				83F01D480927D7557B12E9F0 /* PortieschalingTests.swift in Sources */,
 				92EC088BE4622F64AE5E497A /* ReceptFilterTests.swift in Sources */,
 				C9461080674151D62D98BC2E /* ReceptInvoerTests.swift in Sources */,
+				966A3E967B7A742DCB4DFF27 /* SiriTests.swift in Sources */,
 				C050E739898FD44A71317FB8 /* SpraakbedieningTests.swift in Sources */,
 				B04DCBB86E573F05D5F7DEC9 /* StandaardCategorieenTests.swift in Sources */,
 				91060DEE56D43C5338C835C8 /* StapSplitserTests.swift in Sources */,
@@ -714,7 +751,10 @@
 				8616A16FC0D21940EE908634 /* KnipStart.swift in Sources */,
 				0F90ABEB9681DFA057ED0955 /* Knipsel.xcdatamodeld in Sources */,
 				0F6D1C64CFB543AA0F7315FF /* KnipselApp.swift in Sources */,
+				0BD0653242D219B7668DBF17 /* KnipselOpdrachten.swift in Sources */,
 				5A60F344D4E5646802D23BDF /* KnipselScherm.swift in Sources */,
+				B7309805AC938E05943FF8FF /* KookIntents.swift in Sources */,
+				3EA3682E950C57DA4808A1A6 /* KookRouter.swift in Sources */,
 				4F274C325F6E8D95FE2F5328 /* KookSessie.swift in Sources */,
 				9DE66E63367D0D53E95912CF /* KookVoortgang.swift in Sources */,
 				75FB7E829A9C0A22AC5684FA /* KookmodusScherm.swift in Sources */,
@@ -723,13 +763,16 @@
 				427784EFE93E1404E9C8F1E5 /* ModelIndeler.swift in Sources */,
 				F653DCEDB21019311F29A9D1 /* Modelklassen.swift in Sources */,
 				BDBB4B05B921FC1E3FA88333 /* MotorSpreker.swift in Sources */,
+				421E45A979D84361386E592C /* NuSpeelt.swift in Sources */,
 				A61A610DFC1F0EA4AF7DCF2C /* Onderdelen.swift in Sources */,
 				9900D98F6630ACCD2E880602 /* Opmaak.swift in Sources */,
 				EC848E2C428637C44FEF4FE0 /* Opslag.swift in Sources */,
 				50B8C7A06DC494A30B7D6687 /* PaginaLezer.swift in Sources */,
 				0B0429404EFF7C1862F6714F /* Portieschaling.swift in Sources */,
 				AC350BC54EF98A58A0D6DA15 /* ReceptBewerken.swift in Sources */,
+				A6ED7160A6A1D28C92D4680C /* ReceptEntiteit.swift in Sources */,
 				C2645324A4B81281C02E3055 /* ReceptFilter.swift in Sources */,
+				CEA9D207193D8E231324DF58 /* ReceptIndex.swift in Sources */,
 				5CB4C2ADFA1E428D33E93872 /* ReceptInlezer.swift in Sources */,
 				8B2D4D753AF9C4737D8C9893 /* ReceptInvoer.swift in Sources */,
 				BE2CCBC8A8140209BF370CC0 /* ReceptLijst.swift in Sources */,
@@ -739,6 +782,7 @@
 				1C60906B522D1D4C439C02A2 /* ScanService.swift in Sources */,
 				EB5738A6C32EB7BCFC057E63 /* SchemaReceptLezer.swift in Sources */,
 				497E42DAECE090ACE247CC98 /* SchermAan.swift in Sources */,
+				FC304514D17E8AB62E692B3B /* SiriInstellingen.swift in Sources */,
 				DE8568A51116983D6CA9DE82 /* SpraakInstellingen.swift in Sources */,
 				2362EA9DE5E02E62AA467F52 /* Spraakbediening.swift in Sources */,
 				79E7E6006C9A3A696B61F555 /* Spraakweergave.swift in Sources */,

@@ -6,6 +6,8 @@ struct KnipselApp: App {
 
     init() {
         opslag.richIn()
+        // Recepten vindbaar in Spotlight en voor Siri ("Kook … met Knipsel").
+        ReceptIndex.gedeeld.start(opslag: opslag)
     }
 
     var body: some Scene {

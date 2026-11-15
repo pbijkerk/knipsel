@@ -193,7 +193,8 @@ final class SysteemSpreker: NSObject, Spreker {
         let sessie = AVAudioSession.sharedInstance()
         do {
             try sessie.setCategory(
-                .playback, mode: .spokenAudio, options: [.duckOthers])
+                .playback, mode: .spokenAudio,
+                options: NuSpeeltBediening.spraakOpties(proefAan: NuSpeeltBediening.proefAan()))
             try sessie.setActive(true)
         } catch {
             // Zonder sessie spreekt de synthesizer nog steeds; alleen het zachter zetten van muziek mist.

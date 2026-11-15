@@ -37,6 +37,10 @@ enum AppConfiguratie {
     static let sleutelSpraakWekwoord = "spraakAlleenMetWekwoord"
     static let sleutelSpraakUitlegGezien = "spraakUitlegGezien"
 
+    /// Proef S3 (fase 6): AirPods-steeltje en Apple Watch bedienen de kookmodus via "Nu speelt"
+    /// (standaard uit).
+    static let sleutelAirPodsProef = "airPodsProef"
+
     /// Inlezen van websites (#18): de receptfoto van de site bewaren als foto bij het recept
     /// (standaard aan). Papierknipsels blijven tekst-only (B7).
     static let sleutelWebFotoBewaren = "webFotoBewaren"

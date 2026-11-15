@@ -1,6 +1,8 @@
 name: Knipsel
 options:
   bundleIdPrefix: com.peterbijkerk
+  # Nederlands is de brontaal: ook de Siri-zinnen (AppShortcuts.xcstrings) zijn Nederlands.
+  developmentLanguage: nl
   deploymentTarget:
     iOS: "26.0"
   xcodeVersion: "26"
