@@ -37,4 +37,20 @@ Daarna start elke merge naar `main` vanzelf een nieuwe TestFlight-build.
 | 5 | Microfoon, spraakherkenning | Info.plist-teksten |
 | 7 | AlarmKit, Live Activities | Info.plist + widget-extensie |
 
+## Deel-extensie (#18)
+
+De app bevat een Share Extension `KnipselDelen` (*Knipsel* in het deelmenu), met een **eigen
+app-ID** `com.peterbijkerk.knipsel.delen`. App en extensie delen de **App Group**
+`group.com.peterbijkerk.knipsel` (in `Knipsel/Knipsel.entitlements` en
+`KnipselDelen/KnipselDelen.entitlements`): daarin staat *Nog te controleren*. Beide app-ID's moeten in
+het developerportaal de capability *App Groups* met die groep hebben; signing is automatisch.
+Versie en buildnummer van de extensie lopen mee met de app (`MARKETING_VERSION` /
+`CURRENT_PROJECT_VERSION` op projectniveau in `project.yml`).
+
+Faalt een Xcode Cloud-build op signing (*"No profiles for 'com.peterbijkerk.knipsel.delen'"*,
+*"Provisioning profile doesn't include the com.apple.security.application-groups entitlement"*):
+open het project eenmalig in Xcode, kies bij beide targets (Knipsel en KnipselDelen) onder *Signing &
+Capabilities* het team en controleer dat *App Groups* met `group.com.peterbijkerk.knipsel` aangevinkt
+is; controleer in het portaal dat de groep aan **beide** app-ID's hangt en start de build opnieuw.
+
 Een nieuwe capability vraagt soms een eenmalige handmatige stap in Xcode; die staat dan in het issue.

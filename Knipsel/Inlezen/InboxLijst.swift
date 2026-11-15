@@ -285,6 +285,9 @@ struct InleesInvoer: ViewModifier {
             .task(id: fase) {
                 guard fase == .active else { return }
                 inbox.laad()
+                // Net via het deelmenu toegevoegd (de extensie schrijft in de App Group).
+                inbox.neemGedeeldOver()
+                inbox.ruimOp()
                 await InleesVerwerker(inbox: inbox).verwerkWachtende(
                     categorieen: categorieen.map(\.naamOfStandaard), labels: labels.map(\.naamOfStandaard))
             }

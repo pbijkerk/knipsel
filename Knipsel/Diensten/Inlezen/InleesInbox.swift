@@ -49,19 +49,62 @@ struct InleesItem: Codable, Identifiable, Equatable, Sendable {
 }
 
 /// "Nog te controleren": een kleine inbox als JSON-bestand plus losse bestanden (afbeeldingen,
-/// PDF's, receptfoto's) in één map. De map is in te stellen, zodat de deel-extensie (deel 2 van #18)
-/// hem later via een App Group kan vullen; nu is het Application Support van de app.
+/// PDF's, receptfoto's) in één map. Die map staat in de App Group, zodat de deel-extensie er items
+/// in kan zetten (`DeelPost`, #18); zonder App Group (een build zonder signing) is het Application
+/// Support van de app.
 @MainActor
 @Observable
 final class InleesInbox {
-    static let gedeeld = InleesInbox(map: standaardMap)
+    static let gedeeld: InleesInbox = {
+        let map = standaardMap
+        if !Opslag.draaitOnderTests, map != oudeMap {
+            migreer(van: oudeMap, naar: map)
+        }
+        return InleesInbox(map: map)
+    }()
 
     static var standaardMap: URL {
-        let basis =
-            Opslag.draaitOnderTests
-            ? FileManager.default.temporaryDirectory.appending(path: "KnipselTestInbox-\(UUID().uuidString)")
-            : URL.applicationSupportDirectory
-        return basis.appending(path: "Inlezen", directoryHint: .isDirectory)
+        if Opslag.draaitOnderTests {
+            return FileManager.default.temporaryDirectory.appending(path: "KnipselTestInbox-\(UUID().uuidString)")
+                .appending(path: "Inlezen", directoryHint: .isDirectory)
+        }
+        return DeelGroep.inboxMap ?? oudeMap
+    }
+
+    /// Waar de inbox stond vóór de deel-extensie (deel 1 van #18).
+    static var oudeMap: URL {
+        URL.applicationSupportDirectory.appending(path: "Inlezen", directoryHint: .isDirectory)
+    }
+
+    /// Eenmalig: items en bestanden uit de oude map naar de nieuwe. Staat er in de nieuwe map al een
+    /// inbox, dan worden de items samengevoegd (op id). Daarna is de oude map weg.
+    static func migreer(van oud: URL, naar nieuw: URL) {
+        let fm = FileManager.default
+        guard fm.fileExists(atPath: oud.path()) else { return }
+        let logger = Logger(subsystem: "com.peterbijkerk.knipsel", category: "Inlezen")
+        do {
+            try fm.createDirectory(at: nieuw, withIntermediateDirectories: true)
+            for bestand in try fm.contentsOfDirectory(at: oud, includingPropertiesForKeys: nil) {
+                let doel = nieuw.appending(path: bestand.lastPathComponent)
+                if bestand.lastPathComponent == "inbox.json", fm.fileExists(atPath: doel.path()) {
+                    let oudeItems =
+                        (try? Data(contentsOf: bestand)).flatMap { try? decoder.decode([InleesItem].self, from: $0) }
+                        ?? []
+                    let nieuweItems =
+                        (try? Data(contentsOf: doel)).flatMap { try? decoder.decode([InleesItem].self, from: $0) } ?? []
+                    let bekend = Set(nieuweItems.map(\.id))
+                    let samen = (nieuweItems + oudeItems.filter { !bekend.contains($0.id) }).sorted {
+                        $0.datum > $1.datum
+                    }
+                    try encoder.encode(samen).write(to: doel, options: .atomic)
+                } else if !fm.fileExists(atPath: doel.path()) {
+                    try fm.moveItem(at: bestand, to: doel)
+                }
+            }
+            try fm.removeItem(at: oud)
+        } catch {
+            logger.error("Inbox verhuizen mislukt: \(error.localizedDescription, privacy: .public)")
+        }
     }
 
     let map: URL
@@ -135,6 +178,65 @@ final class InleesInbox {
 
     func data(van naam: String) -> Data? {
         try? Data(contentsOf: url(van: naam))
+    }
+
+    // MARK: - Uit het deelmenu
+
+    /// Neemt wat via het deelmenu binnenkwam over als wachtend item (de verwerker leest het daarna
+    /// in). Geeft het aantal nieuwe items terug.
+    @discardableResult
+    func neemGedeeldOver() -> Int {
+        let bus = DeelBus(map: map)
+        var nieuw = 0
+        for (post, bestand) in bus.posts() {
+            if item(post.id) == nil {
+                var item = InleesItem(id: post.id, bron: Self.bron(post.bron), datum: post.datum)
+                item.bronURL = post.bronURL
+                item.bronNaam = post.bronURL.flatMap(ReceptInlezer.host)
+                let plek = items.firstIndex { $0.datum < item.datum } ?? items.endIndex
+                items.insert(item, at: plek)
+                nieuw += 1
+            }
+            try? FileManager.default.removeItem(at: bestand)
+        }
+        if nieuw > 0 { bewaar() }
+        return nieuw
+    }
+
+    static func bron(_ bron: DeelBron) -> InleesItem.Bron {
+        switch bron {
+        case .link(let url): .link(url)
+        case .tekst(let tekst): .tekst(tekst)
+        case .afbeeldingen(let namen): .afbeeldingen(namen)
+        case .pdf(let naam): .pdf(naam)
+        }
+    }
+
+    /// Bestanden waar geen item (meer) naar verwijst, bijvoorbeeld van een deelpoging die halverwege
+    /// stopte. Alleen ouder dan `grens`: de extensie schrijft het bestand vóór haar item.
+    func ruimOp(ouderDan grens: Date = .now.addingTimeInterval(-3600)) {
+        let bus = DeelBus(map: map)
+        var inGebruik = Set(items.flatMap(bestanden(van:)))
+        for (post, _) in bus.posts() {
+            switch post.bron {
+            case .afbeeldingen(let namen): inGebruik.formUnion(namen)
+            case .pdf(let naam): inGebruik.insert(naam)
+            default: break
+            }
+        }
+        let fm = FileManager.default
+        let inhoud =
+            (try? fm.contentsOfDirectory(
+                at: map, includingPropertiesForKeys: [.contentModificationDateKey, .isDirectoryKey]))
+            ?? []
+        for url in inhoud {
+            let waarden = try? url.resourceValues(forKeys: [.contentModificationDateKey, .isDirectoryKey])
+            guard waarden?.isDirectory != true, url.lastPathComponent != "inbox.json",
+                !inGebruik.contains(url.lastPathComponent), let datum = waarden?.contentModificationDate, datum < grens
+            else { continue }
+            try? fm.removeItem(at: url)
+        }
+        bus.ruimOnleesbareOp(ouderDan: .now.addingTimeInterval(-86_400))
     }
 
     // MARK: - Opslag
