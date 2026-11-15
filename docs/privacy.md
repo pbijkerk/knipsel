@@ -25,6 +25,8 @@ kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en wa
 | Eigen foto van je gerecht (optioneel) | Alleen als je er zelf een maakt of kiest. Verkleind bewaard bij het recept, op je toestel en in je eigen iCloud (privédatabase; bij een recept in het gedeelde kookboek "Thuis" ook zichtbaar voor wie je hebt uitgenodigd). Gaat **nooit** naar Claude of de maker. Verwijder hem via ⋯ › Verwijder foto. |
 | Spraak (spraakbesturing in de kookmodus) | Herkend op het toestel. Er worden geen opnames bewaard of verstuurd. |
 | Voorlezen | Gebeurt op het toestel met de stemmen van iOS. |
+| Siri, Opdrachten en Spotlight | Knipsel zet de **titel en categorie** van je recepten in de zoekindex van iOS, op dit toestel, zodat je ze in Spotlight vindt en Siri ze herkent ("Kook pompoensoep met Knipsel"). Ingrediënten, stappen, notities en foto's gaan niet in de index. Wat je tegen Siri zegt, verwerkt Apple volgens zijn eigen privacybeleid; Knipsel krijgt alleen het gekozen recept of de opdracht ("volgende stap"). |
+| Nu speelt (proef, standaard uit) | Met *Bediening met AirPods en Apple Watch* aan toont iOS tijdens het koken de recepttitel, "Stap 3 van 7" en de foto of het symbool van het recept onder Nu speelt (vergrendelscherm, Bedieningspaneel, Apple Watch). Dat blijft op je toestellen. |
 | Claude-sleutel (optioneel) | In de Keychain van je toestel. |
 | Ingelezen recepten die nog niet gecontroleerd zijn ("Nog te controleren") | Alleen op je toestel, in een map die alleen Knipsel en zijn deelmenu-onderdeel kunnen lezen (App Group). Na bewaren of annuleren verdwijnen ze, met de bijbehorende bestanden (schermafdruk, PDF, foto). |
 | Delen via het deelmenu ("Knipsel" in het deelmenu van Safari, een krantenapp, Foto's of Bestanden) | Knipsel leest alleen wat je zelf deelt: de link, de tekst, de afbeelding(en) of de PDF. Het deelmenu haalt niets op en stuurt niets weg; het zet het item alleen lokaal in *Nog te controleren*. Pas als je Knipsel opent, wordt het ingelezen (een link wordt dan rechtstreeks bij de website opgehaald), en het wordt pas een recept als je het hebt gecontroleerd. |
@@ -47,7 +49,9 @@ Claude. De foto gaat nooit mee. Daarop is het privacybeleid van Anthropic van to
 - **Camera / Foto's** — om een receptpagina vast te leggen, en als je dat wilt een foto van je eigen
   gerecht. Een foto kiezen uit Foto's gebeurt via de systeemkiezer: Knipsel ziet alleen de foto die
   je kiest en vraagt daarvoor geen toegang tot je hele fotobibliotheek.
-- **Microfoon en spraakherkenning** — voor bediening met je stem tijdens het koken.
+- **Microfoon en spraakherkenning** — voor bediening met je stem tijdens het koken. Staat de
+  kookmodus open en luistert Knipsel, dan blijft dat zo als je het scherm op slot zet of naar een
+  andere app gaat (je ziet dan het oranje microfoonlampje); sluit je de kookmodus, dan stopt het.
 - **Meldingen / alarmen** — voor kooktimers.
 
 Je kunt elk recht weigeren of later intrekken in Instellingen van iOS; de rest van de app blijft werken.

@@ -110,9 +110,18 @@ Gekozen door Peter: Kookmodus A + iPad B (#21), Recept A (#22), Bibliotheek A �
 | Laag | Wanneer | Techniek | Status |
 |---|---|---|---|
 | 1. Stem in de app (primair) | Tijdens koken, app open | `SpeechAnalyzer` + `DictationTranscriber` (`nl_NL` on-device, gecontroleerd); terugval `SFSpeechRecognizer` on-device. `AVAudioEngine` met *voice processing* (echo-onderdrukking), zodat Knipsel zijn eigen stem niet hoort en "stop" midden in het voorlezen werkt. | Kern, fase 5 |
-| 2. Siri / App Shortcuts | Starten, of app op achtergrond / vergrendeld | App Intents: `KookReceptIntent` (met `AppEntity` Recept), `VolgendeStap`, `VorigeStap`, `HerhaalStap`, `LeesIngredienten`, `ZetTimer`. Verschijnen vanzelf in Siri, Spotlight en Opdrachten. | Fase 6 |
+| 2. Siri / App Shortcuts | Starten, of app op achtergrond / vergrendeld | App Intents: `KookReceptIntent` (met `ReceptEntiteit`, zoekbaar op titel en ingrediënt), `VolgendeStapIntent`, `VorigeStapIntent`, `HerhaalStapIntent`, `LeesIngredientenIntent`; Nederlandse zinnen in `KnipselOpdrachten` ("Kook pompoensoep met Knipsel", "Volgende stap in Knipsel", …). Recepten staan in Spotlight (`IndexedEntity`). `ZetTimer` volgt in fase 7 (#8). | Gebouwd in fase 6 (#7); Nederlandse zinnen op toestel nog te testen |
 | 3. Actieknop | Eén knop met knokkel = volgende stap | Snelkoppeling "Volgende stap" aan de Actieknop | Alleen iPhone 15 Pro en nieuwer; niet op Peters toestellen, geparkeerd |
-| 4. AirPods / Apple Watch | Steeltje indrukken = volgende, dubbel = vorige | `MPRemoteCommandCenter` + Nu speelt; de Watch toont dan vanzelf de bediening | Fase 6, eerst proef (S3) |
+| 4. AirPods / Apple Watch | Steeltje 1× = voorlezen/stoppen, 2× = volgende, 3× = vorige | `MPRemoteCommandCenter` + Nu speelt, achter de instelling *Bediening met AirPods en Apple Watch (proef)* (standaard uit) | Proef S3 gebouwd, op toestel te testen (`docs/spikes/S3-airpods.md`) |
+
+**Hoe het samenhangt (fase 6).** Eén `KookRouter` opent de kookmodus: "Kook dit", *Verder met…* en
+Siri zetten daar een verzoek neer, en de bibliotheek toont de kookmodus als volledig scherm. De open
+kookmodus meldt zich bij `ActieveKookSessie`; Siri en AirPods vinden de sessie daar (ook met de app
+op de achtergrond, in hetzelfde proces) en gebruiken hetzelfde pad als spraak (`Spraakbediening` →
+`KookSessie`-gebeurtenis → voorlezer). De voorlezer reageert in de sessie zelf, niet via een
+schermupdate, zodat voorlezen ook op de achtergrond volgt. Achtergrondmodus `audio` houdt het
+voorlezen en luisteren gaande als de app naar de achtergrond gaat of het scherm op slot gaat, alleen
+zolang de kookmodus open is.
 | 5. Grote tikzones | Altijd | Rechter ⅔ van het scherm = volgende, linker ⅓ = vorige; werkt met knokkel/elleboog; toetsenbord (spatie/pijlen) op iPad | Fase 3 |
 | 6. Zwaaien (experiment) | Hand voor de camera = volgende | Vision hand-pose via voorcamera | Geparkeerd; batterij en privacy afwegen |
 
@@ -212,7 +221,7 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 |---|---|---|---|
 | S1 | OCR op echte krantenfoto's: kolommen, glanzend papier, krom blad, `l`/`1` | 10 echte pagina's (blijven lokaal) | Synthetisch gedaan: `1 l groentebouillon` → `1 groentebouillon`, `ë` verdween. Echte foto's nog doen |
 | S2 | Indeling op wisselende layouts: regels vs. Claude | Zelfde 10 pagina's | Synthetisch met on-device model: 100 % juist. Regels en Claude nog te meten |
-| S3 | AirPods/Watch-bediening vraagt "Nu speelt"; telt spraaksynthese daarvoor mee? | Klein testproject | Open |
+| S3 | AirPods/Watch-bediening vraagt "Nu speelt"; telt spraaksynthese daarvoor mee? | In de app achter een proefinstelling (fase 6), testplan in `docs/spikes/S3-airpods.md` | Gebouwd, op toestel te testen |
 | S4 | Altijd luisteren: batterij, warmte, valse commando's bij afzuigkap | 30 min koken met meting | Open |
 | S5 | Geen Apple Intelligence op Peters toestellen (B9) | Regelindeler als basis, Claude optioneel | Ontworpen |
 | S6 | Spraakherkenning en voorlezen op iPhone 14 Plus (A15) en iPad 10 (A14): beschikbaar en snel genoeg? | Testscherm in een vroege TestFlight-build | Open |
@@ -227,7 +236,7 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 | 3 | Kookmodus visueel: stap voor stap, groot, scherm aan, tikzones, afvinken, porties schalen | Bruikbaar in de keuken zonder spraak |
 | 4 | Voorlezen per stap, uitspraakregels, tempo | Vóór spraak: commando's sturen het voorlezen |
 | 5 | Spraakbesturing in de app | Grootste UX-winst, hoogste risico (S4) |
-| 6 | Siri, App Shortcuts, Actieknop, AirPods/Watch | Bouwt op de `KookSessie` van 3–5 |
+| 6 | Siri, App Shortcuts, Spotlight, AirPods/Watch (proef); Actieknop geparkeerd | Bouwt op de `KookSessie` van 3–5. Gebouwd (#7); `ZetTimer` hoort bij fase 7 |
 | 7 | Timers (AlarmKit) en Live Activity | Los te bouwen na fase 3 |
 | 8 | Delen met huisgenoot | Raakt het datamodel; na stabiel gebruik |
 
