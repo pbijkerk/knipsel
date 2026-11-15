@@ -27,12 +27,9 @@ struct ReceptWeergave: View {
     @State private var beschikbareBreedte: CGFloat = 0
     /// Gekozen aantal personen; 0 = zoals in het recept.
     @State private var gekozenPorties = 0
-    @State private var kookSessie: KookSessie?
     @State private var toonFotoBibliotheek = false
     @State private var toonCamera = false
     @State private var bevestigFotoVerwijderen = false
-    /// "Foto maken" na "Gekookt": de camera (of Foto's) opent zodra de kookmodus dicht is.
-    @State private var fotoNaKoken = false
 
     /// ±60–65 tekens per regel bij bodytekst in New York (Dyson, 2004); schaalt mee met de tekstgrootte.
     @ScaledMetric(relativeTo: .body) private var leesbreedte: CGFloat = 560
@@ -95,12 +92,6 @@ struct ReceptWeergave: View {
             }
         }
         .sheet(isPresented: $toonBewerken) { ReceptBewerken(recept: recept) }
-        .fullScreenCover(item: $kookSessie, onDismiss: naKookmodus) { sessie in
-            KookmodusScherm(
-                sessie: sessie, gekookt: legGekooktVast, vraagFoto: !recept.heeftFoto,
-                fotoMaken: { fotoNaKoken = true },
-                gesloten: { KookVoortgang().naSluiten(sessie, recept: recept.objectID.uriRepresentation()) })
-        }
         .gerechtFotoKiezer(recept: recept, bibliotheek: $toonFotoBibliotheek, camera: $toonCamera)
         .confirmationDialog("Foto verwijderen?", isPresented: $bevestigFotoVerwijderen, titleVisibility: .visible) {
             Button("Verwijder foto", role: .destructive, action: verwijderFoto)
@@ -254,7 +245,8 @@ struct ReceptWeergave: View {
 
     private var kookKnop: some View {
         Button {
-            kookSessie = KookSessie(recept: recept, porties: porties > 0 ? porties : nil)
+            // De bibliotheek toont de kookmodus (`VerderMet`), net als bij Siri en *Verder met…*.
+            KookRouter.gedeeld.kook(recept: recept.objectID.uriRepresentation(), porties: porties > 0 ? porties : nil)
         } label: {
             SwiftUI.Label("Kook dit", systemImage: "play.fill")
                 .font(.headline.weight(.bold))
@@ -395,27 +387,6 @@ struct ReceptWeergave: View {
     private func nieuweGroep(_ groep: String?, vorige: String?) -> String? {
         guard let groep, !groep.isEmpty, groep != vorige else { return nil }
         return groep
-    }
-
-    private func legGekooktVast() {
-        KookVoortgang().wis(recept: recept.objectID.uriRepresentation())
-        do {
-            try recept.legGekooktVast()
-        } catch {
-            context.rollback()
-            Logger(subsystem: "com.peterbijkerk.knipsel", category: "Recept")
-                .error("Gekookt vastleggen mislukt: \(error.localizedDescription, privacy: .public)")
-        }
-    }
-
-    private func naKookmodus() {
-        guard fotoNaKoken else { return }
-        fotoNaKoken = false
-        if CameraKiezer.isBeschikbaar {
-            toonCamera = true
-        } else {
-            toonFotoBibliotheek = true
-        }
     }
 
     private func verwijderFoto() {

@@ -52,6 +52,9 @@ final class KookSessie: Identifiable {
     let stappen: [KookStap]
     /// Porties van het recept; 0 = onbekend (dan schaalt er niets).
     let receptPorties: Int
+    /// Voor "Nu speelt" (proef S3): de eigen gerechtfoto (JPEG) of anders het categoriesymbool.
+    let fotoData: Data?
+    let symbool: String
 
     /// Index van de huidige stap (0 = stap 1).
     private(set) var huidigeIndex = 0
@@ -67,6 +70,11 @@ final class KookSessie: Identifiable {
     /// Telt elke gebeurtenis, ook twee keer dezelfde ("herhaal", "herhaal"); handig voor `onChange`.
     private(set) var gebeurtenisNummer = 0
 
+    /// Wordt na elke gebeurtenis meteen aangeroepen, ook als de app op de achtergrond is en SwiftUI
+    /// niet ververst: zo volgt het voorlezen een stapwissel via Siri of AirPods (fase 6). De
+    /// kookmodus zet hem via `ActieveKookSessie`.
+    @ObservationIgnored var opGebeurtenis: ((Gebeurtenis) -> Void)?
+
     /// Per stap de woorden die naar ingrediënten verwijzen.
     private let treffersPerStap: [[Ingredientkoppeling.Treffer]]
 
@@ -74,9 +82,11 @@ final class KookSessie: Identifiable {
     ///   buiten het bereik wordt het de dichtstbijzijnde stap.
     init(
         titel: String, ingredienten: [KookIngredient], stappen: [KookStap], receptPorties: Int, porties: Int? = nil,
-        startIndex: Int = 0
+        startIndex: Int = 0, fotoData: Data? = nil, symbool: String = "fork.knife"
     ) {
         self.titel = titel
+        self.fotoData = fotoData
+        self.symbool = symbool
         huidigeIndex = stappen.isEmpty ? 0 : min(max(0, startIndex), stappen.count - 1)
         self.ingredienten = ingredienten
         self.stappen = stappen
@@ -154,6 +164,7 @@ final class KookSessie: Identifiable {
     private func meld(_ nieuwe: Gebeurtenis, gelukt: Bool = true) -> Bool {
         gebeurtenis = nieuwe
         gebeurtenisNummer += 1
+        opGebeurtenis?(nieuwe)
         return gelukt
     }
 
@@ -225,7 +236,9 @@ extension KookSessie {
         }
         self.init(
             titel: recept.titelOfStandaard, ingredienten: ingredienten, stappen: stappen,
-            receptPorties: Int(recept.porties), porties: porties, startIndex: startIndex)
+            receptPorties: Int(recept.porties), porties: porties, startIndex: startIndex,
+            fotoData: recept.heeftFoto ? recept.fotoData : nil,
+            symbool: recept.gesorteerdeCategorieen.first?.symboolOfStandaard ?? "fork.knife")
     }
 
     /// Verder waar je bleef (`KookVoortgang`): die stap, die porties.

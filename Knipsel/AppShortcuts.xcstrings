@@ -1,0 +1,171 @@
+{
+  "sourceLanguage": "nl",
+  "strings": {
+    "Kook ${recept} met ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kook ${recept} met ${applicationName}"
+          }
+        }
+      }
+    },
+    "Kook met ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kook met ${applicationName}"
+          }
+        }
+      }
+    },
+    "Koken met ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Koken met ${applicationName}"
+          }
+        }
+      }
+    },
+    "Volgende stap in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende stap in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Volgende stap ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Volgende stap ${applicationName}"
+          }
+        }
+      }
+    },
+    "Verder in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verder in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Vorige stap in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorige stap in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Vorige stap ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vorige stap ${applicationName}"
+          }
+        }
+      }
+    },
+    "Terug in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Terug in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Herhaal de stap in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herhaal de stap in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Herhaal in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herhaal in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Herhaal stap ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Herhaal stap ${applicationName}"
+          }
+        }
+      }
+    },
+    "Wat heb ik nodig in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat heb ik nodig in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Wat heb ik nodig ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat heb ik nodig ${applicationName}"
+          }
+        }
+      }
+    },
+    "Ingrediënten in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ingrediënten in ${applicationName}"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

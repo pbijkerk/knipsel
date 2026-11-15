@@ -130,7 +130,10 @@ struct VerderMetKaart: View {
 
 /// "Verder met…" voor de bibliotheek: houdt de afgebroken kookbeurt bij (`keuze`) en opent de
 /// kookmodus op die stap, met die porties, zodra `gestart` gezet wordt. Na "Gekookt" verdwijnt de
-/// kaart; de fotovraag werkt zoals vanuit het recept.
+/// kaart, en Knipsel vraagt om een foto van je gerecht.
+///
+/// Dit is de enige plek die de kookmodus toont (fase 6): ook "Kook dit" in het recept en Siri
+/// (`KookReceptIntent`) openen hem hier, via een verzoek in `KookRouter`.
 struct VerderMet: ViewModifier {
     @Environment(\.managedObjectContext) private var context
     /// Volgt de opslag van `KookVoortgang`, zodat de kaart meteen verschijnt of verdwijnt.
@@ -160,6 +163,12 @@ struct VerderMet: ViewModifier {
             }
             .onChange(of: gestart?.id) {
                 if let gestart { fotoRecept = gestart.recept }
+            }
+            .onChange(of: KookRouter.gedeeld.kookVerzoek?.id, initial: true) {
+                guard let verzoek = KookRouter.gedeeld.neemKookVerzoekAf(),
+                    let nieuw = KookRouter.keuze(voor: verzoek, in: context)
+                else { return }
+                gestart = nieuw
             }
             .fullScreenCover(item: $gestart, onDismiss: naKookmodus) { keuze in
                 VerderKookmodus(

@@ -56,6 +56,7 @@ struct BibliotheekSplit: View {
             pad.removeAll()
         }
         .verderMet($verder, gestart: $verderGestart)
+        .toonReceptVerzoek(pad: $pad)
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
         .sheet(isPresented: $toonKnippen) { KnipStart() }
