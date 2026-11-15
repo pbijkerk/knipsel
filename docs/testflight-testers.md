@@ -45,3 +45,26 @@ dan staat de tekst daar om te kopiëren.
 
 Mensen in je App Store Connect-team (Gebruikers en toegang, rol bijv. *Marketing*), daarna in groep
 `Intern`. Geen beoordeling door Apple, maar ze krijgen een account in jouw App Store Connect.
+
+## Je huisgenoot Knipsel geven (Thuis delen, #9)
+
+Thuis delen werkt alleen als je huisgenoot zelf Knipsel heeft, met een **eigen Apple ID** en iCloud aan.
+Zonder App Store gaat dat via TestFlight, op één van twee manieren:
+
+| | Interne tester | Externe tester |
+|---|---|---|
+| Wat je huisgenoot moet zijn | Gebruiker in jouw App Store Connect-team (Gebruikers en toegang › ＋, rol bijv. *Marketing* of *Ontwikkelaar*); de uitnodiging per e-mail accepteren | Niets: alleen een e-mailadres, of de openbare link |
+| Apple-beoordeling | Nee, elke build meteen | Eerste build van een versie langs *Beta App Review* (meestal < 1 dag) |
+| Xcode Cloud | Zoals nu (*Internal Testing Only*) | Workflow aanpassen, zie *Externe testers toevoegen* hierboven |
+| Nadeel | Huisgenoot krijgt een account in jouw App Store Connect | Wachten op de beoordeling; openbare link kan door anderen gebruikt worden |
+
+Advies: **extern**, groep `Familie`, uitnodigen op e-mailadres (geen openbare link). Daarna:
+
+1. Huisgenoot installeert TestFlight, opent de uitnodiging en installeert Knipsel; iCloud staat aan
+   voor Knipsel (Instellingen › [naam] › iCloud › Apps die iCloud gebruiken).
+2. Jij: zet een recept in Thuis (recept › ⋯ › *Verplaats naar Thuis*), dan Instellingen › *Thuis delen*
+   › *Nodig iemand uit* en stuur de link via Berichten of Mail.
+3. Huisgenoot tikt op de link; Knipsel opent en Thuis verschijnt (dat kan even duren).
+
+Let op: TestFlight-builds praten met de **Production**-omgeving van CloudKit. Rol eerst het schema uit
+(CloudKit Console › Knipsel-container › *Deploy Schema Changes*), anders werkt sync en delen niet.
