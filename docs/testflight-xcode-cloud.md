@@ -35,7 +35,7 @@ Daarna start elke merge naar `main` vanzelf een nieuwe TestFlight-build.
 |---|---|---|
 | 1 / 8 | iCloud (CloudKit), container `iCloud.com.peterbijkerk.knipsel` | Xcode → Signing & Capabilities; container wordt dan aangemaakt |
 | 5 | Microfoon, spraakherkenning | Info.plist-teksten |
-| 7 | AlarmKit, Live Activities | Info.plist + widget-extensie |
+| 7 | AlarmKit, Live Activities | Info.plist + widget-extensie `KnipselWidgets` (zie hieronder) |
 
 ## Deel-extensie (#18)
 
@@ -54,3 +54,20 @@ Capabilities* het team en controleer dat *App Groups* met `group.com.peterbijker
 is; controleer in het portaal dat de groep aan **beide** app-ID's hangt en start de build opnieuw.
 
 Een nieuwe capability vraagt soms een eenmalige handmatige stap in Xcode; die staat dan in het issue.
+
+## Widget-extensie voor Live Activities (#8)
+
+De app bevat sinds fase 7 een widget-extensie `KnipselWidgets` (`PlugIns/KnipselWidgets.appex`) met de
+Live Activities van de kookmodus en de kooktimers, met een **eigen app-ID**
+`com.peterbijkerk.knipsel.widgets`. Die extensie heeft **geen entitlements en geen capabilities**: geen
+App Group, geen iCloud, geen push. AlarmKit en Live Activities vragen geen capability, alleen
+Info.plist-sleutels in de app (`NSAlarmKitUsageDescription`, `NSSupportsLiveActivities`).
+
+Eenmalig in het portaal (developer.apple.com/account › Certificates, IDs & Profiles › Identifiers › ＋ ›
+App IDs › App): Explicit `com.peterbijkerk.knipsel.widgets`, beschrijving "Knipsel Widgets", **geen**
+capabilities aanvinken › Continue › Register. Signing is automatisch; versie en buildnummer lopen mee
+met de app.
+
+Faalt een Xcode Cloud-build op signing (*"No profiles for 'com.peterbijkerk.knipsel.widgets'"*): controleer
+dat de app-ID bestaat, open het project eenmalig in Xcode, kies bij het target KnipselWidgets onder
+*Signing & Capabilities* het team (automatisch beheer) en start de build opnieuw.
