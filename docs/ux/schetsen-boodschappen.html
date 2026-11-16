@@ -1,0 +1,205 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>Knipsel — boodschappenlijst</title><style>
+:root{--tomaat:#D9613C;--tomaat-d:#B24B2A;--papier:#FBF7F0;--kaart:#F0E8DC;--inkt:#2B2622;--gedimd:#6F665C;--lijn:#E2D8C9;
+--serif:"New York","Iowan Old Style",Charter,Georgia,serif;--sans:-apple-system,"SF Pro Text",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:#EDE6DA;color:var(--inkt);padding:28px 20px 60px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-family:var(--serif);font-size:34px;letter-spacing:-.5px}
+h2{font-family:var(--serif);font-size:24px;margin:34px 0 10px}
+.lead{color:var(--gedimd);max-width:820px;margin-top:8px;font-size:15px}
+.note{background:#fff8;border-left:4px solid var(--tomaat);padding:10px 14px;margin:14px 0;font-size:14px;max-width:900px;border-radius:0 8px 8px 0}
+table.eisen{border-collapse:collapse;width:100%;font-size:13.5px;background:#fffc;border-radius:12px;overflow:hidden}
+.eisen th,.eisen td{padding:9px 11px;text-align:left;vertical-align:top;border-bottom:1px solid var(--lijn)}
+.eisen th{background:var(--kaart);font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--gedimd)}
+.eisen td:first-child{font-weight:700;color:var(--tomaat-d);white-space:nowrap}
+/* tabs, CSS-only */
+.tabs input{display:none}
+.tabbar{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 18px;position:sticky;top:0;background:#EDE6DA;padding:8px 0;z-index:5}
+.tabbar label{padding:9px 16px;border-radius:999px;background:#fff;cursor:pointer;font-weight:600;font-size:14px;border:1px solid var(--lijn)}
+.panel{display:none}
+#t1:checked~.tabbar label[for=t1],#t2:checked~.tabbar label[for=t2],#t3:checked~.tabbar label[for=t3],#t4:checked~.tabbar label[for=t4],#t5:checked~.tabbar label[for=t5]{background:var(--tomaat);color:#fff;border-color:var(--tomaat)}
+#t1:checked~#p1,#t2:checked~#p2,#t3:checked~#p3,#t4:checked~#p4,#t5:checked~#p5{display:block}
+.nu{background:#fff;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:14px}
+.nu b{color:var(--tomaat-d)}
+.nu ul{margin:6px 0 0 18px}
+.rij{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.optie{width:340px}
+.optie h3{font-family:var(--serif);font-size:19px;margin:12px 0 4px}
+.optie .tag{display:inline-block;font-size:11px;font-weight:700;background:var(--kaart);color:var(--tomaat-d);padding:2px 7px;border-radius:6px;margin:0 4px 4px 0}
+.optie p{font-size:13.5px;margin:5px 0}
+.optie p b{color:var(--gedimd);font-weight:600}
+.btn{display:inline-block;margin-top:8px;background:var(--inkt);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer}
+.aanrader{background:var(--tomaat);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle;font-family:var(--sans)}
+/* telefoon */
+.tel{width:340px;height:700px;border-radius:46px;background:#111;padding:11px;box-shadow:0 18px 40px #0003}
+.scherm{width:100%;height:100%;border-radius:36px;background:#fff;overflow:hidden;position:relative;font-size:13px}
+.status{height:40px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-weight:600;font-size:13px}
+.ipad{width:760px;height:540px;border-radius:30px;background:#111;padding:12px;box-shadow:0 18px 40px #0003}
+.ipad .scherm{border-radius:20px}
+.optie.breed{width:760px}
+/* bouwstenen */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:4px 16px}
+.rond{width:34px;height:34px;border-radius:50%;background:#f2f0ed;display:flex;align-items:center;justify-content:center;font-size:15px}
+.groot{font-family:var(--serif);font-weight:700;font-size:28px;padding:4px 16px 8px}
+.chips{display:flex;gap:6px;padding:4px 16px 10px;overflow:hidden;white-space:nowrap}
+.chip{padding:5px 11px;border-radius:999px;background:#f2f0ed;font-size:12px;font-weight:500}
+.chip.aan{background:#fff;border:1.5px solid var(--tomaat);color:var(--tomaat-d)}
+.zoek{position:absolute;left:16px;right:16px;bottom:22px;height:42px;border-radius:21px;background:#fff;box-shadow:0 4px 18px #0002;display:flex;align-items:center;padding:0 14px;color:#888;gap:8px}
+.serif{font-family:var(--serif)}
+.klein{font-size:11px;color:var(--gedimd)}
+.tom{color:var(--tomaat-d)}
+.fab{position:absolute;right:18px;bottom:78px;height:52px;padding:0 20px;border-radius:26px;background:var(--tomaat);color:#fff;display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 6px 18px #D9613C66}
+/* receptkaarten */
+.raster{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}
+.rkaart{border-radius:16px;height:150px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.rkaart .t{font-family:var(--serif);font-weight:700;font-size:15px;line-height:1.15}
+.rkaart .sym{font-size:30px;opacity:.9}
+.k-soep{background:#F6E3C8}.k-sal{background:#DDE9CF}.k-hoofd{background:#EBD3CB}.k-na{background:#EADCF0}.k-lunch{background:#F3EBC5}.k-brood{background:#EFE2D1}
+.foto{background-size:cover;background-position:center;color:#fff}
+.foto::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,#0009)}
+.foto>*{position:relative;z-index:1}
+.f1{background-image:radial-gradient(circle at 35% 40%,#F2A54A 0 22%,#E07B28 23% 36%,#5b3a22 37% 40%,#efe6d6 41%)}
+.f2{background-image:radial-gradient(circle at 60% 55%,#7aa35a 0 18%,#b9d38f 19% 30%,#e6d8b8 31% 36%,#3d5c3a 37%)}
+.f3{background-image:radial-gradient(ellipse at 50% 60%,#8a3324 0 30%,#5a2318 31% 40%,#d9c7ad 41%)}
+/* lijst */
+.lrij{display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid #eee}
+.lsym{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.ltitel{font-family:var(--serif);font-weight:700;font-size:15px}
+/* recept */
+.balk-onder{position:absolute;left:12px;right:12px;bottom:18px;height:62px;border-radius:31px;background:#fff;box-shadow:0 6px 24px #0002;display:flex;align-items:center;padding:0 8px 0 18px;gap:10px}
+.kookknop{margin-left:auto;background:var(--tomaat);color:#fff;font-weight:700;border-radius:24px;height:46px;padding:0 20px;display:flex;align-items:center;gap:6px}
+.stepper{display:flex;align-items:center;gap:10px;font-weight:600}
+.stepper span{width:28px;height:28px;border-radius:50%;background:#f2f0ed;display:flex;align-items:center;justify-content:center}
+.ing{display:flex;gap:9px;padding:5px 16px;font-family:var(--serif);font-size:14px}
+.ing i{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--tomaat);flex:none;margin-top:3px}
+.ing i.af{background:var(--tomaat)}
+.ing.af{color:#aaa;text-decoration:line-through}
+.seg{display:flex;margin:6px 16px 10px;background:#f2f0ed;border-radius:10px;padding:3px}
+.seg div{flex:1;text-align:center;padding:6px;border-radius:8px;font-weight:600;font-size:12px;color:var(--gedimd)}
+.seg .aan{background:#fff;color:var(--inkt);box-shadow:0 1px 3px #0002}
+.blok{background:#f7f4ef;border-radius:16px;margin:8px 14px;padding:12px}
+.tijdlijn{display:flex;gap:6px;margin:6px 16px}
+.tijdlijn div{flex:1;background:#f7f4ef;border-radius:12px;padding:8px;text-align:center}
+.tijdlijn b{display:block;font-size:15px}
+/* kookmodus */
+.kook{background:var(--papier);height:calc(100% - 40px);position:relative}
+.ipad .kook{height:100%}
+.voortgang{display:flex;gap:4px;padding:6px 16px}
+.voortgang div{flex:1;height:5px;border-radius:3px;background:var(--lijn)}
+.voortgang .g{background:var(--tomaat)}.voortgang .h{background:var(--inkt)}
+.stap{font-family:var(--serif);font-size:29px;line-height:1.22;padding:14px 18px}
+.stap em{font-style:normal;color:var(--tomaat-d);font-weight:700}
+.nodig{background:var(--kaart);border-radius:14px;margin:4px 16px;padding:10px 12px}
+.navknoppen{position:absolute;left:12px;right:12px;bottom:18px;display:flex;gap:10px}
+.navknoppen div{height:76px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+.terug{width:96px;background:var(--kaart)}
+.verder{flex:1;background:var(--inkt);color:var(--papier)}
+.mic{display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;margin:0 16px;width:max-content}
+.mic .stip{width:8px;height:8px;border-radius:50%;background:#3BA55C;box-shadow:0 0 0 4px #3BA55C33}
+.gluur{position:absolute;left:0;right:0;bottom:0;height:150px;background:#fff;border-radius:26px 26px 0 0;box-shadow:0 -6px 20px #0001;padding:12px 18px}
+.greep{width:40px;height:5px;border-radius:3px;background:#ddd;margin:0 auto 10px}
+.timerchip{display:inline-flex;align-items:center;gap:8px;background:var(--tomaat);color:#fff;border-radius:16px;padding:12px 16px;font-weight:700;font-size:16px;margin:6px 16px}
+.zone{position:absolute;top:110px;bottom:120px;width:50%;display:flex;align-items:center;justify-content:center;color:#0002;font-size:44px;font-weight:200}
+/* ipad */
+.kol{position:absolute;top:0;bottom:0;overflow:hidden}
+
+.kook{background:var(--papier);height:calc(100% - 40px);position:relative}
+.vink{width:20px;height:20px;border-radius:50%;border:1.6px solid var(--tomaat);flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
+.vink.aan{background:var(--tomaat)}
+.vink.uit{border-color:#ccc}
+.br{display:flex;gap:10px;align-items:center;padding:7px 16px;font-family:var(--serif);font-size:14px}
+.br.uit{color:#aaa}
+.br .h{margin-left:auto;font-family:var(--sans);font-size:11px;color:var(--gedimd)}
+.sec{font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--gedimd);padding:10px 16px 2px}
+.vel{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px #0003}
+.dim{position:absolute;inset:0;background:#0004}
+.knopbreed{margin:10px 16px 18px;height:50px;border-radius:25px;background:var(--tomaat);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px}
+.knopgrijs{margin:0 16px 14px;height:44px;border-radius:22px;background:#f2f0ed;font-weight:600;display:flex;align-items:center;justify-content:center;font-size:13px}
+.tabbar2{position:absolute;left:30px;right:30px;bottom:18px;height:56px;border-radius:28px;background:#fff;box-shadow:0 6px 20px #0002;display:flex;justify-content:space-around;align-items:center;font-size:10px;color:var(--gedimd);text-align:center}
+.tabbar2 b{display:block;font-size:18px}
+.tabbar2 .aan{color:var(--tomaat-d)}
+.herkomst{display:inline-block;font-size:9.5px;background:var(--kaart);color:var(--tomaat-d);border-radius:5px;padding:1px 5px;margin-left:4px;font-family:var(--sans)}
+.dag{display:flex;gap:10px;align-items:center;padding:8px 16px;border-bottom:1px solid #f0ebe3}
+.dag .d{width:34px;font-weight:700;font-size:12px;color:var(--gedimd)}
+.dag .r{flex:1;border-radius:12px;padding:8px 10px;font-family:var(--serif);font-weight:700;font-size:13px}
+.leeg{border:1.5px dashed #ddd;color:#bbb!important;font-family:var(--sans)!important;font-weight:500!important}
+.rem{background:#f2f2f7;height:calc(100% - 40px)}
+.rem .kop{font-size:26px;font-weight:800;color:#e8833a;padding:6px 16px}
+.rem .sec{color:#8a8a8e}
+.rem .br{font-family:var(--sans)}
+</style></head><body><div class="wrap">
+<h1>Knipsel — boodschappenlijst uit een recept</h1>
+<p class="lead">Schetsen · 16 november 2026. Verzoek: een boodschappenlijstje maken vanuit een recept. Drie vragen: hoe start je het vanuit het recept, waar staat de lijst, en hoe combineer je meerdere recepten. Alle recepten en hoeveelheden zijn verzonnen.</p>
+<h2>Eisen L1–L7</h2><table class="eisen"><tr><th>Eis</th><th>Wat</th><th>Basis</th></tr><tr><td>L1</td><td><b>Geschaald</b><br>De hoeveelheden volgen het gekozen aantal personen, met nette breuken.</td><td>Bestaat al (Portieschaling); zonder schalen klopt je lijst niet.</td></tr><tr><td>L2</td><td><b>Weg wat je al hebt</b><br>Uitvinken wat in huis is; zout, peper en olie staan standaard uit.</td><td>Mela/Paprika; default-effect (Johnson & Goldstein, 2003).</td></tr><tr><td>L3</td><td><b>Nooit stil iets weglaten</b><br>Wat Knipsel niet kan lezen ("wat zout") komt er als tekst op, niet weg.</td><td>Zelfde regel als K2: zichtbaar maken, niet raden.</td></tr><tr><td>L4</td><td><b>Je eigen lijst-app mag</b><br>Herinneringen of delen als tekst, zodat je niet hoeft te wisselen.</td><td>Autonomie (Deci & Ryan, 2000); Crouton ↔ Herinneringen.</td></tr><tr><td>L5</td><td><b>Optellen over recepten</b><br>2 uien + 1 ui = 3 uien; ml en l bij elkaar.</td><td>Anders staat hetzelfde product twee keer op de lijst.</td></tr><tr><td>L6</td><td><b>Privé</b><br>Lijst blijft op het toestel/iCloud; Claude alleen voor indelen als die aan staat.</td><td>K12.</td></tr><tr><td>L7</td><td><b>In winkelvolgorde</b><br>Gegroepeerd per afdeling.</td><td>Hui, Bradlow & Fader (2009); Block & Morwitz (1999) over lijsten als extern geheugen.</td></tr></table>
+<div class="tabs">
+<input type="radio" name="t" id="t1" checked><input type="radio" name="t" id="t2"><input type="radio" name="t" id="t3"><input type="radio" name="t" id="t4"><input type="radio" name="t" id="t5">
+<div class="tabbar"><label for="t1">1 · Vanuit het recept</label><label for="t2">2 · De lijst</label><label for="t3">3 · Meer recepten</label><label for="t4">Volgorde</label></div>
+<div class="panel" id="p1"><div class="rij"><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">‹</div><div class="rond">⋯</div></div>
+<div class="groot" style="font-size:24px">Pompoensoep met gember</div>
+<div class="ing"><i></i><span><b>1</b> flespompoen</span></div><div class="ing"><i></i><span><b>2</b> uien</span></div><div class="dim"></div><div class="vel"><div class="greep" style="margin-top:8px"></div>
+<div style="padding:0 16px"><div style="font-weight:700;font-size:17px">Boodschappen · 4 personen</div>
+<div class="klein">Vink uit wat je al in huis hebt.</div></div>
+<div class="br"><span class="vink aan">✓</span><span><b>1</b> flespompoen</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>2</b> uien</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>3 cm</b> verse gember</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>1 l</b> groentebouillon</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>200 ml</b> kokosmelk</span><span class="h"></span></div>
+<div class="sec">MEESTAL IN HUIS</div>
+<div class="br uit"><span class="vink uit"></span><span><b>2 el</b> olijfolie</span><span class="h"></span></div><div class="br uit"><span class="vink uit"></span><span><b></b> zout en peper</span><span class="h"></span></div>
+<div class="knopbreed">Zet 5 op de lijst</div></div></div></div><h3>1A · Vel met afvinken<span class="aanrader">mijn voorkeur</span></h3><div><span class="tag">L1</span><span class="tag">L2</span><span class="tag">L3</span></div><p><b>Idee</b> — Onderin de receptbalk een 🛒-knop. Er schuift een vel omhoog met alle ingrediënten, al geschaald naar het gekozen aantal personen en standaard aangevinkt. Wat je meestal in huis hebt (olie, zout, peper) staat onderaan, al uitgevinkt. Eén knop zet de rest op de lijst.</p><p><b>Basis</b> — Zo doen Mela en Paprika het: een popover met alles vooraf aangevinkt, en jij vinkt uit wat je al hebt (MacStories, review Mela 2021). Kiezen door uit te vinken gaat sneller dan aanvinken, omdat je de meeste dingen toch nodig hebt (default-effect, Johnson & Goldstein 2003).</p><p><b>Afweging</b> — Eén extra scherm, maar je ziet in één oogopslag wat er op de lijst komt.</p><button class="btn" data-hermes-send="Knipsel boodschappen: werk 1A (vel met afvinken) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">‹</div><div class="rond">⋯</div></div>
+<div class="groot" style="font-size:24px">Pompoensoep met gember</div>
+<div class="serif" style="font-weight:700;font-size:16px;padding:6px 16px 2px">Ingrediënten · voor 4</div>
+<div class="ing"><i class="af"></i><span><b>1</b> flespompoen <span class="herkomst">🛒 op lijst</span></span></div>
+<div class="ing"><i class="af"></i><span><b>2</b> uien <span class="herkomst">🛒 op lijst</span></span></div>
+<div class="ing"><i></i><span><b>3 cm</b> verse gember</span></div>
+<div class="ing"><i></i><span><b>2 el</b> olijfolie</span></div>
+<div class="ing"><i class="af"></i><span><b>1 l</b> groentebouillon <span class="herkomst">🛒 op lijst</span></span></div>
+<div class="ing"><i></i><span><b>200 ml</b> kokosmelk</span></div>
+<div style="margin:10px 16px;padding:10px 12px;background:var(--kaart);border-radius:12px;font-size:12px">Tik op een ingrediënt om het op de lijst te zetten · <b class="tom">Alles op de lijst</b></div>
+<div class="balk-onder"><div class="stepper"><span>−</span>4<span>＋</span></div><div style="font-size:20px">🛒<sup style="font-size:10px;color:var(--tomaat-d)">3</sup></div><div class="kookknop">▶ Kook dit</div></div></div></div><h3>1B · Per ingrediënt tikken</h3><div><span class="tag">L2</span></div><p><b>Idee</b> — Geen apart scherm. In het recept tik je op een ingrediënt om het op de lijst te zetten; er komt een 🛒-labeltje bij. In de balk zie je hoeveel er op de lijst staan.</p><p><b>Basis</b> — Er is geen modus om tussen te wisselen, je doet het waar je al bent (direct manipulation, Shneiderman 1983).</p><p><b>Afweging</b> — Tikken op een ingrediënt vinkt het nu af (voorbereiden). Twee betekenissen op dezelfde tik is verwarrend, en bij tien ingrediënten zijn het tien tikken.</p><button class="btn" data-hermes-send="Knipsel boodschappen: werk 1B (per ingrediënt) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">‹</div><div class="rond">⋯</div></div>
+<div class="groot" style="font-size:24px">Pompoensoep met gember</div>
+<div class="ing"><i></i><span><b>1</b> flespompoen</span></div><div class="ing"><i></i><span><b>2</b> uien</span></div><div class="dim"></div><div class="vel"><div class="greep" style="margin-top:8px"></div>
+<div style="padding:0 16px 6px"><div style="font-weight:700;font-size:17px">Boodschappen voor 4</div><div class="klein">7 ingrediënten · 2 meestal in huis</div></div>
+<div class="knopbreed">🛒 Naar mijn lijst in Knipsel</div>
+<div class="knopgrijs">☑︎ Naar Herinneringen · „Boodschappen”</div>
+<div class="knopgrijs">↗︎ Delen als tekst (WhatsApp, AH-app…)</div>
+<div class="klein" style="text-align:center;padding-bottom:16px">Je laatste keuze wordt de standaard</div></div></div></div><h3>1C · Kies waarheen</h3><div><span class="tag">L4</span><span class="tag">L6</span></div><p><b>Idee</b> — De 🛒-knop vraagt eerst waar de lijst heen moet: de lijst in Knipsel, Herinneringen of delen als tekst. Na de eerste keer onthoudt hij je keuze.</p><p><b>Basis</b> — Laat iedereen zijn eigen lijst-app houden: veel huishoudens hebben al een gedeelde lijst in Herinneringen of de AH-app (gebruikersautonomie, Deci & Ryan 2000).</p><p><b>Afweging</b> — Een extra vraag elke eerste keer; zonder 1A-vel weet je niet precies wat er overgaat.</p><button class="btn" data-hermes-send="Knipsel boodschappen: werk 1C (kies waarheen) uit">Uitwerken</button></div></div></div>
+<div class="panel" id="p2"><div class="rij"><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="groot">Boodschappen</div>
+<div class="klein" style="padding:0 16px 4px">Voor: Pompoensoep (4) · Linzensalade (2)</div>
+<div class="sec">GROENTE & FRUIT</div>
+<div class="br"><span class="vink aan">✓</span><span><b>3</b> uien</span><span class="h">2 + 1</span></div><div class="br"><span class="vink aan">✓</span><span><b>1</b> flespompoen</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>3 cm</b> verse gember</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>1</b> rode ui</span><span class="h"></span></div>
+<div class="sec">ZUIVEL & EIEREN</div><div class="br"><span class="vink aan">✓</span><span><b>100 g</b> feta</span><span class="h"></span></div>
+<div class="sec">HOUDBAAR</div><div class="br"><span class="vink aan">✓</span><span><b>1 l</b> groentebouillon</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>200 ml</b> kokosmelk</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>250 g</b> linzen</span><span class="h"></span></div>
+<div class="sec">AFGEVINKT</div><div class="br uit"><span class="vink aan">✓</span><span><b>1</b> citroen</span><span class="h"></span></div>
+<div class="tabbar2"><div><b>📚</b>Recepten</div><div class="aan"><b>🛒</b>Boodschappen</div><div><b>⚙︎</b>Instellingen</div></div></div></div><h3>2A · Eigen lijst, per afdeling<span class="aanrader">mijn voorkeur</span></h3><div><span class="tag">L1</span><span class="tag">L5</span><span class="tag">L7</span></div><p><b>Idee</b> — Een eigen tab Boodschappen. Gelijke ingrediënten uit verschillende recepten worden opgeteld (2 + 1 uien = 3 uien), gesorteerd op afdeling in de winkel. Afgevinkte items zakken naar onderen. Staat de lijst in het kookboek Thuis, dan zien jij en je huisgenoot dezelfde lijst.</p><p><b>Basis</b> — Een lijst werkt als extern geheugen: wie met een lijst winkelt, vergeet minder en koopt minder op impuls (Block & Morwitz, 1999). Sorteren op afdeling scheelt heen en weer lopen (Hui, Bradlow & Fader, 2009, looppaden in de supermarkt).</p><p><b>Afweging</b> — Het meeste werk: optellen vraagt dat eenheden kloppen ("1 l" en "250 ml"), en de afdeling moet per ingrediënt bekend zijn (woordenlijst, met Claude als terugval). Wel het mooiste en het meest Knipsel-eigen.</p><button class="btn" data-hermes-send="Knipsel boodschappen: werk 2A (eigen lijst per afdeling) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="rem"><div class="kop">Boodschappen</div>
+<div class="sec">GROENTE EN FRUIT</div>
+<div class="br"><span class="vink aan">✓</span><span><b></b> Uien</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b></b> Flespompoen</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b></b> Verse gember</span><span class="h"></span></div>
+<div class="sec">ZUIVEL</div><div class="br"><span class="vink aan">✓</span><span><b></b> Feta</span><span class="h"></span></div>
+<div class="sec">HOUDBAAR</div><div class="br"><span class="vink aan">✓</span><span><b></b> Groentebouillon</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b></b> Kokosmelk</span><span class="h"></span></div>
+<div class="klein" style="padding:10px 16px">Notitie bij elk item: „3 stuks · Pompoensoep (Knipsel)”</div>
+<div style="position:absolute;bottom:28px;left:16px;color:#e8833a;font-weight:600">⊕ Nieuwe herinnering</div></div></div></div><h3>2B · Alleen Herinneringen</h3><div><span class="tag">L4</span><span class="tag">L6</span></div><p><b>Idee</b> — Knipsel heeft geen eigen lijst, maar zet de items in een lijst "Boodschappen" in de app Herinneringen. Herinneringen deelt ze automatisch in per afdeling (iOS 17 en later), en je kunt die lijst al delen met je huisgenoot.</p><p><b>Basis</b> — Hergebruik wat Apple al goed doet; Crouton synchroniseert ook met Herinneringen (MacStories). Je hebt de lijst op je Watch, je kunt hem met Siri aanvullen ("zet melk op de boodschappenlijst") en hij werkt in Plannen.</p><p><b>Afweging</b> — Weinig werk en betrouwbaar. Maar optellen moet Knipsel zelf doen voordat het overzet, en wat je later aanpast in Herinneringen ziet Knipsel niet. Vraagt toegang tot Herinneringen.</p><button class="btn" data-hermes-send="Knipsel boodschappen: werk 2B (Herinneringen) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="groot">Boodschappen</div>
+<div style="display:flex;gap:6px;padding:0 16px 8px"><span class="chip aan">Per recept</span><span class="chip">Per afdeling</span></div>
+<div class="blok"><div style="display:flex;justify-content:space-between"><b class="serif">Pompoensoep · 4</b><span class="klein">3/6</span></div>
+<div class="br uit"><span class="vink aan">✓</span><span><b>1</b> flespompoen</span><span class="h"></span></div><div class="br uit"><span class="vink aan">✓</span><span><b>2</b> uien</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>3 cm</b> gember</span><span class="h"></span></div></div>
+<div class="blok"><div style="display:flex;justify-content:space-between"><b class="serif">Linzensalade · 2</b><span class="klein">0/4</span></div>
+<div class="br"><span class="vink aan">✓</span><span><b>250 g</b> linzen</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>100 g</b> feta</span><span class="h"></span></div><div class="br"><span class="vink aan">✓</span><span><b>1</b> rode ui</span><span class="h"></span></div></div>
+<div class="tabbar2"><div><b>📚</b>Recepten</div><div class="aan"><b>🛒</b>Boodschappen</div><div><b>⚙︎</b>Instellingen</div></div></div></div><h3>2C · Eigen lijst, per recept</h3><div><span class="tag">L5</span></div><p><b>Idee</b> — Eigen tab, maar gegroepeerd per recept met de voortgang (3 van 6). Met een knop wissel je naar per afdeling.</p><p><b>Basis</b> — Handig als je voor één gerecht nog iets mist. Eenvoudiger te bouwen, want er hoeft niets opgeteld te worden.</p><p><b>Afweging</b> — In de winkel loop je toch per afdeling, dus de standaardweergave per recept betekent dubbel lopen voor de uien.</p><button class="btn" data-hermes-send="Knipsel boodschappen: werk 2C (per recept) uit">Uitwerken</button></div></div></div>
+<div class="panel" id="p3"><div class="rij"><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">⚙︎</div><div class="rond">＋</div></div><div class="groot">Recepten</div>
+<div class="raster">
+<div class="rkaart k-soep"><div style="display:flex;justify-content:space-between"><span class="sym">🥣</span><span class="vink aan" style="width:24px;height:24px">✓</span></div><div class="t">Pompoensoep met gember</div></div>
+<div class="rkaart k-sal"><div style="display:flex;justify-content:space-between"><span class="sym">🥗</span><span class="vink aan" style="width:24px;height:24px">✓</span></div><div class="t">Lauwwarme linzensalade</div></div>
+<div class="rkaart k-hoofd"><div style="display:flex;justify-content:space-between"><span class="sym">🍲</span><span class="vink uit" style="width:24px;height:24px;background:#fff8"></span></div><div class="t">Stoofpot met rode wijn</div></div>
+<div class="rkaart k-lunch"><div style="display:flex;justify-content:space-between"><span class="sym">🥧</span><span class="vink uit" style="width:24px;height:24px;background:#fff8"></span></div><div class="t">Prei-quiche</div></div></div>
+<div class="knopbreed" style="position:absolute;left:0;right:0;bottom:24px">🛒 Boodschappen voor 2 recepten</div></div></div><h3>3A · Meerdere recepten kiezen<span class="aanrader">mijn voorkeur</span></h3><div><span class="tag">L5</span></div><p><b>Idee</b> — In de bibliotheek kies je met Selecteer een paar recepten en maak je één lijst. Daarna kom je in hetzelfde vel als bij 1A, nu met alles opgeteld.</p><p><b>Basis</b> — Klein en past bij hoe je nu kookt: je kiest op zaterdag een paar recepten. Bouwt voort op 1A en 2A.</p><p><b>Afweging</b> — Je moet het aantal personen per recept nog kiezen (standaard dat van het recept).</p><button class="btn" data-hermes-send="Knipsel boodschappen: werk 3A (meerdere kiezen) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm "><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="groot">Deze week</div>
+<div class="dag"><span class="d">ma</span><div class="r k-soep">Pompoensoep · 4</div></div>
+<div class="dag"><span class="d">di</span><div class="r leeg">＋ recept</div></div>
+<div class="dag"><span class="d">wo</span><div class="r k-sal">Linzensalade · 2</div></div>
+<div class="dag"><span class="d">do</span><div class="r k-hoofd">Stoofpot · 4</div></div>
+<div class="dag"><span class="d">vr</span><div class="r leeg">＋ recept</div></div>
+<div class="dag"><span class="d">za</span><div class="r leeg">＋ recept</div></div>
+<div class="dag"><span class="d">zo</span><div class="r k-na">Rabarbercrumble · 6</div></div>
+<div class="knopbreed" style="position:absolute;left:0;right:0;bottom:70px">🛒 Maak boodschappenlijst (19)</div></div></div><h3>3B · Weekmenu</h3><div><span class="tag">L5</span><span class="tag">L7</span></div><p><b>Idee</b> — Een weekplanner: sleep recepten naar dagen, met het aantal personen per dag. Eén knop maakt de lijst voor de hele week. In Thuis plannen jullie samen.</p><p><b>Basis</b> — Vooruit plannen hangt samen met gezonder eten en minder verspilling (Ducrot e.a., 2017; meal planning-studie in Frankrijk). Mela en Crouton hebben het allebei.</p><p><b>Afweging</b> — Een flinke nieuwe functie: datamodel voor planning, delen in Thuis, herinneringen. Eerder een eigen fase dan een onderdeel van de boodschappenlijst.</p><button class="btn" data-hermes-send="Knipsel boodschappen: werk 3B (weekmenu) uit">Uitwerken</button></div></div></div>
+<div class="panel" id="p4"><table class="eisen"><tr><th>Stap</th><th>Wat</th><th>Waarom</th></tr>
+<tr><td>1</td><td>1A vel met afvinken + 2B naar Herinneringen + delen als tekst</td><td>Snel bruikbaar, weinig risico, werkt meteen met je huisgenoot via een gedeelde Herinneringen-lijst.</td></tr>
+<tr><td>2</td><td>2A eigen lijst per afdeling (ook in Thuis)</td><td>Als je merkt dat optellen/afdelingen in Herinneringen tekortschieten.</td></tr>
+<tr><td>3</td><td>3A meerdere recepten kiezen</td><td>Bouwt op 1A + 2A.</td></tr>
+<tr><td>Geparkeerd</td><td>1B, 1C, 2C, 3B weekmenu</td><td>1B botst met afvinken; 3B is een eigen fase.</td></tr></table></div>
+</div>
+<h2>Bronnen</h2><p class="lead" style="font-size:13px">Block, L. G., & Morwitz, V. G. (1999). Shopping lists as an external memory aid for grocery shopping. <i>Journal of Consumer Psychology</i>, 8(4) · Deci & Ryan (2000) · Ducrot, P. e.a. (2017). Meal planning is associated with food variety, diet quality and body weight status. <i>IJBNPA</i>, 14 · Hui, S. K., Bradlow, E. T., & Fader, P. S. (2009). Testing behavioral hypotheses using an integrated model of grocery store shopping path and purchase behavior. <i>Journal of Consumer Research</i>, 36(3) · Johnson & Goldstein (2003). Do defaults save lives? <i>Science</i> · Shneiderman (1983). Praktijk: MacStories-reviews van Mela en Crouton; Apple Herinneringen (boodschappenlijst, iOS 17).</p>
+</div></body></html>
