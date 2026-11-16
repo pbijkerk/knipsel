@@ -103,6 +103,24 @@ Gekozen door Peter: Kookmodus A + iPad B (#21), Recept A (#22), Bibliotheek A �
 
 - Scherm blijft aan (`isIdleTimerDisabled`) zolang de kookmodus open is.
 - Live Activity op het vergrendelscherm (alle toestellen) en in het Dynamic Island (alleen iPhone 15 Plus): "Stap 3 van 4 · ⏱ 18:42".
+- **Timers (fase 7, #8).** `TijdHerkenner` haalt de tijden uit de staptekst ("20 minuten", "20 min.",
+  "1½ uur", "anderhalf uur", "1 uur en 15 minuten", "een kwartier", "drie kwartier", "een minuut of
+  vijf", "45 seconden"); een bereik ("10-15 min", "10 à 15 minuten") geeft de bovengrens als timer en
+  het bereik in beeld. Temperaturen, "2 el", jaartallen en kloktijden ("om 18.00 uur") tellen niet.
+  Bij bewaren (knippen, inlezen, bewerken) krijgt `Stap.timerSeconden` de langste tijd; oude recepten
+  zonder die waarde krijgen hem in de kookmodus uit de tekst. In de kookmodus staat bij elke tijd een
+  tomaatrode knop "⏱ Timer 20 min"; lopende timers staan als chips boven de knoppen onderin (tik =
+  pauzeren, verder, stoppen). `TimerService` zet ze als AlarmKit-countdown (alarm ook op slot en op
+  stil, "Nog 1 min" bij het alarm, meerdere tegelijk, elk met recept + stap als naam, bv. "Pompoensoep
+  · Stap 3: laat 20 minuten zachtjes koken"). Zonder toestemming voor alarmen lopen ze alleen in de app
+  en zegt Knipsel het als ze klaar zijn. Na het voorlezen van een stap met een tijd vraagt Knipsel
+  "Zal ik een timer van 20 minuten zetten?" (niet als er voor die stap al een loopt).
+- **Live Activities (fase 7).** De widget-extensie `KnipselWidgets` levert twee: de kookmodus
+  (`KookActivityAttributes`: "Stap 3 van 7 · titel", de stap kort, de eerstvolgende timer die zelf
+  aftelt, knoppen vorige/herhaal/volgende als `LiveActivityIntent` die in de app draaien) zolang de
+  kookmodus open is — weg bij sluiten en bij *Gekookt* — en per timer de AlarmKit-weergave
+  (`AlarmAttributes<KookTimerMetadata>`: aftellen, pauze/verder, stop). Lopende timers blijven lopen
+  als de kookmodus dicht gaat.
 - Ingrediënten die in de huidige stap voorkomen worden in de lijst uitgelicht; afvinken kan met "gedaan".
 
 ## 4. Bediening zonder handen — lagen
@@ -110,7 +128,7 @@ Gekozen door Peter: Kookmodus A + iPad B (#21), Recept A (#22), Bibliotheek A �
 | Laag | Wanneer | Techniek | Status |
 |---|---|---|---|
 | 1. Stem in de app (primair) | Tijdens koken, app open | `SpeechAnalyzer` + `DictationTranscriber` (`nl_NL` on-device, gecontroleerd); terugval `SFSpeechRecognizer` on-device. `AVAudioEngine` met *voice processing* (echo-onderdrukking), zodat Knipsel zijn eigen stem niet hoort en "stop" midden in het voorlezen werkt. | Kern, fase 5 |
-| 2. Siri / App Shortcuts | Starten, of app op achtergrond / vergrendeld | App Intents: `KookReceptIntent` (met `ReceptEntiteit`, zoekbaar op titel en ingrediënt), `VolgendeStapIntent`, `VorigeStapIntent`, `HerhaalStapIntent`, `LeesIngredientenIntent`; Nederlandse zinnen in `KnipselOpdrachten` ("Kook pompoensoep met Knipsel", "Volgende stap in Knipsel", …). Recepten staan in Spotlight (`IndexedEntity`). `ZetTimer` volgt in fase 7 (#8). | Gebouwd in fase 6 (#7); Nederlandse zinnen op toestel nog te testen |
+| 2. Siri / App Shortcuts | Starten, of app op achtergrond / vergrendeld | App Intents: `KookReceptIntent` (met `ReceptEntiteit`, zoekbaar op titel en ingrediënt), `VolgendeStapIntent`, `VorigeStapIntent`, `HerhaalStapIntent`, `LeesIngredientenIntent`; Nederlandse zinnen in `KnipselOpdrachten` ("Kook pompoensoep met Knipsel", "Volgende stap in Knipsel", …). Recepten staan in Spotlight (`IndexedEntity`). Fase 7: `ZetTimerIntent` ("Zet een timer in Knipsel"; zonder minuten de tijd van de huidige stap, anders vraagt Siri "Hoeveel minuten?") en `HoeLangNogIntent` ("Hoe lang nog in Knipsel"). | Gebouwd in fase 6 (#7) en 7 (#8); Nederlandse zinnen op toestel nog te testen |
 | 3. Actieknop | Eén knop met knokkel = volgende stap | Snelkoppeling "Volgende stap" aan de Actieknop | Alleen iPhone 15 Pro en nieuwer; niet op Peters toestellen, geparkeerd |
 | 4. AirPods / Apple Watch | Steeltje 1× = voorlezen/stoppen, 2× = volgende, 3× = vorige | `MPRemoteCommandCenter` + Nu speelt, achter de instelling *Bediening met AirPods en Apple Watch (proef)* (standaard uit) | Proef S3 gebouwd, op toestel te testen (`docs/spikes/S3-airpods.md`) |
 
@@ -138,10 +156,19 @@ zolang de kookmodus open is.
 | "ingrediënten", "wat heb ik nodig?" | ingrediënten voor deze stap (of alles) |
 | "hoeveel ‹ingrediënt›?" | "200 milliliter kokosmelk" (rekening houdend met geschaalde porties) |
 | "stap 3" | spring naar stap 3 |
-| "timer ‹n› minuten", "zet de timer", "hoe lang nog?" | timer zetten / resterende tijd |
+| "timer ‹n› minuten", "zet de timer", "hoe lang nog?", "stop de timer" | timer zetten (‹n› of de tijd van de stap) / resterende tijd voorlezen / eerstvolgende timer stoppen (fase 7) |
+| "ja", "oké", "klaar", "doe maar" / "nee" — alleen direct na de timervraag² | timer van de stap zetten / geen timer |
 | "stoppen met koken" | kookmodus sluiten |
 
 ¹ Impliciete signalen ("oké", "klaar", "gedaan") staan standaard aan (B11), met melding en "terug" om te herstellen; uit te zetten in Instellingen.
+
+² **Toestand "timervraag" (fase 7).** Na "Zal ik een timer van 20 minuten zetten?" telt "ja", "oké",
+"klaar" of "doe maar" (ook met de impliciete signalen uit) als *ja* zolang de vraag klinkt en tot 8
+seconden daarna (`Timervraag.venster`); een uiting die in dat venster begint maar waarvan het
+eindresultaat later binnenkomt (± 2 s), telt ook. "Nee", "nee hoor", "hoeft niet", "geen timer" sluiten
+de vraag. Daarbuiten betekent "oké"/"klaar" weer *volgende*, en is "nee" geen commando. Een nieuwe stap,
+"stop" of tikken op Ja/Nee in de banner sluit de vraag ook. "Stop de timer" stopt eerst het voorlezen
+(voorlopig "stop") en daarna de timer als de zin doorloopt.
 
 Regels tegen vals alarm (afzuigkap, radio, gesprek):
 - Alleen korte uitingen (≤ 4 woorden) die een commando zijn tellen; een lange zin met "volgende" erin niet.
@@ -245,7 +272,13 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
   `InleesInbox` ("Nog te controleren": JSON + bestanden in een map die later de App Group van de
   deel-extensie wordt). Een recept van een website bewaart de link in `bronPagina` (geen modelwijziging)
   en, als dat aan staat, één foto van de site in `fotoData`; papierknipsels blijven tekst-only (B7).
-- **Rechten (Info.plist):** camera, microfoon, spraakherkenning, foto's (alleen kiezen), AlarmKit. Netwerk alleen voor Claude (optioneel) en iCloud.
+- **Rechten (Info.plist):** camera, microfoon, spraakherkenning, foto's (alleen kiezen), AlarmKit
+  (`NSAlarmKitUsageDescription`), Live Activities (`NSSupportsLiveActivities`). Netwerk alleen voor
+  Claude (optioneel) en iCloud.
+- **Targets:** de app, `KnipselDelen` (deelmenu, App Group) en `KnipselWidgets` (fase 7, alleen Live
+  Activities, zonder entitlements). Wat de widget nodig heeft (`KookActivityAttributes`,
+  `KookTimerMetadata`, de knoppen als `LiveActivityIntent` en de weergaven) staat in `Knipsel/Gedeeld`
+  en compileert in beide.
 
 ## 8. Risico's en proeven
 
@@ -268,8 +301,8 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 | 3 | Kookmodus visueel: stap voor stap, groot, scherm aan, tikzones, afvinken, porties schalen | Bruikbaar in de keuken zonder spraak |
 | 4 | Voorlezen per stap, uitspraakregels, tempo | Vóór spraak: commando's sturen het voorlezen |
 | 5 | Spraakbesturing in de app | Grootste UX-winst, hoogste risico (S4) |
-| 6 | Siri, App Shortcuts, Spotlight, AirPods/Watch (proef); Actieknop geparkeerd | Bouwt op de `KookSessie` van 3–5. Gebouwd (#7); `ZetTimer` hoort bij fase 7 |
-| 7 | Timers (AlarmKit) en Live Activity | Los te bouwen na fase 3 |
+| 6 | Siri, App Shortcuts, Spotlight, AirPods/Watch (proef); Actieknop geparkeerd | Bouwt op de `KookSessie` van 3–5. Gebouwd (#7); `ZetTimer` in fase 7 |
+| 7 | Timers (AlarmKit) en Live Activity | Gebouwd (#8): tijdherkenning, timers, timervraag, Live Activities (widget-extensie `KnipselWidgets`), Siri-timers. Alarm op slot/stil en Dynamic Island nog op toestel te testen |
 | 8 | Delen met huisgenoot | Raakt het datamodel; na stabiel gebruik. Gebouwd (#9): kookboek Thuis, modelversie 3 |
 
 ## 10. Eigen suggesties (nog niet ingepland)

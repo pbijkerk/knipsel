@@ -44,6 +44,22 @@ struct KnipselOpdrachten: AppShortcutsProvider {
                 "Ingrediënten in \(.applicationName)",
             ],
             shortTitle: "Wat heb ik nodig?", systemImageName: "list.bullet")
+        AppShortcut(
+            intent: ZetTimerIntent(),
+            phrases: [
+                "Zet een timer in \(.applicationName)",
+                "Zet de timer in \(.applicationName)",
+                "Timer in \(.applicationName)",
+            ],
+            shortTitle: "Zet een timer", systemImageName: "timer")
+        AppShortcut(
+            intent: HoeLangNogIntent(),
+            phrases: [
+                "Hoe lang nog in \(.applicationName)",
+                "Hoe lang nog \(.applicationName)",
+                "Hoelang nog in \(.applicationName)",
+            ],
+            shortTitle: "Hoe lang nog?", systemImageName: "hourglass")
     }
 
     static let shortcutTileColor: ShortcutTileColor = .orange

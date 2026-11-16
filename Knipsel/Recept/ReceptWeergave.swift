@@ -414,16 +414,38 @@ struct ReceptWeergave: View {
                             .font(lettertype(.body))
                             .lineSpacing(3)
                             .fixedSize(horizontal: false, vertical: true)
-                        if let timer = Weergave.tijd(minuten: Int(stap.timerSeconden) / 60) {
-                            SwiftUI.Label(timer, systemImage: "timer")
-                                .font(.footnote)
-                                .foregroundStyle(.secondary)
+                        if let tijd = TijdHerkenner.hoofdtijd(in: stap.tekst ?? "") {
+                            stapTimer(tijd, stapNummer: index + 1, tekst: stap.tekst ?? "")
                         }
                     }
                 }
                 .accessibilityElement(children: .combine)
             }
         }
+    }
+
+    /// "⏱ 20 min" bij een stap; tik = een timer zetten zonder kookmodus (via een menu, zodat het niet
+    /// per ongeluk gaat).
+    private func stapTimer(_ tijd: Tijdvermelding, stapNummer: Int, tekst: String) -> some View {
+        Menu {
+            Button("Zet een timer van \(Tijdweergave.kort(tijd.seconden))", systemImage: "timer") {
+                let naam = Timernaam.naam(stapNummer: stapNummer, tekst: tekst, tijd: tijd)
+                let recept = recept.titelOfStandaard
+                Task {
+                    await TimerService.gedeeld.start(
+                        seconden: tijd.seconden, naam: naam, kort: Timernaam.kort(stapNummer: stapNummer),
+                        recept: recept, stapIndex: stapNummer - 1)
+                }
+            }
+        } label: {
+            SwiftUI.Label(tijd.label, systemImage: "timer")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .frame(minHeight: 32)
+                .contentShape(Rectangle())
+        }
+        .accessibilityLabel("Tijd \(tijd.label)")
+        .accessibilityHint("Tik om een timer te zetten")
     }
 
     @ViewBuilder private var notitiesBlok: some View {

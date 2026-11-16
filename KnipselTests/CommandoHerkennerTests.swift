@@ -127,7 +127,7 @@ struct CommandoHerkennerTests {
         "ik ben er klaar mee",
         "terug naar de winkel",
         "stop maar in de oven",
-        "hoeveel tijd nog",
+        "hoeveel tijd kost dit",
         "hoeveel minuten moet het koken",
         "hoeveel kost dat",
         "nee",

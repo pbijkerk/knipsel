@@ -1,6 +1,6 @@
 # Privacybeleid Knipsel
 
-*Laatst bijgewerkt: 15 november 2026 (Thuis delen)*
+*Laatst bijgewerkt: 15 november 2026 (timers en Live Activities)*
 
 Knipsel is een recepten-app voor iPhone en iPad, gemaakt door Peter Bijkerk voor eigen gebruik en een
 kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en waar ze blijven.
@@ -27,6 +27,8 @@ kleine kring testers. Dit beleid beschrijft welke gegevens de app gebruikt en wa
 | Voorlezen | Gebeurt op het toestel met de stemmen van iOS. |
 | Siri, Opdrachten en Spotlight | Knipsel zet de **titel en categorie** van je recepten in de zoekindex van iOS, op dit toestel, zodat je ze in Spotlight vindt en Siri ze herkent ("Kook pompoensoep met Knipsel"). Ingrediënten, stappen, notities en foto's gaan niet in de index. Wat je tegen Siri zegt, verwerkt Apple volgens zijn eigen privacybeleid; Knipsel krijgt alleen het gekozen recept of de opdracht ("volgende stap"). |
 | Nu speelt (proef, standaard uit) | Met *Bediening met AirPods en Apple Watch* aan toont iOS tijdens het koken de recepttitel, "Stap 3 van 7" en de foto of het symbool van het recept onder Nu speelt (vergrendelscherm, Bedieningspaneel, Apple Watch). Dat blijft op je toestellen. |
+| Kooktimers (alarmen) | Een timer is een alarm van iOS (AlarmKit) op je toestel, met de naam van het recept en de stap ("Pompoensoep · Stap 3: laat 20 minuten zachtjes koken"). Knipsel onthoudt de lopende timers (naam en eindtijd) op het toestel, zodat ze na het herstarten weer in beeld staan; ze synchroniseren niet en gaan nergens heen. |
+| Live Activities (vergrendelscherm, Dynamic Island) | Zolang de kookmodus open is, toont iOS de recepttitel, "Stap 3 van 7", het begin van de stap en de eerstvolgende timer op je vergrendelscherm en (op toestellen die het hebben) in het Dynamic Island; elke timer heeft er ook een. Dat wordt op het toestel bijgewerkt, zonder pushmeldingen of server. Iedereen die je vergrendelscherm ziet, ziet die stap; zet Live Activities uit in Instellingen › Knipsel. |
 | Claude-sleutel (optioneel) | In de Keychain van je toestel. |
 | Ingelezen recepten die nog niet gecontroleerd zijn ("Nog te controleren") | Alleen op je toestel, in een map die alleen Knipsel en zijn deelmenu-onderdeel kunnen lezen (App Group). Na bewaren of annuleren verdwijnen ze, met de bijbehorende bestanden (schermafdruk, PDF, foto). |
 | Delen via het deelmenu ("Knipsel" in het deelmenu van Safari, een krantenapp, Foto's of Bestanden) | Knipsel leest alleen wat je zelf deelt: de link, de tekst, de afbeelding(en) of de PDF. Het deelmenu haalt niets op en stuurt niets weg; het zet het item alleen lokaal in *Nog te controleren*. Pas als je Knipsel opent, wordt het ingelezen (een link wordt dan rechtstreeks bij de website opgehaald), en het wordt pas een recept als je het hebt gecontroleerd. |
@@ -52,7 +54,9 @@ Claude. De foto gaat nooit mee. Daarop is het privacybeleid van Anthropic van to
 - **Microfoon en spraakherkenning** — voor bediening met je stem tijdens het koken. Staat de
   kookmodus open en luistert Knipsel, dan blijft dat zo als je het scherm op slot zet of naar een
   andere app gaat (je ziet dan het oranje microfoonlampje); sluit je de kookmodus, dan stopt het.
-- **Meldingen / alarmen** — voor kooktimers.
+- **Alarmen** — voor kooktimers: ze gaan ook af als je scherm op slot zit of je telefoon op stil
+  staat. Weiger je dit, dan lopen timers alleen zolang Knipsel open is en zegt Knipsel het als ze klaar
+  zijn.
 
 Je kunt elk recht weigeren of later intrekken in Instellingen van iOS; de rest van de app blijft werken.
 

@@ -114,8 +114,31 @@ extension Voorleestekst {
     }
 }
 
+/// "Zal ik een timer van 20 minuten zetten?" (K11): na het voorlezen van een stap met een tijd.
+/// Een "ja" of "oké" telt als antwoord zolang de vraag klinkt en tot `venster` seconden daarna;
+/// daarbuiten is "oké" weer gewoon "volgende" (zie `Spraakbediening`).
+struct Timervraag: Equatable, Sendable {
+    /// De stap (0 = stap 1) waar de vraag bij hoort.
+    let stapIndex: Int
+    let seconden: Int
+    let tekst: String
+    /// Wanneer de vraag helemaal uitgesproken (of afgebroken) was; `nil` zolang hij klinkt.
+    var uitgesprokenOp: Date?
+
+    static let venster: TimeInterval = 8
+
+    func isOpen(op nu: Date) -> Bool {
+        guard let uitgesprokenOp else { return true }
+        return nu.timeIntervalSince(uitgesprokenOp) <= Self.venster
+    }
+
+    /// Wanneer het venster dichtgaat; `nil` zolang de vraag nog klinkt.
+    var sluitOp: Date? { uitgesprokenOp?.addingTimeInterval(Self.venster) }
+}
+
 /// Voorlezen in de kookmodus (K9): bij elke stapwissel de nieuwe stap, en daarna wachten. Nooit
 /// automatisch doorgaan; "verder" komt altijd van de kok (tik, veeg, toets, later spraak en Siri).
+/// Noemt de stap een tijd, dan vraagt Knipsel daarna of er een timer moet komen (`Timervraag`).
 @MainActor
 @Observable
 final class VoorleesService {
@@ -128,6 +151,13 @@ final class VoorleesService {
     private(set) var status: Status = .stil
     /// De luidspreker in de kookmodus. Uit = niets voorlezen.
     private(set) var isAan: Bool
+    /// De timervraag die nu klinkt of net klonk (ook voor de banner in beeld).
+    private(set) var timervraag: Timervraag?
+
+    /// Mag Knipsel bij deze stap een timer aanbieden? Nee als er al een loopt (gezet door de kookmodus).
+    @ObservationIgnored var magTimerVragen: (KookSessie, KookStap) -> Bool = { _, _ in true }
+    /// Na de stap uit te spreken: de timervraag.
+    @ObservationIgnored private var vervolg: Timervraag?
 
     /// De tekst die nu (of het laatst) voorgelezen wordt, voor het echofilter van de spraakbediening.
     @ObservationIgnored private(set) var laatsteTekst: String?
@@ -153,14 +183,48 @@ final class VoorleesService {
         self.instellingen = instellingen
         self.bewaarTempo = bewaarTempo
         self.klok = klok
-        spreker.klaar = { [weak self] in
-            self?.status = .stil
-            self?.gestoptOp = self?.klok()
-        }
+        spreker.klaar = { [weak self] in self?.uitgesproken() }
         onderbrekingswacht = Onderbrekingswacht { [weak self] in self?.onderbroken() }
     }
 
     var spreekt: Bool { status != .stil }
+
+    /// De klok van de voorlezer (in tests een nepklok).
+    func nu() -> Date { klok() }
+
+    private func uitgesproken() {
+        status = .stil
+        gestoptOp = klok()
+        if let vraag = vervolg {
+            vervolg = nil
+            spreek(vraag.tekst, vraag: vraag)
+        } else if timervraag != nil, timervraag?.uitgesprokenOp == nil {
+            timervraag?.uitgesprokenOp = klok()
+        }
+    }
+
+    // MARK: - Timervraag
+
+    /// De timervraag als een "ja" nu nog als antwoord telt.
+    func openTimervraag() -> Timervraag? {
+        guard let timervraag, timervraag.isOpen(op: klok()) else { return nil }
+        return timervraag
+    }
+
+    /// Beantwoord (ja of nee) of verlopen: weg uit beeld.
+    func sluitTimervraag() {
+        timervraag = nil
+        vervolg = nil
+    }
+
+    /// Haalt een verlopen vraag weg, een paar seconden na het venster: een "ja" dat binnen het venster
+    /// begon, komt als eindresultaat pas ± 2 s later binnen.
+    func ruimTimervraagOp() {
+        guard let sluitOp = timervraag?.sluitOp, klok().timeIntervalSince(sluitOp) > Self.naloopAntwoord else { return }
+        timervraag = nil
+    }
+
+    static let naloopAntwoord: TimeInterval = 4
 
     /// Wat Knipsel nu zegt, of tot `naloop` seconden geleden zei: de herkenning loopt iets achter.
     func voorgelezenTekst(naloop: TimeInterval = 2) -> String? {
@@ -190,8 +254,14 @@ final class VoorleesService {
         guard let tekst = Voorleestekst.huidigeStap(van: sessie, metIngredienten: instellingen.ingredientenMeelezen)
         else { return }
         spreek(tekst, met: instellingen)
-        // TODO(fase 7): heeft de stap een tijd (`huidigeStap.timerSeconden > 0`), vraag dan na het
-        // voorlezen "Zal ik een timer van 20 minuten zetten?" (K11). Nu nog niet uitspreken.
+        // Noemt de stap een tijd, dan na het voorlezen: "Zal ik een timer van 20 minuten zetten?" (K11).
+        if !sessie.isAfgerond, let stap = sessie.huidigeStap, stap.hoofdtijdSeconden > 0,
+            magTimerVragen(sessie, stap)
+        {
+            vervolg = Timervraag(
+                stapIndex: stap.id, seconden: stap.hoofdtijdSeconden,
+                tekst: Timerzinnen.vraag(seconden: stap.hoofdtijdSeconden))
+        }
     }
 
     func leesIngredienten(van sessie: KookSessie) {
@@ -228,9 +298,15 @@ final class VoorleesService {
 
     // MARK: - Bediening
 
-    /// Spreekt `tekst` uit; wat er nog liep, stopt eerst.
+    /// Spreekt `tekst` uit; wat er nog liep, stopt eerst (ook een openstaande timervraag).
     func spreek(_ tekst: String, met instellingen: Voorleesinstellingen? = nil) {
+        spreek(tekst, met: instellingen, vraag: nil)
+    }
+
+    private func spreek(_ tekst: String, met instellingen: Voorleesinstellingen? = nil, vraag: Timervraag?) {
         let instellingen = instellingen ?? self.instellingen()
+        vervolg = nil
+        timervraag = vraag
         if spreekt { spreker.stop() }
         laatsteTekst = tekst
         gestoptOp = nil
@@ -238,8 +314,11 @@ final class VoorleesService {
         status = .spreekt
     }
 
-    /// Stopt direct, ook midden in een zin.
+    /// Stopt direct, ook midden in een zin. Een timervraag die nog moest komen, vervalt; een die net
+    /// klonk, blijft nog even beantwoordbaar.
     func stop() {
+        vervolg = nil
+        if timervraag != nil, timervraag?.uitgesprokenOp == nil { timervraag?.uitgesprokenOp = klok() }
         guard spreekt else { return }
         spreker.stop()
         status = .stil

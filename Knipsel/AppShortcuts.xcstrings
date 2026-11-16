@@ -165,6 +165,72 @@
           }
         }
       }
+    },
+    "Zet een timer in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet een timer in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Zet de timer in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zet de timer in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Timer in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Timer in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Hoe lang nog in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoe lang nog in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Hoe lang nog ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoe lang nog ${applicationName}"
+          }
+        }
+      }
+    },
+    "Hoelang nog in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoelang nog in ${applicationName}"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

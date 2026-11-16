@@ -103,6 +103,11 @@ final class Stap: NSManagedObject {
     @NSManaged var recept: Recept?
 
     static func verzoek() -> NSFetchRequest<Stap> { NSFetchRequest(entityName: "Stap") }
+
+    /// De timer van deze stap; voor recepten van vóór fase 7 (zonder `timerSeconden`) uit de tekst.
+    var hoofdtijdSeconden: Int {
+        timerSeconden > 0 ? Int(timerSeconden) : TijdHerkenner.timerSeconden(in: tekst ?? "")
+    }
 }
 
 @objc(Categorie)

@@ -19,8 +19,16 @@ enum Commando: Equatable, Sendable {
     case naarStap(Int)
     case stoppenMetKoken
     /// Een impliciet signaal ("oké", "klaar") dat als volgende telt (B11). `woord` is wat er gezegd werd,
-    /// voor de melding "Volgende (oké)".
+    /// voor de melding "Volgende (oké)". Direct na de timervraag betekent het "ja" (fase 7).
     case impliciet(String)
+    /// "Zet de timer" (tijd van de stap, `nil`) of "timer 10 minuten" (seconden).
+    case zetTimer(seconden: Int?)
+    /// "Hoe lang nog?"
+    case hoeLangNog
+    /// "Stop de timer", "alarm uit".
+    case stopTimer
+    /// "Nee" op de timervraag; alleen herkend zolang die open staat.
+    case weiger
 }
 
 /// Zet een (deel)transcript om in een `Commando`, of `nil` als het geen commando is. Puur en zonder
@@ -39,6 +47,9 @@ struct CommandoHerkenner: Sendable {
         var impliciet = true
         /// Alleen luisteren als de zin met "Knipsel" begint (of eindigt); standaard uit.
         var alleenMetWekwoord = false
+        /// De timervraag staat open: "ja", "oké", "doe maar" en "nee" tellen als antwoord, ook als de
+        /// impliciete signalen uit staan. Zet `Spraakbediening` per uiting.
+        var antwoordVerwacht = false
     }
 
     /// Kernwoorden per ingrediënt (index = positie in de lijst), voor "hoeveel …".
@@ -48,6 +59,8 @@ struct CommandoHerkenner: Sendable {
     static let maxWoorden = 4
     static let maxWoordenHoeveel = 7
     static let maxWoordenMetWekwoord = 10
+    /// "Zet een timer van vijfentwintig minuten" mag wat langer zijn.
+    static let maxWoordenTimer = 8
 
     init(ingredientnamen: [String] = [], instellingen: Instellingen = Instellingen()) {
         ingredientKernen = ingredientnamen.map(Ingredientkoppeling.kernwoorden)
@@ -59,9 +72,16 @@ struct CommandoHerkenner: Sendable {
         var woorden = Self.woorden(transcript)
         let metWekwoord = Self.haalWekwoordWeg(&woorden)
         if instellingen.alleenMetWekwoord && !metWekwoord { return nil }
+        let kaal = woorden
         woorden.removeAll { Self.stopwoordjes.contains($0) }
         guard !woorden.isEmpty else { return nil }
 
+        if instellingen.antwoordVerwacht, let antwoord = Self.antwoord(kaal) { return antwoord }
+        if woorden.count <= (metWekwoord ? Self.maxWoordenMetWekwoord : Self.maxWoordenTimer),
+            let timer = Self.timerCommando(woorden, transcript: transcript)
+        {
+            return timer
+        }
         if metWekwoord {
             guard woorden.count <= Self.maxWoordenMetWekwoord else { return nil }
             return geheel(woorden) ?? zoekIn(woorden)
@@ -73,6 +93,52 @@ struct CommandoHerkenner: Sendable {
         guard woorden.count <= Self.maxWoorden else { return nil }
         return geheel(woorden)
     }
+
+    // MARK: - Timers (fase 7)
+
+    /// "Zet de timer", "timer 10 minuten", "zet een timer van twintig minuten", "hoe lang nog?",
+    /// "stop de timer", "alarm uit".
+    static func timerCommando(_ woorden: [String], transcript: String) -> Commando? {
+        let set = Set(woorden)
+        if set.contains("nog"),
+            set.contains("hoelang") || (set.contains("hoe") && set.contains("lang"))
+                || (set.contains("hoeveel") && !set.isDisjoint(with: ["tijd", "minuten", "minuutjes"]))
+        {
+            return .hoeLangNog
+        }
+        guard !set.isDisjoint(with: timerwoorden) else { return nil }
+        if !set.isDisjoint(with: stopTimerwoorden) { return .stopTimer }
+        if let tijd = TijdHerkenner.tijden(in: transcript).last { return .zetTimer(seconden: tijd.seconden) }
+        if set.isSubset(of: timerwoorden.union(zetTimerwoorden)) { return .zetTimer(seconden: nil) }
+        return nil
+    }
+
+    /// Antwoord op de timervraag: "ja", "oké", "ja graag", "doe maar" → `.impliciet`; "nee",
+    /// "nee hoor", "hoeft niet" → `.weiger`. Op de hele uiting (met stopwoordjes als "graag", "maar").
+    static func antwoord(_ woorden: [String]) -> Commando? {
+        guard !woorden.isEmpty, woorden.count <= maxWoorden else { return nil }
+        let nee: Set<String> = ["nee", "neen", "niet", "hoeft", "geen", "laat"]
+        if woorden.allSatisfy(weigerwoorden.union(stopwoordjes).contains), woorden.contains(where: nee.contains) {
+            return .weiger
+        }
+        let ja = impliciteWoorden.union(jawoorden)
+        if woorden.allSatisfy(ja.union(stopwoordjes).contains), woorden.contains(where: ja.contains) {
+            return .impliciet(weergave(woorden.filter { ja.contains($0) }))
+        }
+        return nil
+    }
+
+    private static let timerwoorden: Set<String> = ["timer", "timers", "wekker", "alarm", "kookwekker"]
+    private static let zetTimerwoorden: Set<String> = [
+        "zet", "zetten", "start", "starten", "de", "een", "die", "aan", "ja", "oke", "graag", "maar", "doe", "nieuwe",
+    ]
+    private static let stopTimerwoorden: Set<String> = [
+        "stop", "stoppen", "uit", "af", "annuleer", "annuleren", "weg", "uitzetten",
+    ]
+    private static let jawoorden: Set<String> = ["doe", "zeker", "prima", "goed", "graag", "yes"]
+    private static let weigerwoorden: Set<String> = [
+        "nee", "neen", "niet", "hoeft", "nodig", "laat", "geen", "bedankt", "dank", "je", "hoor", "timer",
+    ]
 
     // MARK: - Hele uiting
 

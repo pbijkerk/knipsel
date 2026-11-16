@@ -133,6 +133,9 @@ struct ReceptInvoer: Equatable {
         for (index, regel) in stapRegels.enumerated() {
             let stap = index < stappen.count ? stappen[index] : Stap(context: context)
             stap.tekst = regel.tekst
+            // De tijd voor de timer (K11) volgt de tekst: bij knippen, inlezen en bewerken.
+            let timer = Int32(clamping: TijdHerkenner.timerSeconden(in: regel.tekst))
+            if stap.timerSeconden != timer { stap.timerSeconden = timer }
             if stap.groep != regel.groep { stap.groep = regel.groep }
             stap.volgorde = Int16(clamping: index)
             stap.recept = recept

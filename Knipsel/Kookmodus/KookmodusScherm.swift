@@ -137,6 +137,7 @@ struct KookmodusScherm: View {
     @State private var spraak: Spraakbediening
     @State private var luisteraar = LuisterService()
     @State private var motorSpreker: MotorSpreker?
+    private let timers = TimerService.gedeeld
 
     init(
         sessie: KookSessie, gekookt: @escaping () -> Void = {}, vraagFoto: Bool = false,
@@ -151,7 +152,8 @@ struct KookmodusScherm: View {
         let voorlezer = VoorleesService(spreker: wissel)
         _wissel = State(initialValue: wissel)
         _voorlezer = State(initialValue: voorlezer)
-        _spraak = State(initialValue: Spraakbediening(sessie: sessie, voorlezer: voorlezer))
+        _spraak = State(
+            initialValue: Spraakbediening(sessie: sessie, voorlezer: voorlezer, timers: TimerService.gedeeld))
     }
 
     /// Luisteren alleen met de kookmodus open en spraakbediening aan. Starten alleen op de voorgrond;
@@ -163,7 +165,12 @@ struct KookmodusScherm: View {
 
     var body: some View {
         KookmodusInhoud(
-            sessie: sessie, voorlezer: voorlezer, spraak: spraak, luisteraar: luisteraar, gekookt: gekookt,
+            sessie: sessie, voorlezer: voorlezer, spraak: spraak, luisteraar: luisteraar, timers: timers,
+            gekookt: {
+                gekookt()
+                // Klaar met koken: de Live Activity mag weg (lopende timers blijven lopen).
+                KookActivityBeheer.gedeeld.stop(sessie)
+            },
             vraagFoto: vraagFoto, fotoMaken: fotoMaken, sluit: { dismiss() },
             toestemmingGevraagd: { Task { await vraagToestemming() } }
         )
@@ -175,12 +182,23 @@ struct KookmodusScherm: View {
             spraak.sluit = { dismiss() }
             spraak.tik = { [luisteraar] in luisteraar.motor.speelTik() }
             // Voor Siri, Opdrachten en AirPods (fase 6): die vinden de sessie hier, ook op de achtergrond.
-            ActieveKookSessie.gedeeld.registreer(spraak) { NuSpeeltBediening.gedeeld.werkBij() }
+            ActieveKookSessie.gedeeld.registreer(spraak) { [sessie, timers] in
+                NuSpeeltBediening.gedeeld.werkBij()
+                KookActivityBeheer.gedeeld.werkBij(sessie, timers: timers.timers)
+            }
             NuSpeeltBediening.gedeeld.start()
+            // Timers (fase 7): niet opnieuw vragen als er voor deze stap al een loopt.
+            voorlezer.magTimerVragen = { [timers] sessie, stap in
+                !timers.heeftTimer(recept: sessie.titel, stapIndex: stap.id)
+            }
+            timers.begin()
+            if !sessie.isGekookt { KookActivityBeheer.gedeeld.start(sessie, timers: timers.timers) }
             if voorlezer.isAan { voorlezer.leesHuidigeStap(van: sessie) }
         }
         .onDisappear {
             NuSpeeltBediening.gedeeld.stop()
+            // De Live Activity van de kookmodus stopt; lopende timers (AlarmKit) gaan gewoon door.
+            KookActivityBeheer.gedeeld.stop(sessie)
             ActieveKookSessie.gedeeld.meldAf(sessie)
             schermAan.kookmodusGesloten()
             stopLuisteren()
@@ -193,6 +211,14 @@ struct KookmodusScherm: View {
             schermAan.faseGewijzigd(fase)
         }
         .onChange(of: voorlezer.status) { NuSpeeltBediening.gedeeld.werkBij() }
+        .onChange(of: timers.timers) { KookActivityBeheer.gedeeld.werkBij(sessie, timers: timers.timers) }
+        .task {
+            // Timers zonder AlarmKit (geen toestemming) lopen in de app af.
+            while !Task.isCancelled {
+                timers.tik()
+                try? await Task.sleep(for: .seconds(1))
+            }
+        }
         .task(id: moetLuisteren) {
             if moetLuisteren {
                 await startLuisteren()
@@ -251,6 +277,8 @@ struct KookmodusInhoud: View {
     /// Spraakbediening (fase 5); `nil` in renders zonder spraak.
     var spraak: Spraakbediening?
     var luisteraar: LuisterService?
+    /// Kooktimers (fase 7); `nil` in renders zonder timers.
+    var timers: TimerService?
     var gekookt: () -> Void = {}
     var vraagFoto = false
     var fotoMaken: () -> Void = {}
@@ -274,11 +302,16 @@ struct KookmodusInhoud: View {
     @State private var isVastgelegd = false
     @State private var fotoVraagWeg = false
     @State private var bevestigingTaak: Task<Void, Never>?
+    /// De timervraag staat in beeld (tot het venster dicht is).
+    @State private var vraagInBeeld: Timervraag?
 
     /// Voor renders zonder venster: forceer de opmaak.
     var breedOverschrijving: Bool?
     /// Voor renders: begin alsof "Gekookt" al is getikt.
     var alVastgelegd = false
+    /// Voor renders: een vaste klok voor de timerchips, en een timervraag in beeld.
+    var renderNu: Date?
+    var vraagOverschrijving: Timervraag?
 
     private enum Zone { case vorige, volgende }
 
@@ -301,6 +334,7 @@ struct KookmodusInhoud: View {
                         kopbalk
                         tikvlak { stapKolomBreed }
                         spraakbalk
+                        timerbalk
                         kooknavigatie
                     }
                 }
@@ -309,6 +343,7 @@ struct KookmodusInhoud: View {
                     kopbalk
                     tikvlak { stapKolomSmal }
                     spraakbalk
+                    timerbalk
                     kooknavigatie
                 }
             }
@@ -340,6 +375,7 @@ struct KookmodusInhoud: View {
         }
         .background { toetsenbord }
         .onAppear { if alVastgelegd { isVastgelegd = true } }
+        .task(id: voorlezer.timervraag) { await toonTimervraag() }
         .onChange(of: sessie.gebeurtenisNummer) {
             // Het voorlezen van de nieuwe stap gebeurt al in de sessie zelf (`opGebeurtenis`, gezet
             // door `ActieveKookSessie`), zodat het ook op de achtergrond werkt; hier alleen in beeld.
@@ -432,7 +468,7 @@ struct KookmodusInhoud: View {
         if sessie.vorigeStap != nil { hoogte -= gedimd }
         if sessie.volgendeStap != nil { hoogte -= gedimd }
         if let stap = sessie.huidigeStap {
-            if stap.timerSeconden >= 60 { hoogte -= 44 }
+            if !stap.tijden.isEmpty { hoogte -= 64 }
             if let groep = stap.groep, !groep.isEmpty { hoogte -= 34 }
         }
         return CGSize(width: min(760, stapvlak.width - 80), height: max(1, hoogte))
@@ -503,11 +539,6 @@ struct KookmodusInhoud: View {
                     .font(stapLettertype)
                     .lineSpacing(stapGrootte * 0.22)
                     .fixedSize(horizontal: false, vertical: true)
-                if let timer = Weergave.tijd(minuten: stap.timerSeconden / 60) {
-                    SwiftUI.Label(timer, systemImage: "timer")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(Kookkleuren.markering)
-                }
             }
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Stap \(sessie.stapNummer) van \(sessie.aantalStappen). \(stap.tekst)")
@@ -522,7 +553,66 @@ struct KookmodusInhoud: View {
             }
             .accessibilityAction(named: "Volgende stap") { sessie.volgende() }
             .accessibilityAction(named: "Vorige stap") { sessie.vorige() }
+            timerknoppen(stap)
         }
+    }
+
+    /// Een knop per tijd in de stap (meestal één): "⏱ Timer 20 min". Knoppen gaan voor de tikzones.
+    @ViewBuilder private func timerknoppen(_ stap: KookStap) -> some View {
+        let tijden = Array(stap.tijden.prefix(3))
+        if !tijden.isEmpty {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 10) { timerknoppenInhoud(stap, tijden) }
+                VStack(alignment: .leading, spacing: 10) { timerknoppenInhoud(stap, tijden) }
+            }
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        }
+    }
+
+    @ViewBuilder private func timerknoppenInhoud(_ stap: KookStap, _ tijden: [Tijdvermelding]) -> some View {
+        ForEach(Array(tijden.enumerated()), id: \.offset) { _, tijd in
+            TimerKnop(tijd: tijd, loopt: loopt(tijd, in: stap)) {
+                guard let timers else { return }
+                Task {
+                    await KookTimers.start(seconden: tijd.seconden, stap: stap, tijd: tijd, in: sessie, timers: timers)
+                }
+                voorlezer.sluitTimervraag()
+            }
+        }
+    }
+
+    private func loopt(_ tijd: Tijdvermelding, in stap: KookStap) -> Bool {
+        timers?.timers.contains { $0.recept == sessie.titel && $0.stapIndex == stap.id && $0.totaal == tijd.seconden }
+            ?? false
+    }
+
+    /// Lopende timers, net boven de knoppen onderin (onder de duim, buiten de tikzones).
+    @ViewBuilder private var timerbalk: some View {
+        if let timers, !timers.timers.isEmpty {
+            TimerChips(
+                timers: timers.timers, pauzeer: { timers.pauzeer($0) }, hervat: { timers.hervat($0) },
+                stop: { timers.stop($0) }, nu: renderNu
+            )
+            .padding(.horizontal, breed ? 8 : 0)
+            .padding(.top, 8)
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+        }
+    }
+
+    /// Toont de timervraag tot het venster dicht is, en ruimt hem daarna op.
+    private func toonTimervraag() async {
+        guard let vraag = voorlezer.timervraag else {
+            withAnimation { vraagInBeeld = nil }
+            return
+        }
+        withAnimation(.easeOut(duration: 0.2)) { vraagInBeeld = vraag }
+        guard let sluitOp = vraag.sluitOp else { return }
+        try? await Task.sleep(for: .seconds(max(0, sluitOp.timeIntervalSinceNow)))
+        guard !Task.isCancelled else { return }
+        withAnimation(.easeIn(duration: 0.3)) { vraagInBeeld = nil }
+        try? await Task.sleep(for: .seconds(VoorleesService.naloopAntwoord + 0.5))
+        guard !Task.isCancelled else { return }
+        voorlezer.ruimTimervraagOp()
     }
 
     private func gedimdeStap(_ stap: KookStap) -> some View {
@@ -857,6 +947,22 @@ struct KookmodusInhoud: View {
     /// "✓ volgende" (1,5 s) en het antwoord op "hoeveel …?", boven de spraakbalk.
     private var spraakfeedback: some View {
         VStack(spacing: 12) {
+            if let vraag = vraagInBeeld ?? vraagOverschrijving {
+                TimervraagBanner(
+                    vraag: vraag, luistert: luisterstatus == .luistert || vraagOverschrijving != nil,
+                    ja: {
+                        if let spraak {
+                            spraak.beantwoordTimervraag(ja: true)
+                        } else {
+                            voorlezer.sluitTimervraag()
+                        }
+                    },
+                    nee: {
+                        if let spraak { spraak.beantwoordTimervraag(ja: false) } else { voorlezer.sluitTimervraag() }
+                    }
+                )
+                .transition(.opacity.combined(with: .move(edge: .bottom)))
+            }
             if let antwoord = spraak?.antwoord {
                 Antwoordkaart(antwoord: antwoord, lettertype: lettertype) { spraak?.sluitAntwoord() }
                     .transition(.opacity.combined(with: .move(edge: .bottom)))

@@ -26,6 +26,9 @@ struct Uitingbeslisser: Sendable {
 
     private var kandidaat: Kandidaat?
     private var uitgevoerdeSegmenten: Set<Int> = []
+    /// Het segment waarin "stop" al direct (voorlopig) uitgevoerd is: groeit het nog uit tot "stop de
+    /// timer", dan telt dat er alsnog bij.
+    private var directGestopt: Int?
     private var laatste: (commando: Commando, tijd: TimeInterval)?
     /// Net alleen "Knipsel" gehoord: de volgende uiting tot dit tijdstip telt als met wekwoord.
     private var gewektTot: TimeInterval?
@@ -42,7 +45,12 @@ struct Uitingbeslisser: Sendable {
     mutating func verwerk(
         _ tekst: String, segment: Int, definitief: Bool, nu: TimeInterval, voorgelezen: String? = nil
     ) -> Commando? {
-        guard !uitgevoerdeSegmenten.contains(segment) else { return nil }
+        if uitgevoerdeSegmenten.contains(segment) {
+            // "Stop" ging al direct; "stop de timer" in dezelfde uiting stopt daarna ook de timer.
+            guard directGestopt == segment, herkenner.herken(tekst) == .stopTimer else { return nil }
+            directGestopt = nil
+            return voerUit(.stopTimer, segment: segment, nu: nu)
+        }
         if let voorgelezen, Echofilter.isEcho(tekst, voorgelezen: voorgelezen) {
             if kandidaat?.segment == segment { kandidaat = nil }
             return nil
@@ -63,12 +71,13 @@ struct Uitingbeslisser: Sendable {
             && !(voorgelezen.map { CommandoHerkenner.woorden($0).contains("stop") } ?? false)
         if definitief || directeStop {
             if definitief { gewektTot = nil }
+            directGestopt = definitief ? nil : segment
             return voerUit(commando, segment: segment, nu: nu)
         }
         switch commando {
-        case .impliciet, .hoeveel(ingredient: nil, _):
-            // Pas bij het eindresultaat: "ja" kan "ja, dat is lekker" worden, en "hoeveel bo…" is nog
-            // geen ingrediënt.
+        case .impliciet, .weiger, .hoeveel(ingredient: nil, _), .zetTimer:
+            // Pas bij het eindresultaat: "ja" kan "ja, dat is lekker" worden, "hoeveel bo…" is nog
+            // geen ingrediënt, en "zet de timer" kan nog "… op tien minuten" krijgen.
             kandidaat = nil
             return nil
         default:
