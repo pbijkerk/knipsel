@@ -107,10 +107,10 @@ struct BoodschappenVel: View {
             } header: {
                 Text("Vink uit wat je al in huis hebt.")
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color(.secondaryLabel))
                     .textCase(nil)
             } footer: {
-                if let suggestie = meestal.suggestie(in: nodig.filter { !aangevinkt.contains($0.id) }) {
+                if let suggestie = meestal.suggestie(in: nodig) {
                     leerVoorstel(suggestie)
                 }
             }
@@ -172,8 +172,11 @@ struct BoodschappenVel: View {
                     Text(tweede.1).tag(tweede.0)
                 }
             } label: {
-                Text(keuze == .overslaan ? "Overslaan" : (keuze == .bijtellen ? "Erbij tellen" : "Los erbij"))
-                    .fontWeight(.semibold)
+                HStack(spacing: 3) {
+                    Text(keuze == .overslaan ? "Overslaan" : (keuze == .bijtellen ? "Erbij tellen" : "Los erbij"))
+                    Image(systemName: "chevron.up.chevron.down").imageScale(.small)
+                }
+                .fontWeight(.semibold)
             }
             .accessibilityLabel("Wat te doen met \(regel.naam)")
             .accessibilityValue(keuze == .overslaan ? "Overslaan" : tweede.1)
@@ -191,6 +194,7 @@ struct BoodschappenVel: View {
             Button("Ja") {
                 meestal.neemOver(regel)
                 meestal.bewaar(in: defaults)
+                aangevinkt.remove(regel.id)
             }
             .fontWeight(.semibold)
             Button("Nee") {
@@ -246,9 +250,11 @@ struct BoodschappenVel: View {
             .disabled(gekozen.isEmpty)
             .simultaneousGesture(TapGesture().onEnded { geteld = true })
         }
+        .frame(maxWidth: 520)
         .padding(.horizontal, 20)
         .padding(.top, 12)
         .padding(.bottom, 8)
+        .frame(maxWidth: .infinity)
         .background(.bar)
     }
 
