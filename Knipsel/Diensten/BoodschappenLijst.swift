@@ -242,7 +242,8 @@ enum BoodschappenLijst {
             // Ongeschaald en niet opgeteld blijft de hoeveelheid precies zoals in het recept.
             let afronden = abs(factor - 1) > 0.0001 || aantal > 1
             func waarde(_ basis: Double) -> Double {
-                afronden ? Portieschaling.rond(basis / deler, eenheid: eenheid) : basis / deler
+                let w = afronden ? Portieschaling.rond(basis / deler, eenheid: eenheid) : basis / deler
+                return BoodschappenLijst.inWinkel(w, eenheid: eenheid)
             }
             let hoeveelheid = waarde(van)
             let bovengrens = tot.map(waarde).flatMap { $0 > hoeveelheid ? $0 : nil }
@@ -256,6 +257,15 @@ enum BoodschappenLijst {
                 id: id, sleutel: sleutel, naam: naam, hoeveelheid: hoeveelheid, hoeveelheidTot: bovengrens,
                 eenheid: eenheid, tekst: tekst, meestalInHuis: meestalInHuis.bevat(naam))
         }
+    }
+}
+
+extension BoodschappenLijst {
+    /// In de winkel koop je hele stuks: "4½ uien" wordt "5 uien", "½ citroen" wordt "1 citroen".
+    /// Alleen zonder eenheid; "1½ el" en "4½ cm" blijven staan.
+    static func inWinkel(_ waarde: Double, eenheid: String?) -> Double {
+        guard (eenheid ?? "").trimmingCharacters(in: .whitespaces).isEmpty, waarde > 0 else { return waarde }
+        return (waarde - 0.001).rounded(.up)
     }
 }
 
