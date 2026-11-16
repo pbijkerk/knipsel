@@ -26,6 +26,8 @@
 	<string>Knipsel gebruikt de camera om een receptpagina uit een krant of tijdschrift te scannen (alleen de herkende tekst wordt bewaard, de foto van de pagina niet) en, als je dat wilt, om een foto van je eigen gerecht bij het recept te maken.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>In de kookmodus luistert Knipsel naar korte opdrachten als "volgende", "herhaal" of "hoeveel boter?", zodat je het scherm niet hoeft aan te raken. Knipsel luistert alleen zolang de kookmodus open is; er wordt niets opgenomen of bewaard.</string>
+	<key>NSRemindersFullAccessUsageDescription</key>
+	<string>Knipsel zet de ingrediënten die je aanvinkt in je lijst Boodschappen in Herinneringen, en kijkt welke daar al op staan zodat er niets dubbel op komt (als je dat kiest, telt Knipsel de hoeveelheid erbij). Andere lijsten en herinneringen blijven ongemoeid, en er gaat niets van het toestel af.</string>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
 	<key>NSSpeechRecognitionUsageDescription</key>

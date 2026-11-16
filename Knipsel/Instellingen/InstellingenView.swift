@@ -59,6 +59,15 @@ struct InstellingenView: View {
                 }
                 SiriInstellingen()
                 Section {
+                    NavigationLink {
+                        BoodschappenInstellingen()
+                    } label: {
+                        SwiftUI.Label("Boodschappen", systemImage: "cart")
+                    }
+                } footer: {
+                    Text("Wat je meestal in huis hebt, staat op je boodschappenlijst standaard uitgevinkt.")
+                }
+                Section {
                     Toggle(isOn: $webFotoBewaren) {
                         SwiftUI.Label("Foto van receptsites bewaren", systemImage: "photo")
                     }

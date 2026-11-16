@@ -40,6 +40,7 @@ struct ReceptWeergave: View {
     @State private var bevestigFotoVerwijderen = false
     @State private var bevestigVerplaatsen = false
     @State private var foutmelding: String?
+    @State private var toonBoodschappen = false
     /// De eerste keer een langere uitleg bij "Verplaats naar Thuis".
     @AppStorage(AppConfiguratie.sleutelThuisUitlegGezien) private var thuisUitlegGezien = false
 
@@ -98,6 +99,9 @@ struct ReceptWeergave: View {
                 Button("Weergave", systemImage: "textformat.size") { toonLeesinstellingen = true }
                 Menu("Meer", systemImage: "ellipsis") {
                     Button("Bewerk", systemImage: "pencil") { toonBewerken = true }
+                    if heeftIngredienten {
+                        Button("Boodschappen…", systemImage: "cart") { toonBoodschappen = true }
+                    }
                     fotoMenu
                     verplaatsKnop
                     Button("Verwijder", systemImage: "trash", role: .destructive) { bevestigVerwijderen = true }
@@ -105,6 +109,14 @@ struct ReceptWeergave: View {
             }
         }
         .sheet(isPresented: $toonBewerken) { ReceptBewerken(recept: recept) }
+        .sheet(isPresented: $toonBoodschappen) {
+            BoodschappenVel(
+                recept: recept.titelOfStandaard, porties: recept.porties > 0 ? porties : 0,
+                invoer: recept.gesorteerdeIngredienten.map { BoodschappenInvoer($0) }, factor: factor,
+                bestemming: HerinneringenDienst.gedeeld
+            )
+            .presentationDetents([.medium, .large])
+        }
         .gerechtFotoKiezer(recept: recept, bibliotheek: $toonFotoBibliotheek, camera: $toonCamera)
         .confirmationDialog("Foto verwijderen?", isPresented: $bevestigFotoVerwijderen, titleVisibility: .visible) {
             Button("Verwijder foto", role: .destructive, action: verwijderFoto)
@@ -269,17 +281,23 @@ struct ReceptWeergave: View {
         .accessibilityElement(children: .combine)
     }
 
-    /// Vaste balk onderin (U2): porties en "Kook dit" onder de duim, ook als je naar de bereiding scrolt.
+    private var heeftIngredienten: Bool { !(recept.ingredienten ?? []).isEmpty }
+
+    /// Vaste balk onderin (U2): porties, 🛒 en "Kook dit" onder de duim, ook als je naar de bereiding scrolt.
     @ViewBuilder private var receptBalk: some View {
         let kanKoken = !recept.gesorteerdeStappen.isEmpty
-        if kanKoken || recept.porties > 0 {
+        if kanKoken || recept.porties > 0 || heeftIngredienten {
             ViewThatFits(in: .horizontal) {
                 HStack(spacing: 12) {
                     portiesKnoppen
+                    boodschappenKnop
                     if kanKoken { kookKnop }
                 }
                 VStack(spacing: 8) {
-                    portiesKnoppen
+                    HStack(spacing: 12) {
+                        portiesKnoppen
+                        boodschappenKnop
+                    }
                     if kanKoken { kookKnop }
                 }
             }
@@ -294,6 +312,26 @@ struct ReceptWeergave: View {
             .padding(.bottom, 4)
             .frame(maxWidth: .infinity)
             .dynamicTypeSize(...DynamicTypeSize.accessibility2)
+        }
+    }
+
+    /// 🛒 naast de porties (#38): opent het vel Boodschappen, geschaald naar het gekozen aantal personen.
+    @ViewBuilder private var boodschappenKnop: some View {
+        if heeftIngredienten {
+            Button {
+                toonBoodschappen = true
+            } label: {
+                Image(systemName: "cart")
+                    .font(.body.weight(.semibold))
+                    .frame(width: 34, height: 34)
+                    .background(Color(.tertiarySystemFill), in: Circle())
+                    .frame(width: 44, height: 44)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .foregroundStyle(Color.accentColor)
+            .accessibilityLabel("Boodschappen")
+            .accessibilityHint("Zet de ingrediënten op je boodschappenlijst")
         }
     }
 
