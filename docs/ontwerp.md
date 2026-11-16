@@ -309,7 +309,12 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 
 1. **"Vraag de chef"** — vrije vraag tijdens het koken ("kan ik ook crème fraîche gebruiken?"), beantwoord
    door Claude (of later het on-device model), alleen met het recept als context en met een zichtbaar "suggestie"-label.
-2. **Boodschappenlijst** — ingrediënten (geschaald) naar Herinneringen, op winkelvolgorde gegroepeerd.
+2. **Boodschappenlijst** — stap 1 gebouwd (#38): 🛒 in de receptbalk opent een vel met de ingrediënten
+   geschaald en aangevinkt, "Meestal in huis" uitgevinkt (aan te passen, Knipsel leert wat je vaak uitvinkt),
+   naar de lijst "Boodschappen" in Herinneringen of delen als tekst. Herinneringen deelt een lijst van het type
+   Boodschappen zelf in per afdeling; EventKit kan dat lijsttype niet zetten, dus dat doet de gebruiker in
+   Herinneringen (Toon lijstinfo › Lijsttype). Een eigen lijst over meerdere recepten en het weekmenu volgen
+   apart (schetsen `docs/ux/schetsen-boodschappen.html`).
 3. **"Wat kan ik maken met …"** — zoeken op wat je in huis hebt ("prei, ei, kaas").
 4. **Menu koken** — twee of drie recepten tegelijk in de kookmodus, met wisselen per stem ("naar de saus").
 5. **Gekookt-logboek** — datum, sterren en notitie ("minder zout"); tonen bij het recept.

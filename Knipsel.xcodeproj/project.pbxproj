@@ -23,6 +23,7 @@
 		1F3FDBC589F02001C1B7B97A /* TimerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9253C1E711E4D4809D2D3A4B /* TimerService.swift */; };
 		20421F08FC3BD9F058C8C5A1 /* ActivityIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC094C8E260E00709A10A41E /* ActivityIntents.swift */; };
 		2362EA9DE5E02E62AA467F52 /* Spraakbediening.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6649CEA3FA3A624A9FA2064E /* Spraakbediening.swift */; };
+		238586ED127CDDAA2D5C2978 /* BoodschappenInstellingen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14B561A32DEAC7C7A2A8E356 /* BoodschappenInstellingen.swift */; };
 		2482827169D7E429866A06A9 /* ThuisTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EABB8821D775F7C074547320 /* ThuisTests.swift */; };
 		2776CB8B6DDEA346CE3E150B /* RegelIndeler.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4AC70FA2ED8B187CB519B0B /* RegelIndeler.swift */; };
 		286DA735156802B44994271F /* InleesVerwerker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12858D855F0292ECA529D6E1 /* InleesVerwerker.swift */; };
@@ -44,8 +45,10 @@
 		450719FC3AA154174CE23D97 /* kookzender.html in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CC84520EBEC57921E15 /* kookzender.html */; };
 		458D5796AF86AE9BEDADB5D6 /* testpagina.png in Resources */ = {isa = PBXBuildFile; fileRef = 0610FBAD74DF1C4D24580715 /* testpagina.png */; };
 		468BD70A4EE22C297692F80B /* betaalmuur-krant.html in Resources */ = {isa = PBXBuildFile; fileRef = F293CAF652184041C9BF4062 /* betaalmuur-krant.html */; };
+		48A2F598004D962180075CA5 /* HerinneringenDienst.swift in Sources */ = {isa = PBXBuildFile; fileRef = E79401E15A93EE7924E6656C /* HerinneringenDienst.swift */; };
 		497E42DAECE090ACE247CC98 /* SchermAan.swift in Sources */ = {isa = PBXBuildFile; fileRef = 529AD9C64E9BDB5E580A3E6C /* SchermAan.swift */; };
 		49DC26C2D48E70AFDC2EB33B /* KookVoortgangTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD4A72CEC245DF458099EDC9 /* KookVoortgangTests.swift */; };
+		49E78F3173F98ADC9838E8F5 /* BoodschappenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87164833474DED195AC1817E /* BoodschappenTests.swift */; };
 		4F274C325F6E8D95FE2F5328 /* KookSessie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 562F5390ADDD4A8F009B3BA9 /* KookSessie.swift */; };
 		4FF07964A61B3E0C425DD2CD /* VoorleesInstellingen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EFD1678E71CED6C2D45F8FB /* VoorleesInstellingen.swift */; };
 		50AFB4967778F39A3E4D82C5 /* CommandoHerkenner.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8209BC4A9BCD316C6D89399 /* CommandoHerkenner.swift */; };
@@ -71,6 +74,7 @@
 		6EE3F87BE59578B724013FA4 /* Uitingbeslisser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC14DDC5B266DCB2B81DC4F /* Uitingbeslisser.swift */; };
 		6F601ABB2A179A0EED71F3CE /* Audiomotor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D6BF471F700505878E222C /* Audiomotor.swift */; };
 		703FB3E1FC61881EEBAB86E8 /* KnipselWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = E106950816385404FA5F67F7 /* KnipselWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		72AF751136AC3986CE0D15DC /* BoodschappenLijst.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1128C811CF36CB9DCA85B14 /* BoodschappenLijst.swift */; };
 		738173462C9B4FBECD8620D2 /* ThuisDelenScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF42938953FC73C07EA132FC /* ThuisDelenScherm.swift */; };
 		75FB7E829A9C0A22AC5684FA /* KookmodusScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = F668CB4EF71739D016404873 /* KookmodusScherm.swift */; };
 		7609930B979CD3AD847075DF /* GerechtFotoKiezer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893C0E4CB8D5AACF1A1B5065 /* GerechtFotoKiezer.swift */; };
@@ -103,6 +107,7 @@
 		B211156F21975D64BBDD7330 /* BibliotheekCompact.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13043F6A124766992A9EC92C /* BibliotheekCompact.swift */; };
 		B23A98F49BCC31DED61DA5C8 /* ClaudeIndelerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD497F957B3582290552826B /* ClaudeIndelerTests.swift */; };
 		B7309805AC938E05943FF8FF /* KookIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B94C367AB288EE152943E1B /* KookIntents.swift */; };
+		BC6862D4DACC9962D077F5D5 /* BoodschappenVel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF08D769A851BE5A336DAA0A /* BoodschappenVel.swift */; };
 		BCB99531A5CA1B10C7B5A7EA /* PerenInRodeWijn.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F13650094C100D28D45EBD5 /* PerenInRodeWijn.swift */; };
 		BDBB4B05B921FC1E3FA88333 /* MotorSpreker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65806BA221489972A5A9EED0 /* MotorSpreker.swift */; };
 		BE2CCBC8A8140209BF370CC0 /* ReceptLijst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4920C55C5B359D793E921673 /* ReceptLijst.swift */; };
@@ -124,6 +129,7 @@
 		D411A1BA50A1A4111D4E4BC8 /* StappenEnClaudeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11CB265982A24C2A3B0302B3 /* StappenEnClaudeTests.swift */; };
 		D500E8261F43F354A466E5AD /* Ingredientkoppeling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209E54A5306E6DFE80C487D5 /* Ingredientkoppeling.swift */; };
 		DC8B5058D64A8DE07C790C2B /* TimerWeergave.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D14B3489EC67EF94A4D581A /* TimerWeergave.swift */; };
+		DCA397E52EFF9138C42666A4 /* MeestalInHuis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21FEAF2FF5F4627F6A808452 /* MeestalInHuis.swift */; };
 		DE8568A51116983D6CA9DE82 /* SpraakInstellingen.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1BD32BDD0BAF5D9D8AEFFFC /* SpraakInstellingen.swift */; };
 		DEC6563513861F3B066F3E2D /* GerechtFoto.swift in Sources */ = {isa = PBXBuildFile; fileRef = 579E35F670326A740E862739 /* GerechtFoto.swift */; };
 		DED577EB1B67E5D05CE010C9 /* Uitspraakregels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1800D3286A33FA25D0CDB692 /* Uitspraakregels.swift */; };
@@ -208,6 +214,7 @@
 		129BF70483D327699E4C49C0 /* KaartkleurenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KaartkleurenTests.swift; sourceTree = "<group>"; };
 		13043F6A124766992A9EC92C /* BibliotheekCompact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibliotheekCompact.swift; sourceTree = "<group>"; };
 		1349CCA6120F7D327342988E /* HTMLTekst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTMLTekst.swift; sourceTree = "<group>"; };
+		14B561A32DEAC7C7A2A8E356 /* BoodschappenInstellingen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoodschappenInstellingen.swift; sourceTree = "<group>"; };
 		154104563D12D62C31FDFF04 /* supermarkt-lijst.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = "supermarkt-lijst.html"; sourceTree = "<group>"; };
 		171A25B1BCB38B52FB9ABA51 /* KnipselScherm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipselScherm.swift; sourceTree = "<group>"; };
 		17E2EA310696D39FC0F54C71 /* SiriInstellingen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriInstellingen.swift; sourceTree = "<group>"; };
@@ -220,6 +227,7 @@
 		209E54A5306E6DFE80C487D5 /* Ingredientkoppeling.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ingredientkoppeling.swift; sourceTree = "<group>"; };
 		212AD1B4E678214154D53ECE /* TijdHerkenner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TijdHerkenner.swift; sourceTree = "<group>"; };
 		21430A5E8EB0D9FEF0ECF84C /* DeelDienst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeelDienst.swift; sourceTree = "<group>"; };
+		21FEAF2FF5F4627F6A808452 /* MeestalInHuis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeestalInHuis.swift; sourceTree = "<group>"; };
 		2A0A091AC7276F0B6291F3A6 /* SpraakbedieningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpraakbedieningTests.swift; sourceTree = "<group>"; };
 		2A989570D162883BA4071D14 /* Knipsel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Knipsel 3.xcdatamodel"; sourceTree = "<group>"; };
 		2AB18677647FD308C8B3C413 /* TimervraagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimervraagTests.swift; sourceTree = "<group>"; };
@@ -280,6 +288,7 @@
 		81D29371C90818259BC8A361 /* ReceptOpbouw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptOpbouw.swift; sourceTree = "<group>"; };
 		82315C270362977EC44642F1 /* ReceptBewerken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptBewerken.swift; sourceTree = "<group>"; };
 		8579C78469AD96BD3CD5D529 /* KeychainService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainService.swift; sourceTree = "<group>"; };
+		87164833474DED195AC1817E /* BoodschappenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoodschappenTests.swift; sourceTree = "<group>"; };
 		87F50F041C4CB953D585CFF4 /* KnipselApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipselApp.swift; sourceTree = "<group>"; };
 		88F2A62551961BC12AF1FDB0 /* TijdHerkennerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TijdHerkennerTests.swift; sourceTree = "<group>"; };
 		893C0E4CB8D5AACF1A1B5065 /* GerechtFotoKiezer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GerechtFotoKiezer.swift; sourceTree = "<group>"; };
@@ -291,6 +300,7 @@
 		9AE93C8783545508E21C7C37 /* ClaudeIndeler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeIndeler.swift; sourceTree = "<group>"; };
 		9CDD09785EEFE89D17A7188D /* Opmaak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opmaak.swift; sourceTree = "<group>"; };
 		9F3E0E386DC84E412E8F73FE /* ReceptEntiteit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptEntiteit.swift; sourceTree = "<group>"; };
+		A1128C811CF36CB9DCA85B14 /* BoodschappenLijst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoodschappenLijst.swift; sourceTree = "<group>"; };
 		A47550B28B74FB224C6205EB /* Knipsel.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Knipsel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A875A58DA63CCCD1D49EC53C /* ReceptVerplaatsen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptVerplaatsen.swift; sourceTree = "<group>"; };
 		AB79EBDFADD9D84884EA2AA3 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
@@ -311,6 +321,7 @@
 		C97CF0FA72B5D097AC41FAC0 /* Knipsel.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Knipsel.entitlements; sourceTree = "<group>"; };
 		CC62418E320151F46A5D662F /* ReceptWeergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptWeergave.swift; sourceTree = "<group>"; };
 		CDC349A2666A3BA717305377 /* UitnodigingOntvangen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UitnodigingOntvangen.swift; sourceTree = "<group>"; };
+		CF08D769A851BE5A336DAA0A /* BoodschappenVel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoodschappenVel.swift; sourceTree = "<group>"; };
 		D26E22081E007AD5CE470348 /* InboxLijst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InboxLijst.swift; sourceTree = "<group>"; };
 		D27E7F45AE46B4F8472FA56C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D34FC0C7915749A131F9DE78 /* GerechtFotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GerechtFotoTests.swift; sourceTree = "<group>"; };
@@ -323,6 +334,7 @@
 		E106950816385404FA5F67F7 /* KnipselWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = KnipselWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		E27CF3A5879BFA34A814BA6A /* ActivityWeergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityWeergave.swift; sourceTree = "<group>"; };
 		E55DDE6D13AF983174B115EF /* Spraakweergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spraakweergave.swift; sourceTree = "<group>"; };
+		E79401E15A93EE7924E6656C /* HerinneringenDienst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HerinneringenDienst.swift; sourceTree = "<group>"; };
 		E8209BC4A9BCD316C6D89399 /* CommandoHerkenner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandoHerkenner.swift; sourceTree = "<group>"; };
 		EABB8821D775F7C074547320 /* ThuisTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThuisTests.swift; sourceTree = "<group>"; };
 		EC543CE3052A7954077AEEF4 /* Spreker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Spreker.swift; sourceTree = "<group>"; };
@@ -356,6 +368,7 @@
 				4B57464F0562ED0CD3B7E10D /* Voorbeeldrecepten.swift */,
 				425CB2FC9C8FE0D0C29E8EBF /* Weergave.swift */,
 				D3628BAEB7A87E87A31BA1BF /* Bibliotheek */,
+				F2E3D931C212BE687958C49A /* Boodschappen */,
 				26E51F83CFF350CCCD23D2DF /* Delen */,
 				0CDBE69D3BD712FFA7A3630E /* Diensten */,
 				24A1B6E19DF295019049E1B4 /* Gedeeld */,
@@ -375,11 +388,14 @@
 		0CDBE69D3BD712FFA7A3630E /* Diensten */ = {
 			isa = PBXGroup;
 			children = (
+				A1128C811CF36CB9DCA85B14 /* BoodschappenLijst.swift */,
 				9AE93C8783545508E21C7C37 /* ClaudeIndeler.swift */,
 				579E35F670326A740E862739 /* GerechtFoto.swift */,
+				E79401E15A93EE7924E6656C /* HerinneringenDienst.swift */,
 				021F75B011F22D7BDC256846 /* Indeler.swift */,
 				03E25895FFF0EB680702572E /* IngredientParser.swift */,
 				8579C78469AD96BD3CD5D529 /* KeychainService.swift */,
+				21FEAF2FF5F4627F6A808452 /* MeestalInHuis.swift */,
 				6A0059719A9B2CB0E15C31E9 /* ModelIndeler.swift */,
 				9CDD09785EEFE89D17A7188D /* Opmaak.swift */,
 				5080A8C816A2DC91ED20E4C3 /* Portieschaling.swift */,
@@ -455,6 +471,7 @@
 			isa = PBXGroup;
 			children = (
 				F0971CECD87A1CAEA6333DB7 /* BibliotheekbeheerTests.swift */,
+				87164833474DED195AC1817E /* BoodschappenTests.swift */,
 				BD497F957B3582290552826B /* ClaudeIndelerTests.swift */,
 				F34EB83CF845B3C050F02FD9 /* CommandoHerkennerTests.swift */,
 				37F5F605C77AA64048FCAE31 /* DelenTests.swift */,
@@ -498,6 +515,7 @@
 		4D6EAA208F20B2D2C46ECE69 /* Instellingen */ = {
 			isa = PBXGroup;
 			children = (
+				14B561A32DEAC7C7A2A8E356 /* BoodschappenInstellingen.swift */,
 				0BB7B04DB132CC61614ED998 /* InstellingenView.swift */,
 				17E2EA310696D39FC0F54C71 /* SiriInstellingen.swift */,
 				C1BD32BDD0BAF5D9D8AEFFFC /* SpraakInstellingen.swift */,
@@ -661,6 +679,14 @@
 			path = KnipselWidgets;
 			sourceTree = "<group>";
 		};
+		F2E3D931C212BE687958C49A /* Boodschappen */ = {
+			isa = PBXGroup;
+			children = (
+				CF08D769A851BE5A336DAA0A /* BoodschappenVel.swift */,
+			);
+			path = Boodschappen;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -821,6 +847,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				89662557847966E3755ECFD9 /* BibliotheekbeheerTests.swift in Sources */,
+				49E78F3173F98ADC9838E8F5 /* BoodschappenTests.swift in Sources */,
 				B23A98F49BCC31DED61DA5C8 /* ClaudeIndelerTests.swift in Sources */,
 				5D97C1A6A1620B7FCEF9727B /* CommandoHerkennerTests.swift in Sources */,
 				6C11B367457D77BFDE47FD60 /* DelenTests.swift in Sources */,
@@ -863,6 +890,9 @@
 				B211156F21975D64BBDD7330 /* BibliotheekCompact.swift in Sources */,
 				9958265122AC0BC0143D6456 /* BibliotheekSplit.swift in Sources */,
 				E12BCD6DA88B3D76A6178416 /* Bibliotheekbeheer.swift in Sources */,
+				238586ED127CDDAA2D5C2978 /* BoodschappenInstellingen.swift in Sources */,
+				72AF751136AC3986CE0D15DC /* BoodschappenLijst.swift in Sources */,
+				BC6862D4DACC9962D077F5D5 /* BoodschappenVel.swift in Sources */,
 				63E13378C0B8DF653EAC89C5 /* ClaudeIndeler.swift in Sources */,
 				BF4BE3298F8304900A764F50 /* CloudKitDeelDienst.swift in Sources */,
 				50AFB4967778F39A3E4D82C5 /* CommandoHerkenner.swift in Sources */,
@@ -875,6 +905,7 @@
 				DEC6563513861F3B066F3E2D /* GerechtFoto.swift in Sources */,
 				7609930B979CD3AD847075DF /* GerechtFotoKiezer.swift in Sources */,
 				FEE8A464D1C206106FDAE1BA /* HTMLTekst.swift in Sources */,
+				48A2F598004D962180075CA5 /* HerinneringenDienst.swift in Sources */,
 				D30E192477AD60342F38D01F /* InboxLijst.swift in Sources */,
 				E482A35DA62B0DA757E8AF89 /* Indeler.swift in Sources */,
 				16C4657DF374C61D4E114303 /* IngredientParser.swift in Sources */,
@@ -903,6 +934,7 @@
 				75FB7E829A9C0A22AC5684FA /* KookmodusScherm.swift in Sources */,
 				5EB75E63CC2445910674E630 /* Leesinstellingen.swift in Sources */,
 				D2757A8FE14C6F0E0D11AA9D /* LuisterService.swift in Sources */,
+				DCA397E52EFF9138C42666A4 /* MeestalInHuis.swift in Sources */,
 				427784EFE93E1404E9C8F1E5 /* ModelIndeler.swift in Sources */,
 				F653DCEDB21019311F29A9D1 /* Modelklassen.swift in Sources */,
 				BDBB4B05B921FC1E3FA88333 /* MotorSpreker.swift in Sources */,

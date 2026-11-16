@@ -48,6 +48,16 @@ enum AppConfiguratie {
     /// (standaard aan). Papierknipsels blijven tekst-only (B7).
     static let sleutelWebFotoBewaren = "webFotoBewaren"
 
+    /// Boodschappen (#38): wat je meestal in huis hebt, met de tellers van wat je uitvinkt (JSON,
+    /// `MeestalInHuis`), alleen op dit toestel.
+    static let sleutelMeestalInHuis = "meestalInHuis"
+
+    /// De lijst in Herinneringen waar boodschappen in komen; Knipsel maakt hem aan als hij er niet is.
+    static let boodschappenLijstNaam = "Boodschappen"
+
+    /// Opent de app Herinneringen. Niet officieel gedocumenteerd; lukt het niet, dan gebeurt er niets.
+    static let herinneringenURL = URL(string: "x-apple-reminderkit://")!
+
     /// Keychain: de eigen Anthropic-sleutel voor indelen met Claude (optioneel, B10).
     static let sleutelClaude = "claudeApiSleutel"
 
