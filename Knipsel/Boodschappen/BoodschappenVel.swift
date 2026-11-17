@@ -5,16 +5,21 @@ import SwiftUI
 /// in huis hebt. De hoofdknop zet ze op de eigen lijst in Knipsel (#39) van het kookboek van het recept,
 /// of — als dat in Instellingen zo staat — in Herinneringen; de andere bestemming en "Delen als tekst"
 /// staan eronder.
+///
+/// Voor meerdere recepten uit de bibliotheek (#40, schets 3A) staat bovenaan per recept een rij met
+/// porties, is alles opgeteld en staat onder elke regel uit welke recepten hij komt.
 struct BoodschappenVel: View {
-    let recept: String
-    let porties: Int
-    let invoer: [BoodschappenInvoer]
-    let factor: Double
+    /// De recepten op het vel; bij één recept uit de receptweergave precies één.
+    let recepten: [VelRecept]
     let bestemming: any Boodschappenbestemming
-    /// Kookboek van het recept: een Thuis-recept gaat op de Thuis-lijst.
-    let kookboek: Kookboek
+    /// Met Thuis (gedeeld of met inhoud) mag je bij meerdere recepten kiezen op welke lijst ze gaan.
+    let thuisBestaat: Bool
     private let defaults: UserDefaults
-    private let hoofd: VelBestemming
+    private let standaard: BoodschappenStandaard
+    /// Eén recept uit de receptweergave: porties en factor zijn daar al gekozen.
+    private let enkel: (porties: Int, factor: Double)?
+    /// Na het versturen naar een lijst (de bibliotheek zet dan de selectie uit).
+    private let naSucces: () -> Void
 
     @Environment(\.dismiss) private var dismiss
     @Environment(\.managedObjectContext) private var context
@@ -31,6 +36,10 @@ struct BoodschappenVel: View {
     @State private var geteld = false
     /// Per regel-id wat er al op de eigen lijst staat en wat het samen wordt ("2 uien" → "5 uien").
     @State private var opLijst: [String: (bestaand: String, samen: String?)] = [:]
+    /// Gekozen personen per recept (alleen bij meerdere recepten).
+    @State private var porties: [String: Int]
+    /// Op welke lijst in Knipsel het komt: het kookboek van het recept, of bij meerdere de meeste.
+    @State private var kookboek: Kookboek
 
     enum Fase: Equatable {
         case kiezen
@@ -44,24 +53,78 @@ struct BoodschappenVel: View {
         bestemming: any Boodschappenbestemming, kookboek: Kookboek = .mijn, defaults: UserDefaults = .standard,
         fase: Fase = .kiezen
     ) {
-        self.recept = recept
-        self.porties = porties
-        self.invoer = invoer
-        self.factor = factor
+        self.init(
+            recepten: [VelRecept(id: recept, titel: recept, invoer: invoer, standaard: 0, kookboek: kookboek)],
+            enkel: (porties, factor), bestemming: bestemming, thuisBestaat: false, defaults: defaults, fase: fase,
+            naSucces: {})
+    }
+
+    /// Meerdere recepten uit de bibliotheek (#40): elk begint op zijn eigen standaardporties.
+    init(
+        recepten: [VelRecept], bestemming: any Boodschappenbestemming, thuisBestaat: Bool,
+        defaults: UserDefaults = .standard, fase: Fase = .kiezen, naSucces: @escaping () -> Void = {}
+    ) {
+        self.init(
+            recepten: recepten, enkel: nil, bestemming: bestemming, thuisBestaat: thuisBestaat, defaults: defaults,
+            fase: fase, naSucces: naSucces)
+    }
+
+    private init(
+        recepten: [VelRecept], enkel: (porties: Int, factor: Double)?, bestemming: any Boodschappenbestemming,
+        thuisBestaat: Bool, defaults: UserDefaults, fase: Fase, naSucces: @escaping () -> Void
+    ) {
+        self.recepten = recepten
+        self.enkel = enkel
         self.bestemming = bestemming
-        self.kookboek = kookboek
+        self.thuisBestaat = thuisBestaat
         self.defaults = defaults
-        hoofd = VelBestemming.hoofd(standaard: .laad(uit: defaults), kookboek: kookboek)
+        self.naSucces = naSucces
+        standaard = .laad(uit: defaults)
+        _kookboek = State(initialValue: VelBestemming.kookboek(voor: recepten.map(\.kookboek)))
+        let porties = Dictionary(recepten.map { ($0.id, $0.standaard) }, uniquingKeysWith: { a, _ in a })
+        _porties = State(initialValue: porties)
         let meestal = MeestalInHuis.laad(uit: defaults)
         _meestal = State(initialValue: meestal)
-        let regels = BoodschappenLijst.regels(invoer, factor: factor, meestalInHuis: meestal)
+        let regels = BoodschappenLijst.regels(
+            recepten: Self.delen(recepten, enkel: enkel, porties: porties), meestalInHuis: meestal)
         _aangevinkt = State(initialValue: Set(regels.filter { !$0.meestalInHuis }.map(\.id)))
         _fase = State(initialValue: fase)
         _toegang = State(initialValue: bestemming.toegang)
     }
 
+    private var meerdere: Bool { enkel == nil }
+
+    private var hoofd: VelBestemming { VelBestemming.hoofd(standaard: standaard, kookboek: kookboek) }
+
+    private static func delen(
+        _ recepten: [VelRecept], enkel: (porties: Int, factor: Double)?, porties: [String: Int]
+    ) -> [ReceptBoodschappen] {
+        recepten.map { recept in
+            if let enkel {
+                return ReceptBoodschappen(titel: recept.titel, invoer: recept.invoer, factor: enkel.factor)
+            }
+            return ReceptBoodschappen(
+                titel: recept.titel, invoer: recept.invoer, standaard: recept.standaard,
+                porties: porties[recept.id] ?? recept.standaard)
+        }
+    }
+
     private var regels: [BoodschappenRegel] {
-        BoodschappenLijst.regels(invoer, factor: factor, meestalInHuis: meestal)
+        BoodschappenLijst.regels(
+            recepten: Self.delen(recepten, enkel: enkel, porties: porties), meestalInHuis: meestal)
+    }
+
+    /// Per recept de titel en het aantal personen, voor de tekst en de notitie.
+    private var titelsEnPorties: [(titel: String, porties: Int)] {
+        recepten.map { recept in
+            (recept.titel, enkel?.porties ?? (recept.standaard > 0 ? porties[recept.id] ?? recept.standaard : 0))
+        }
+    }
+
+    /// Wat er in de herkomst op de lijst komt: het recept, of bij meerdere de recepten van de regel.
+    private func herkomst(_ regel: BoodschappenRegel) -> String? {
+        guard meerdere else { return recepten.first?.titel }
+        return regel.herkomst.isEmpty ? nil : regel.herkomst.joined(separator: ", ")
     }
 
     private var gekozen: [BoodschappenRegel] { regels.filter { aangevinkt.contains($0.id) } }
@@ -75,7 +138,8 @@ struct BoodschappenVel: View {
     }
 
     private var titel: String {
-        Weergave.porties(porties).map { "Boodschappen · \($0)" } ?? "Boodschappen"
+        guard let enkel else { return VelRecept.titel(aantal: recepten.count) }
+        return Weergave.porties(enkel.porties).map { "Boodschappen · \($0)" } ?? "Boodschappen"
     }
 
     var body: some View {
@@ -102,6 +166,11 @@ struct BoodschappenVel: View {
             laadOpLijst()
             await laadDubbele()
         }
+        .onChange(of: porties) {
+            laadOpLijst()
+            Task { await laadDubbele() }
+        }
+        .onChange(of: kookboek) { laadOpLijst() }
         .onDisappear(perform: leer)
         .alert(
             "Er ging iets mis", isPresented: Binding(get: { foutmelding != nil }, set: { if !$0 { foutmelding = nil } })
@@ -119,6 +188,7 @@ struct BoodschappenVel: View {
         let nodig = alle.filter { !$0.meestalInHuis }
         let inHuis = alle.filter(\.meestalInHuis)
         return List {
+            if meerdere { receptRijen }
             Section {
                 if toegang == .geweigerd { geenToegang }
                 ForEach(nodig) { rij($0) }
@@ -138,15 +208,63 @@ struct BoodschappenVel: View {
                 }
             }
             if alle.isEmpty {
-                Text("Dit recept heeft geen ingrediënten.").foregroundStyle(.secondary)
+                Text(meerdere ? "Deze recepten hebben geen ingrediënten." : "Dit recept heeft geen ingrediënten.")
+                    .foregroundStyle(.secondary)
             }
         }
         .listStyle(.insetGrouped)
         .safeAreaInset(edge: .bottom) { knoppen }
     }
 
+    /// Bovenaan bij meerdere recepten: "Zet op: Mijn lijst | Thuis" en per recept de porties.
+    @ViewBuilder private var receptRijen: some View {
+        if VelBestemming.toonKookboekKeuze(meerdere: meerdere, thuisBestaat: thuisBestaat) {
+            Section {
+                HStack(spacing: 12) {
+                    Text("Zet op:")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                    Picker("Zet op", selection: $kookboek) {
+                        Text("Mijn lijst").tag(Kookboek.mijn)
+                        Text("Thuis").tag(Kookboek.thuis)
+                    }
+                    .pickerStyle(.segmented)
+                    .labelsHidden()
+                }
+                .listRowBackground(Color.clear)
+                .listRowInsets(EdgeInsets(top: 2, leading: 4, bottom: 2, trailing: 4))
+                .accessibilityElement(children: .contain)
+            }
+        }
+        Section {
+            ForEach(recepten) { recept in
+                HStack(spacing: 10) {
+                    Text(recept.titel)
+                        .font(.system(.body, design: .serif).weight(.semibold))
+                        .lineLimit(2)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    if recept.standaard > 0 {
+                        PortiesKnoppen(
+                            porties: porties[recept.id] ?? recept.standaard,
+                            wijzig: { porties[recept.id] = min(99, max(1, $0)) }, kleur: Kookkleuren.accent,
+                            rond: true
+                        )
+                        .accessibilityLabel("Porties \(recept.titel)")
+                    } else {
+                        Text("Porties onbekend")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        } header: {
+            Text(recepten.count == 1 ? "1 recept" : "\(recepten.count) recepten")
+        }
+    }
+
     private func rij(_ regel: BoodschappenRegel) -> some View {
         let aan = aangevinkt.contains(regel.id)
+        let uit = meerdere && !regel.herkomst.isEmpty ? regel.herkomst.joined(separator: ", ") : nil
         return VStack(alignment: .leading, spacing: 6) {
             Button {
                 if aan { aangevinkt.remove(regel.id) } else { aangevinkt.insert(regel.id) }
@@ -156,14 +274,22 @@ struct BoodschappenVel: View {
                         .font(.title3)
                         .foregroundStyle(aan ? Kookkleuren.accent : Color.secondary)
                         .accessibilityHidden(true)
-                    Text(regel.tekst)
-                        .foregroundStyle(aan ? .primary : .secondary)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(regel.tekst)
+                            .foregroundStyle(aan ? .primary : .secondary)
+                        if let uit {
+                            Text(uit)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                                .lineLimit(2)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .accessibilityLabel(regel.tekst)
+            .accessibilityLabel(uit.map { "\(regel.tekst), uit \($0)" } ?? regel.tekst)
             .accessibilityValue(aan ? "aangevinkt" : "niet aangevinkt")
             .accessibilityHint(aan ? "Tik als je het al in huis hebt" : "Tik om het op de lijst te zetten")
             if aan, let dubbel = dubbele[regel.id] {
@@ -325,7 +451,7 @@ struct BoodschappenVel: View {
     }
 
     private var deelKnop: some View {
-        ShareLink(item: BoodschappenLijst.tekst(recept: recept, porties: porties, regels: gekozen)) {
+        ShareLink(item: BoodschappenLijst.tekst(recepten: titelsEnPorties, regels: gekozen)) {
             SwiftUI.Label("Delen als tekst", systemImage: "square.and.arrow.up")
                 .font(.body.weight(.semibold))
                 .frame(maxWidth: .infinity, minHeight: 44)
@@ -439,9 +565,10 @@ struct BoodschappenVel: View {
     private func zetOpKnipselLijst(_ boek: Kookboek) {
         do {
             let resultaat = try Boodschappenlijsten.zetOpLijst(
-                gekozen.map(LijstRegel.init), herkomst: recept, kookboek: boek, context: context)
+                gekozen.map { (LijstRegel($0), herkomst($0)) }, kookboek: boek, context: context)
             geteld = true
             fase = .klaarLijst(resultaat, boek)
+            naSucces()
             Task { await OnbekendeAfdelingen.gedeeld.deelIn(context: context) }
         } catch {
             foutmelding = "Op de lijst zetten lukte niet: \(error.localizedDescription)"
@@ -469,9 +596,10 @@ struct BoodschappenVel: View {
             fase = .bezig
             do {
                 let resultaat = try await bestemming.zetOpLijst(
-                    gekozen, keuzes: keuzes, notitie: HerinneringenDienst.notitie(recept: recept))
+                    gekozen, keuzes: keuzes, notitie: HerinneringenDienst.notitie(recepten: recepten.map(\.titel)))
                 geteld = true
                 fase = .klaar(resultaat)
+                naSucces()
             } catch {
                 fase = .kiezen
                 foutmelding = "Op de lijst zetten lukte niet: \(error.localizedDescription)"
@@ -484,5 +612,34 @@ struct BoodschappenVel: View {
         guard geteld else { return }
         meestal.registreerUitgevinkt(regels.filter { !aangevinkt.contains($0.id) })
         meestal.bewaar(in: defaults)
+    }
+}
+
+/// Eén recept op het vel: titel, ingrediënten, standaardporties (0 = onbekend) en kookboek.
+struct VelRecept: Identifiable, Equatable {
+    let id: String
+    let titel: String
+    let invoer: [BoodschappenInvoer]
+    let standaard: Int
+    let kookboek: Kookboek
+
+    init(id: String, titel: String, invoer: [BoodschappenInvoer], standaard: Int, kookboek: Kookboek = .mijn) {
+        self.id = id
+        self.titel = titel
+        self.invoer = invoer
+        self.standaard = standaard
+        self.kookboek = kookboek
+    }
+
+    init(_ recept: Recept) {
+        self.init(
+            id: recept.objectID.uriRepresentation().absoluteString, titel: recept.titelOfStandaard,
+            invoer: recept.gesorteerdeIngredienten.map { BoodschappenInvoer($0) }, standaard: Int(recept.porties),
+            kookboek: recept.kookboekWaarde)
+    }
+
+    /// Titel van het vel: "Boodschappen · 3 recepten".
+    static func titel(aantal: Int) -> String {
+        aantal == 1 ? "Boodschappen · 1 recept" : "Boodschappen · \(aantal) recepten"
     }
 }

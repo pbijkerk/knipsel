@@ -17,10 +17,16 @@ struct BibliotheekSplit: View {
     @State private var verder: VerderKeuze?
     @State private var verderGestart: VerderKeuze?
     @State private var toonInbox = false
+    @State private var selectie = ReceptSelectie()
     @Environment(InleesInbox.self) private var inbox
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
     /// Zijbalk standaard zichtbaar, zoals in de schets.
     @State private var kolommen: NavigationSplitViewVisibility = .all
+
+    /// - Parameter selectie: begin in selectiemodus (#40), voor voorbeelden en tests.
+    init(selectie: ReceptSelectie = ReceptSelectie()) {
+        _selectie = State(initialValue: selectie)
+    }
 
     var body: some View {
         NavigationSplitView(columnVisibility: $kolommen) {
@@ -63,16 +69,28 @@ struct BibliotheekSplit: View {
 
     private var receptenKolom: some View {
         NavigationStack(path: $pad) {
-            ReceptLijst(filter: filter, weergave: weergave, kop: kop)
+            ReceptLijst(filter: filter, weergave: weergave, kop: kop, selectie: $selectie)
                 .safeAreaInset(edge: .bottom, spacing: 0) {
-                    HStack {
-                        Spacer()
-                        KnipKnop { toonKnippen = true }
+                    if selectie.actief {
+                        SelectieBalk(selectie: $selectie)
+                    } else {
+                        HStack {
+                            Spacer()
+                            KnipKnop { toonKnippen = true }
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 12)
                     }
-                    .padding(.horizontal, 24)
-                    .padding(.bottom, 12)
                 }
-                .navigationTitle(lijstTitel)
+                .navigationTitle(selectie.actief ? "Kies recepten" : lijstTitel)
+                .toolbar {
+                    // Recepten kiezen voor één boodschappenlijst (#40).
+                    if !selectie.actief {
+                        ToolbarItem(placement: .topBarTrailing) {
+                            Button("Selecteer") { selectie.start() }
+                        }
+                    }
+                }
                 .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
                 .navigationDestination(for: NSManagedObjectID.self) { id in
                     ReceptScherm(

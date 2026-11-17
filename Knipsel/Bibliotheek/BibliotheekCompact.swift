@@ -15,8 +15,14 @@ struct BibliotheekCompact: View {
     @State private var verderGestart: VerderKeuze?
     @State private var toonInbox = false
     @State private var toonBoodschappen = false
+    @State private var selectie = ReceptSelectie()
     @Environment(InleesInbox.self) private var inbox
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
+
+    /// - Parameter selectie: begin in selectiemodus (#40), voor voorbeelden en tests.
+    init(selectie: ReceptSelectie = ReceptSelectie()) {
+        _selectie = State(initialValue: selectie)
+    }
 
     var body: some View {
         NavigationStack(path: $pad) {
@@ -40,17 +46,22 @@ struct BibliotheekCompact: View {
                             .padding(.top, verder == nil ? 4 : 10)
                         }
                         FilterChips(filter: $filter, toonLabels: $toonLabels).padding(.vertical, 8)
-                    })
+                    }),
+                selectie: $selectie
             )
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                HStack {
-                    Spacer()
-                    KnipKnop { toonKnippen = true }
+                if selectie.actief {
+                    SelectieBalk(selectie: $selectie)
+                } else {
+                    HStack {
+                        Spacer()
+                        KnipKnop { toonKnippen = true }
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
                 }
-                .padding(.horizontal, 16)
-                .padding(.bottom, 8)
             }
-            .navigationTitle("Recepten")
+            .navigationTitle(selectie.actief ? "Kies recepten" : "Recepten")
             .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
             .navigationDestination(for: NSManagedObjectID.self) { id in
                 ReceptScherm(
@@ -64,6 +75,12 @@ struct BibliotheekCompact: View {
                 // De eigen boodschappenlijst (#39), met het aantal open items.
                 ToolbarItem(placement: .topBarTrailing) {
                     BoodschappenKnop { toonBoodschappen = true }
+                }
+                // Recepten kiezen voor één boodschappenlijst (#40).
+                if !selectie.actief {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button("Selecteer") { selectie.start() }
+                    }
                 }
             }
             .navigationDestination(isPresented: $toonBoodschappen) { BoodschappenScherm() }

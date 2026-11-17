@@ -148,6 +148,9 @@ enum BoodschappenFout: LocalizedError {
     /// Notitie bij elk item: "Pompoensoep met gember · Knipsel".
     static func notitie(recept: String) -> String { "\(recept) · Knipsel" }
 
+    /// Meerdere recepten (#40): "Pompoensoep, Linzensalade · Knipsel".
+    static func notitie(recepten: [String]) -> String { notitie(recept: recepten.joined(separator: ", ")) }
+
     /// Regels waarvan de genormaliseerde naam al open op de lijst staat ("Uien" of "2 uien" bij "3 uien").
     static func dubbele(_ regels: [BoodschappenRegel], bestaand: [HerinneringItem]) -> [String: DubbelItem] {
         var perSleutel: [String: HerinneringItem] = [:]
