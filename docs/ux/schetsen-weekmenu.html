@@ -1,0 +1,166 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>Knipsel — weekmenu</title><style>
+:root{--tomaat:#D9613C;--tomaat-d:#B24B2A;--papier:#FBF7F0;--kaart:#F0E8DC;--inkt:#2B2622;--gedimd:#6F665C;--lijn:#E2D8C9;
+--serif:"New York","Iowan Old Style",Charter,Georgia,serif;--sans:-apple-system,"SF Pro Text",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:#EDE6DA;color:var(--inkt);padding:28px 20px 60px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-family:var(--serif);font-size:34px;letter-spacing:-.5px}
+h2{font-family:var(--serif);font-size:24px;margin:34px 0 10px}
+.lead{color:var(--gedimd);max-width:820px;margin-top:8px;font-size:15px}
+.note{background:#fff8;border-left:4px solid var(--tomaat);padding:10px 14px;margin:14px 0;font-size:14px;max-width:900px;border-radius:0 8px 8px 0}
+table.eisen{border-collapse:collapse;width:100%;font-size:13.5px;background:#fffc;border-radius:12px;overflow:hidden}
+.eisen th,.eisen td{padding:9px 11px;text-align:left;vertical-align:top;border-bottom:1px solid var(--lijn)}
+.eisen th{background:var(--kaart);font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--gedimd)}
+.eisen td:first-child{font-weight:700;color:var(--tomaat-d);white-space:nowrap}
+/* tabs, CSS-only */
+.tabs input{display:none}
+.tabbar{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 18px;position:sticky;top:0;background:#EDE6DA;padding:8px 0;z-index:5}
+.tabbar label{padding:9px 16px;border-radius:999px;background:#fff;cursor:pointer;font-weight:600;font-size:14px;border:1px solid var(--lijn)}
+.panel{display:none}
+#t1:checked~.tabbar label[for=t1],#t2:checked~.tabbar label[for=t2],#t3:checked~.tabbar label[for=t3],#t4:checked~.tabbar label[for=t4],#t5:checked~.tabbar label[for=t5]{background:var(--tomaat);color:#fff;border-color:var(--tomaat)}
+#t1:checked~#p1,#t2:checked~#p2,#t3:checked~#p3,#t4:checked~#p4,#t5:checked~#p5{display:block}
+.nu{background:#fff;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:14px}
+.nu b{color:var(--tomaat-d)}
+.nu ul{margin:6px 0 0 18px}
+.rij{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.optie{width:340px}
+.optie h3{font-family:var(--serif);font-size:19px;margin:12px 0 4px}
+.optie .tag{display:inline-block;font-size:11px;font-weight:700;background:var(--kaart);color:var(--tomaat-d);padding:2px 7px;border-radius:6px;margin:0 4px 4px 0}
+.optie p{font-size:13.5px;margin:5px 0}
+.optie p b{color:var(--gedimd);font-weight:600}
+.btn{display:inline-block;margin-top:8px;background:var(--inkt);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer}
+.aanrader{background:var(--tomaat);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle;font-family:var(--sans)}
+/* telefoon */
+.tel{width:340px;height:700px;border-radius:46px;background:#111;padding:11px;box-shadow:0 18px 40px #0003}
+.scherm{width:100%;height:100%;border-radius:36px;background:#fff;overflow:hidden;position:relative;font-size:13px}
+.status{height:40px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-weight:600;font-size:13px}
+.ipad{width:760px;height:540px;border-radius:30px;background:#111;padding:12px;box-shadow:0 18px 40px #0003}
+.ipad .scherm{border-radius:20px}
+.optie.breed{width:760px}
+/* bouwstenen */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:4px 16px}
+.rond{width:34px;height:34px;border-radius:50%;background:#f2f0ed;display:flex;align-items:center;justify-content:center;font-size:15px}
+.groot{font-family:var(--serif);font-weight:700;font-size:28px;padding:4px 16px 8px}
+.chips{display:flex;gap:6px;padding:4px 16px 10px;overflow:hidden;white-space:nowrap}
+.chip{padding:5px 11px;border-radius:999px;background:#f2f0ed;font-size:12px;font-weight:500}
+.chip.aan{background:#fff;border:1.5px solid var(--tomaat);color:var(--tomaat-d)}
+.zoek{position:absolute;left:16px;right:16px;bottom:22px;height:42px;border-radius:21px;background:#fff;box-shadow:0 4px 18px #0002;display:flex;align-items:center;padding:0 14px;color:#888;gap:8px}
+.serif{font-family:var(--serif)}
+.klein{font-size:11px;color:var(--gedimd)}
+.tom{color:var(--tomaat-d)}
+.fab{position:absolute;right:18px;bottom:78px;height:52px;padding:0 20px;border-radius:26px;background:var(--tomaat);color:#fff;display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 6px 18px #D9613C66}
+/* receptkaarten */
+.raster{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}
+.rkaart{border-radius:16px;height:150px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.rkaart .t{font-family:var(--serif);font-weight:700;font-size:15px;line-height:1.15}
+.rkaart .sym{font-size:30px;opacity:.9}
+.k-soep{background:#F6E3C8}.k-sal{background:#DDE9CF}.k-hoofd{background:#EBD3CB}.k-na{background:#EADCF0}.k-lunch{background:#F3EBC5}.k-brood{background:#EFE2D1}
+.foto{background-size:cover;background-position:center;color:#fff}
+.foto::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,#0009)}
+.foto>*{position:relative;z-index:1}
+.f1{background-image:radial-gradient(circle at 35% 40%,#F2A54A 0 22%,#E07B28 23% 36%,#5b3a22 37% 40%,#efe6d6 41%)}
+.f2{background-image:radial-gradient(circle at 60% 55%,#7aa35a 0 18%,#b9d38f 19% 30%,#e6d8b8 31% 36%,#3d5c3a 37%)}
+.f3{background-image:radial-gradient(ellipse at 50% 60%,#8a3324 0 30%,#5a2318 31% 40%,#d9c7ad 41%)}
+/* lijst */
+.lrij{display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid #eee}
+.lsym{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.ltitel{font-family:var(--serif);font-weight:700;font-size:15px}
+/* recept */
+.balk-onder{position:absolute;left:12px;right:12px;bottom:18px;height:62px;border-radius:31px;background:#fff;box-shadow:0 6px 24px #0002;display:flex;align-items:center;padding:0 8px 0 18px;gap:10px}
+.kookknop{margin-left:auto;background:var(--tomaat);color:#fff;font-weight:700;border-radius:24px;height:46px;padding:0 20px;display:flex;align-items:center;gap:6px}
+.stepper{display:flex;align-items:center;gap:10px;font-weight:600}
+.stepper span{width:28px;height:28px;border-radius:50%;background:#f2f0ed;display:flex;align-items:center;justify-content:center}
+.ing{display:flex;gap:9px;padding:5px 16px;font-family:var(--serif);font-size:14px}
+.ing i{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--tomaat);flex:none;margin-top:3px}
+.ing i.af{background:var(--tomaat)}
+.ing.af{color:#aaa;text-decoration:line-through}
+.seg{display:flex;margin:6px 16px 10px;background:#f2f0ed;border-radius:10px;padding:3px}
+.seg div{flex:1;text-align:center;padding:6px;border-radius:8px;font-weight:600;font-size:12px;color:var(--gedimd)}
+.seg .aan{background:#fff;color:var(--inkt);box-shadow:0 1px 3px #0002}
+.blok{background:#f7f4ef;border-radius:16px;margin:8px 14px;padding:12px}
+.tijdlijn{display:flex;gap:6px;margin:6px 16px}
+.tijdlijn div{flex:1;background:#f7f4ef;border-radius:12px;padding:8px;text-align:center}
+.tijdlijn b{display:block;font-size:15px}
+/* kookmodus */
+.kook{background:var(--papier);height:calc(100% - 40px);position:relative}
+.ipad .kook{height:100%}
+.voortgang{display:flex;gap:4px;padding:6px 16px}
+.voortgang div{flex:1;height:5px;border-radius:3px;background:var(--lijn)}
+.voortgang .g{background:var(--tomaat)}.voortgang .h{background:var(--inkt)}
+.stap{font-family:var(--serif);font-size:29px;line-height:1.22;padding:14px 18px}
+.stap em{font-style:normal;color:var(--tomaat-d);font-weight:700}
+.nodig{background:var(--kaart);border-radius:14px;margin:4px 16px;padding:10px 12px}
+.navknoppen{position:absolute;left:12px;right:12px;bottom:18px;display:flex;gap:10px}
+.navknoppen div{height:76px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+.terug{width:96px;background:var(--kaart)}
+.verder{flex:1;background:var(--inkt);color:var(--papier)}
+.mic{display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;margin:0 16px;width:max-content}
+.mic .stip{width:8px;height:8px;border-radius:50%;background:#3BA55C;box-shadow:0 0 0 4px #3BA55C33}
+.gluur{position:absolute;left:0;right:0;bottom:0;height:150px;background:#fff;border-radius:26px 26px 0 0;box-shadow:0 -6px 20px #0001;padding:12px 18px}
+.greep{width:40px;height:5px;border-radius:3px;background:#ddd;margin:0 auto 10px}
+.timerchip{display:inline-flex;align-items:center;gap:8px;background:var(--tomaat);color:#fff;border-radius:16px;padding:12px 16px;font-weight:700;font-size:16px;margin:6px 16px}
+.zone{position:absolute;top:110px;bottom:120px;width:50%;display:flex;align-items:center;justify-content:center;color:#0002;font-size:44px;font-weight:200}
+/* ipad */
+.kol{position:absolute;top:0;bottom:0;overflow:hidden}
+
+.dag{display:flex;gap:10px;align-items:center;padding:7px 16px;border-bottom:1px solid #f0ebe3}
+.dag .dn{width:34px;flex:none;font-size:11px;font-weight:700;color:var(--gedimd);line-height:1.15}
+.dag .dn b{display:block;font-size:17px;color:#222}
+.dag.vandaag .dn b{color:var(--tomaat-d)}
+.dag .lsym{width:40px;height:40px;font-size:20px}
+.dag .leeg{flex:1;border:1.5px dashed var(--lijn);border-radius:12px;padding:10px;color:#aaa;font-size:12px}
+.dag .pers{margin-left:auto;font-size:11px;color:var(--gedimd);white-space:nowrap}
+.dag .rest{font-size:10px;background:#EAF4EC;color:#2E7D46;border-radius:6px;padding:1px 6px;font-weight:700}
+.dag .vrij{flex:1;font-size:12px;color:var(--gedimd);font-style:italic}
+.weekkop{display:flex;justify-content:space-between;align-items:center;padding:0 16px 6px;font-size:12px;color:var(--gedimd)}
+.strip{display:flex;gap:6px;padding:6px 16px 10px;overflow:hidden}
+.strip .d{flex:1;min-width:0;background:#f2f0ed;border-radius:12px;padding:6px 4px;text-align:center;font-size:10px;color:var(--gedimd)}
+.strip .d b{display:block;font-size:18px;margin:2px 0}
+.strip .d.aan{background:var(--kaart);outline:2px solid var(--tomaat)}
+.strip .d.leeg b{opacity:.25}
+.vel{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -8px 30px #0003;padding:10px 0 26px}
+.vel .greepje{width:36px;height:5px;border-radius:3px;background:#ddd;margin:0 auto 8px}
+.dagknop{display:inline-block;border-radius:12px;background:#f2f0ed;padding:8px 0;width:34px;text-align:center;font-size:11px;margin:2px}
+.dagknop.aan{background:var(--tomaat);color:#fff;font-weight:700}
+.voorstel{margin:6px 16px;border-radius:14px;background:linear-gradient(135deg,#FFF4E8,#FDE7DA);padding:10px 12px;font-size:12px}
+.knopbreed{height:48px;border-radius:24px;background:var(--tomaat);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.wissel{margin-left:auto;font-size:15px;color:var(--tomaat-d)}
+</style></head><body><div class="wrap">
+<h1>Knipsel — weekmenu</h1>
+<p class="lead">Schetsen · 17 november 2026 · issue #41. Peter: "erg interessant, onthouden, apart vormgeven". Eerste aanzet was schets 3B in <code>schetsen-boodschappen.html</code>. Recepten zijn verzonnen.</p>
+<div class="note"><b>Bouwt op:</b> boodschappenlijst (#38, #39), meerdere recepten tegelijk (#40) en het kookboek Thuis (fase 8). De knop "boodschappen voor de week" is dus vooral hergebruik.</div>
+<h2>Eisen M1–M7</h2><table class="eisen"><tr><th>Eis</th><th>Wat</th><th>Basis</th></tr><tr><td>M1</td><td><b>Snel plannen</b><br>Een recept op een dag zetten in hooguit drie tikken.</td><td>Elke extra stap kost afhakers; plannen moet lichter zijn dan niet plannen.</td></tr><tr><td>M2</td><td><b>Flexibel, zonder schuldgevoel</b><br>Verschuiven en ruilen; lege of vrije dagen ("uit eten") zijn normaal.</td><td>Plannen faalt vooral doordat het leven verandert; een rigide plan wordt losgelaten.</td></tr><tr><td>M3</td><td><b>Boodschappen voor de week</b><br>Eén knop: alles vanaf vandaag (of een gekozen dag) naar de lijst, opgeteld (hergebruik #40).</td><td>Sluit de cirkel met de boodschappenlijst.</td></tr><tr><td>M4</td><td><b>Samen in Thuis</b><br>Jij en je huisgenoot zien en wijzigen dezelfde week.</td><td>Zelfde zone als het kookboek en de lijst (fase 8, #39).</td></tr><tr><td>M5</td><td><b>Restjes en kook dubbel</b><br>Een dag kan "restjes van maandag" zijn; porties tellen dan dubbel op de lijst.</td><td>Minder verspilling (Voedingscentrum).</td></tr><tr><td>M6</td><td><b>Vandaag</b><br>"Wat eten we vandaag?" — bovenaan de bibliotheek en via Siri; tik = recept of kookmodus.</td><td>Bouwt op fase 6 (Siri) en "Verder met…" (#24).</td></tr><tr><td>M7</td><td><b>Privé en lokaal</b><br>Voorstellen worden op het toestel berekend; geen Claude nodig.</td><td>Zoals de rest van Knipsel (B10).</td></tr></table>
+<h2>Drie richtingen</h2><div class="rij"><div class="optie"><div class="tel"><div class="scherm"><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">‹</div><div class="seg" style="font-size:11px;display:flex;gap:10px"><span class="aan">Mijn week</span><span>Thuis</span></div><div class="rond">⋯</div></div>
+<div class="groot" style="font-size:24px">Deze week</div>
+<div class="weekkop"><span>‹ 23 – 29 nov ›</span><span>5 van 7 gepland</span></div>
+<div class="dag"><div class="dn">MA<b>23</b></div><div class="lsym k-soep">🥣</div><div style="flex:1;min-width:0"><div class="ltitel">Pompoensoep met gember</div><div class="klein">40 min · <span class='rest'>kook dubbel</span></div></div><div class="pers">4 p</div></div>
+<div class="dag"><div class="dn">DI<b>24</b></div><div class="lsym k-soep">🥣</div><div style="flex:1;min-width:0"><div class="ltitel">Restjes pompoensoep</div><div class="klein">van maandag</div></div><div class="pers"></div></div>
+<div class="dag vandaag"><div class="dn">WO<b>25</b></div><div class="lsym k-lunch">🥧</div><div style="flex:1;min-width:0"><div class="ltitel">Prei-quiche</div><div class="klein">1 u</div></div><div class="pers">2 p</div></div>
+<div class="dag"><div class="dn">DO<b>26</b></div><div class="leeg">＋ Kies een recept</div></div>
+<div class="dag"><div class="dn">VR<b>27</b></div><div class="vrij">Uit eten</div></div>
+<div class="dag"><div class="dn">ZA<b>28</b></div><div class="lsym k-hoofd">🍲</div><div style="flex:1;min-width:0"><div class="ltitel">Stoofvlees met bier</div><div class="klein">3 u · gasten</div></div><div class="pers">6 p</div></div>
+<div class="dag"><div class="dn">ZO<b>29</b></div><div class="leeg">＋ Kies een recept</div></div>
+<div class="knopbreed" style="position:absolute;left:0;right:0;bottom:22px;margin:0 16px;font-size:13px">🛒 Boodschappen voor wo – za</div></div></div><h3>A · Weekoverzicht<span class="aanrader">mijn voorkeur</span></h3><div><span class="tag">M1</span><span class="tag">M2</span><span class="tag">M3</span><span class="tag">M4</span><span class="tag">M5</span><span class="tag">M6</span></div><p><b>Idee</b> — Een eigen scherm <i>Deze week</i> (📅 naast 🛒 in de bibliotheek, op iPad een rij in de zijbalk). Zeven dagen onder elkaar; per dag één recept met het aantal personen, of leeg, of een vrije notitie ("Uit eten"). Vegen = verplaatsen naar een andere dag. <b>Kook dubbel</b> zet de volgende dag op "Restjes". Eén knop maakt de boodschappen voor de rest van de week (het vel uit #40). Mijn week | Thuis zoals bij de boodschappenlijst.</p><p><b>Basis</b> — Vooruit plannen hangt samen met gevarieerder en gezonder eten (Ducrot e.a., 2017, <i>IJBNPA</i>, n = 40.554). Een concreet plan ("woensdag quiche") wordt vaker uitgevoerd dan een voornemen (implementatie-intenties, Gollwitzer, 1999). Plannen + lijst is ook het eerste advies tegen verspilling (Voedingscentrum).</p><p><b>Afweging</b> — Een nieuw scherm en een kleine modeluitbreiding (planning per dag). Lege dagen mogen: geen rood, geen "je bent achter".</p><button class="btn" data-hermes-send="Knipsel weekmenu: werk A (weekoverzicht) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm"><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">⚙︎</div><div class="rond">🛒</div></div>
+<div class="groot">Recepten</div>
+<div class="strip"><div class="d">MA<b>🥣</b></div><div class="d">DI<b>🥣</b></div><div class="d aan">WO<b>🥧</b></div><div class="d leeg">DO<b>＋</b></div><div class="d">VR<b>🍽</b></div><div class="d">ZA<b>🍲</b></div><div class="d leeg">ZO<b>＋</b></div></div>
+<div class="raster">
+<div class="rkaart k-sal"><div class="sym">🥗</div><div><div class="t">Linzensalade</div><div class="klein">25 min</div></div></div>
+<div class="rkaart k-hoofd"><div class="sym">🍛</div><div><div class="t">Dal met spinazie</div><div class="klein">35 min</div></div></div></div>
+<div class="vel"><div class="greepje"></div>
+<div style="padding:0 16px;font-weight:700;font-size:15px">Plan „Linzensalade” in</div>
+<div style="padding:8px 12px 2px"><span class="dagknop">ma</span><span class="dagknop">di</span><span class="dagknop">wo</span><span class="dagknop aan">do</span><span class="dagknop">vr</span><span class="dagknop">za</span><span class="dagknop">zo</span></div>
+<div class="klein" style="padding:4px 16px">Donderdag 26 nov · 4 personen · Thuis</div>
+<div class="knopbreed" style="margin:10px 16px 0;font-size:13px">Zet op donderdag</div></div></div></div><h3>B · Plannen vanuit het recept</h3><div><span class="tag">M1</span><span class="tag">M6</span></div><p><b>Idee</b> — Geen apart scherm: in elk recept <b>📅 Plan in</b> → kies een dag. Bovenaan de bibliotheek een smalle <b>weekstrip</b> met de zeven dagen; tik een dag om het recept te openen of te kiezen.</p><p><b>Basis</b> — Plannen gebeurt waar je toch al bladert (zoals Paprika's "Add to meal plan"). Weinig nieuwe schermen.</p><p><b>Afweging</b> — Je ziet de week nooit in één oogopslag met personen en restjes; verschuiven is lastig. Werkt goed als <i>tweede ingang</i> naast A.</p><button class="btn" data-hermes-send="Knipsel weekmenu: werk B (plannen vanuit recept) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm"><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">‹</div><div class="rond">✓</div></div>
+<div class="groot" style="font-size:24px">Voorstel voor de week</div>
+<div class="voorstel">Op basis van wat je <b>lang niet</b> kookte, het <b>seizoen</b> (pompoen, prei, kool) en <b>kort op doordeweekse dagen</b>. Tik ⇄ om te wisselen.</div>
+<div class="dag"><div class="dn">MA<b>23</b></div><div class="lsym k-hoofd">🍛</div><div style="flex:1;min-width:0"><div class="ltitel">Dal met spinazie</div><div class="klein">35 min · 9 wk niet</div></div><div class="pers"></div><span class="wissel">⇄</span></div>
+<div class="dag"><div class="dn">DI<b>24</b></div><div class="lsym k-soep">🥣</div><div style="flex:1;min-width:0"><div class="ltitel">Pompoensoep met gember</div><div class="klein">40 min · seizoen</div></div><div class="pers"></div><span class="wissel">⇄</span></div>
+<div class="dag"><div class="dn">WO<b>25</b></div><div class="lsym k-lunch">🍳</div><div style="flex:1;min-width:0"><div class="ltitel">Omelet met prei</div><div class="klein">20 min</div></div><div class="pers"></div><span class="wissel">⇄</span></div>
+<div class="dag"><div class="dn">DO<b>26</b></div><div class="lsym k-sal">🥗</div><div style="flex:1;min-width:0"><div class="ltitel">Linzensalade</div><div class="klein">25 min</div></div><div class="pers"></div><span class="wissel">⇄</span></div>
+<div class="dag"><div class="dn">VR<b>27</b></div><div class="vrij">— vrij gelaten</div></div>
+<div class="dag"><div class="dn">ZA<b>28</b></div><div class="lsym k-hoofd">🍲</div><div style="flex:1;min-width:0"><div class="ltitel">Stoofvlees met bier</div><div class="klein">3 u · weekend</div></div><div class="pers"></div><span class="wissel">⇄</span></div>
+<div class="knopbreed" style="position:absolute;left:0;right:0;bottom:22px;margin:0 16px;font-size:13px">Neem over in mijn week</div></div></div><h3>C · Knipsel stelt een week voor</h3><div><span class="tag">M1</span><span class="tag">M7</span></div><p><b>Idee</b> — Eén knop <i>Stel een week voor</i>: Knipsel vult de lege dagen met recepten die je lang niet kookte, die bij het seizoen passen en die doordeweeks kort zijn. Per dag ⇄ om te wisselen. Lokaal berekend, geen Claude nodig.</p><p><b>Basis</b> — Haalt de dagelijkse "wat eten we?"-vraag weg; variatie komt vanzelf (zelfde kenmerk als in Ducrot e.a.).</p><p><b>Afweging</b> — Alleen zinvol met genoeg recepten en kookgeschiedenis. Goed als <i>knop in A</i>, niet als hoofdroute.</p><button class="btn" data-hermes-send="Knipsel weekmenu: werk C (weekvoorstel) uit">Uitwerken</button></div></div>
+<h2>Mijn voorstel</h2><p class="lead">Bouw <b>A</b> (weekoverzicht) met <b>B</b> als tweede ingang (📅 <i>Plan in</i> in het recept) — dat is één functie met twee deuren. <b>C</b> (weekvoorstel) als latere knop in A, zodra er kookgeschiedenis is. Koppeling met de Agenda-app laat ik weg: dubbel bijhouden en weinig winst.</p>
+<h2>Open vragen</h2><ul class="lead"><li>Eén recept per dag, of ook lunch/ontbijt? Voorstel: alleen het avondeten, met ruimte voor een tweede regel.</li><li>Begint de week op maandag of op je boodschappendag? Voorstel: instelbaar, standaard maandag.</li><li>Moet een gepland recept na de dag vanzelf als "gekookt" tellen? Voorstel: nee — alleen als je "Gekookt" tikt of de kookmodus afrondt.</li></ul>
+<h2>Bronnen</h2><p class="lead" style="font-size:13px">Ducrot, P., Méjean, C., Aroumougame, V., e.a. (2017). Meal planning is associated with food variety, diet quality and body weight status in a large sample of French adults. <i>IJBNPA</i>, 14(12) · Gollwitzer, P. M. (1999). Implementation intentions. <i>American Psychologist</i>, 54(7) · Voedingscentrum, tips tegen voedselverspilling · Praktijk: Mela, Paprika, Crouton.</p>
+</div></body></html>

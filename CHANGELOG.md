@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- Schetsen weekmenu (`docs/ux/schetsen-weekmenu.html`), eisen M1–M7
 - Schetsen "Wat kan ik maken?": recepten zoeken op ingrediënten in huis (`docs/ux/schetsen-wat-kan-ik-maken.html`), eisen W1–W6
 - Schetsen voor een boodschappenlijst uit een recept (`docs/ux/schetsen-boodschappen.html`), eisen L1–L7; weekmenu als idee apart
 - Privacybeleid (`docs/privacy.md`), testinformatie en uitleg voor externe testers (`docs/testflight-testers.md`), en "Wat te testen" per build via `TestFlight/WhatToTest.nl-NL.txt`
