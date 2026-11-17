@@ -68,6 +68,14 @@ struct KnipselOpdrachten: AppShortcutsProvider {
                 "Wat moet ik kopen in \(.applicationName)",
             ],
             shortTitle: "Boodschappenlijst", systemImageName: "cart")
+        AppShortcut(
+            intent: VandaagIntent(),
+            phrases: [
+                "Wat eten we vandaag in \(.applicationName)",
+                "Wat eten we vandaag \(.applicationName)",
+                "Wat staat er vandaag op het menu in \(.applicationName)",
+            ],
+            shortTitle: "Wat eten we vandaag?", systemImageName: "calendar")
     }
 
     static let shortcutTileColor: ShortcutTileColor = .orange

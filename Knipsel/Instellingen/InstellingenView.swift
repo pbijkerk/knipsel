@@ -6,6 +6,7 @@ struct InstellingenView: View {
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var bibliotheekWeergave =
         BibliotheekWeergave.kaarten
     @AppStorage(AppConfiguratie.sleutelWebFotoBewaren) private var webFotoBewaren = true
+    @AppStorage(AppConfiguratie.sleutelWeekBegin) private var weekBegin = Weekbegin.maandag.rawValue
 
     var body: some View {
         NavigationStack {
@@ -68,6 +69,19 @@ struct InstellingenView: View {
                     Text(
                         "Waar boodschappen uit een recept heen gaan, en wat je meestal in huis hebt (staat standaard uitgevinkt)."
                     )
+                }
+                Section {
+                    Picker(selection: $weekBegin) {
+                        ForEach(Weekbegin.allCases) { dag in
+                            Text(dag.naam).tag(dag.rawValue)
+                        }
+                    } label: {
+                        SwiftUI.Label("Week begint op", systemImage: "calendar")
+                    }
+                } header: {
+                    Text("Weekmenu")
+                } footer: {
+                    Text("Bijvoorbeeld op je boodschappendag. Het weekmenu en Plan in tonen dan die zeven dagen.")
                 }
                 Section {
                     Toggle(isOn: $webFotoBewaren) {

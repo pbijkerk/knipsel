@@ -199,6 +199,41 @@ final class BoodschappenItem: NSManagedObject {
     var tekstOfNaam: String { tekst?.nietLeegOfNil ?? naam?.nietLeegOfNil ?? "" }
 }
 
+/// Eén avondeten in het weekmenu (#41, modelversie 5): een recept met het aantal personen, een vrije
+/// notitie ("Uit eten") of restjes van een eerdere maaltijd. Eén per dag per kookboek (Mijn week of
+/// Thuis, in dezelfde store en zone als de recepten daarvan). Geen relaties, zoals `BoodschappenItem`:
+/// het recept staat erin als uuid-tekst, zodat delen niets meeneemt en een verwijderd recept de
+/// maaltijd niet weghaalt (dan blijft `titel` als terugval).
+@objc(Maaltijd)
+final class Maaltijd: NSManagedObject {
+    @NSManaged var uuid: UUID?
+    /// De dag: het begin van die dag in de lokale tijd.
+    @NSManaged var datum: Date?
+    /// `Recept.uuid` als tekst; `nil` bij een notitie of restjes.
+    @NSManaged var receptUUID: String?
+    /// De recepttitel toen het gepland werd: de terugval als het recept weg is.
+    @NSManaged var titel: String?
+    /// Voor hoeveel personen; 0 = zoals in het recept (of onbekend).
+    @NSManaged var porties: Int16
+    /// Vrije tekst in plaats van een recept, zoals "Uit eten".
+    @NSManaged var notitie: String?
+    /// `uuid` (als tekst) van de maaltijd waarvan dit de restjes zijn ("kook dubbel").
+    @NSManaged var restjesVanUUID: String?
+    /// Ruwe waarde van `Kookboek`; standaard "mijn".
+    @NSManaged var kookboek: String
+    @NSManaged var aangemaaktOp: Date?
+
+    static func verzoek() -> NSFetchRequest<Maaltijd> { NSFetchRequest(entityName: "Maaltijd") }
+
+    override func awakeFromInsert() {
+        super.awakeFromInsert()
+        uuid = UUID()
+        aangemaaktOp = .now
+    }
+
+    var kookboekWaarde: Kookboek { Kookboek(veld: kookboekVeld) }
+}
+
 extension String {
     fileprivate var nietLeegOfNil: String? {
         let schoon = trimmingCharacters(in: .whitespacesAndNewlines)

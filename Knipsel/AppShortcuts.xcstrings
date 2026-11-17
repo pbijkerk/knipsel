@@ -264,6 +264,39 @@
           }
         }
       }
+    },
+    "Wat eten we vandaag in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat eten we vandaag in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Wat eten we vandaag ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat eten we vandaag ${applicationName}"
+          }
+        }
+      }
+    },
+    "Wat staat er vandaag op het menu in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat staat er vandaag op het menu in ${applicationName}"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

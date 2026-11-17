@@ -41,6 +41,7 @@ struct ReceptWeergave: View {
     @State private var bevestigVerplaatsen = false
     @State private var foutmelding: String?
     @State private var toonBoodschappen = false
+    @State private var toonPlanIn = false
     /// De eerste keer een langere uitleg bij "Verplaats naar Thuis".
     @AppStorage(AppConfiguratie.sleutelThuisUitlegGezien) private var thuisUitlegGezien = false
 
@@ -99,6 +100,8 @@ struct ReceptWeergave: View {
                 Button("Weergave", systemImage: "textformat.size") { toonLeesinstellingen = true }
                 Menu("Meer", systemImage: "ellipsis") {
                     Button("Bewerk", systemImage: "pencil") { toonBewerken = true }
+                    // Op een dag van het weekmenu zetten (#41, schets B).
+                    Button("Plan in…", systemImage: "calendar.badge.plus") { toonPlanIn = true }
                     if heeftIngredienten {
                         Button("Boodschappen…", systemImage: "cart") { toonBoodschappen = true }
                     }
@@ -109,6 +112,9 @@ struct ReceptWeergave: View {
             }
         }
         .sheet(isPresented: $toonBewerken) { ReceptBewerken(recept: recept) }
+        .sheet(isPresented: $toonPlanIn) {
+            PlanInVel(recept: recept).presentationDetents([.medium])
+        }
         .sheet(isPresented: $toonBoodschappen) {
             BoodschappenVel(
                 recept: recept.titelOfStandaard, porties: recept.porties > 0 ? porties : 0,
