@@ -8,6 +8,7 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 ## [Unreleased]
 
 ### Toegevoegd
+- Weekmenu: 📅 naast 🛒 in de bibliotheek (op iPad *Weekmenu* in de zijbalk) opent *Deze week* met zeven dagen onder elkaar en per dag één avondeten — een recept met het aantal personen, een notitie als "Uit eten", of leeg (zonder schuldgevoel). Tik een lege dag om een recept te kiezen; op een gevulde dag *Open recept*, *Kook dit*, *Porties*, *Kook dubbel* (de volgende dag wordt "Restjes van …"), *Verplaats naar…* (een bezette dag ruilt) en *Wis*; slepen tussen dagen kan ook. Onderin *🛒 Boodschappen voor wo – za* zet alles vanaf vandaag (lang drukken: kies de begindag) op de lijst via het vel voor meerdere recepten, met de porties van restjes dubbel. *Mijn week | Thuis* zoals bij de boodschappenlijst; de Thuis-week ziet je huisgenoot ook. In een recept zet ⋯ › *Plan in…* het op een dag van deze of volgende week. Bovenaan de bibliotheek staat "Vandaag: …" als er iets gepland is, en Siri antwoordt op "Wat eten we vandaag in Knipsel". De week begint standaard op maandag (Instellingen › Weekmenu). Gepland telt niet als gekookt. Modelversie 5 (#41)
 - Schetsen weekmenu (`docs/ux/schetsen-weekmenu.html`), eisen M1–M7
 - Schetsen "Wat kan ik maken?": recepten zoeken op ingrediënten in huis (`docs/ux/schetsen-wat-kan-ik-maken.html`), eisen W1–W6
 - Schetsen voor een boodschappenlijst uit een recept (`docs/ux/schetsen-boodschappen.html`), eisen L1–L7; weekmenu als idee apart

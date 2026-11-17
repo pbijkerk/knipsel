@@ -209,10 +209,10 @@ struct WeekScherm: View {
             VStack(spacing: 2) {
                 Text(Weekplanning.weekTitel(start, kalender: kalender))
                     .font(.headline)
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(Color.primary)
                 Text(Weekplanning.teller(gepland: gepland))
                     .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    .foregroundStyle(Color(.secondaryLabel))
             }
             .frame(maxWidth: .infinity)
             .accessibilityElement(children: .combine)
@@ -260,7 +260,7 @@ struct WeekScherm: View {
         .accessibilityLabel(toegankelijk(dag, inhoud, isVandaag: isVandaag))
         .accessibilityHint(maaltijd == nil ? "Tik om een recept te kiezen" : "Tik voor acties")
         .modifier(SleepDag(maaltijd: maaltijd) { id in verplaats(id, naar: dag) })
-        .listRowBackground(isVandaag ? Kookkleuren.accent.opacity(0.08) : nil)
+        .listRowBackground(isVandaag ? Kookkleuren.accent.opacity(0.12) : nil)
     }
 
     private func isVerwijderd(_ inhoud: Daginhoud) -> Bool {
@@ -448,15 +448,20 @@ struct WeekScherm: View {
     }
 
     private func voerUit(_ actie: DagActies.Actie, voor maaltijd: GeplandeMaaltijd) {
-        actiesVoor = nil
+        // Porties wijzig je in het vel zelf; de rest sluit het.
+        if case .porties = actie {} else { actiesVoor = nil }
         let recept = Weekmenu.recept(bij: maaltijd, alle: maaltijden, context: context)
         switch actie {
         case .open:
             openRecept = recept?.objectID
         case .kook:
             if let recept {
-                KookRouter.gedeeld.kook(
-                    recept: recept.sleutelURL, porties: maaltijd.porties > 0 ? maaltijd.porties : nil)
+                let porties = maaltijd.porties > 0 ? maaltijd.porties : nil
+                // Na het sluiten van het vel: een fullScreenCover tijdens die animatie valt weg.
+                Task { @MainActor in
+                    try? await Task.sleep(for: .milliseconds(350))
+                    KookRouter.gedeeld.kook(recept: recept.sleutelURL, porties: porties)
+                }
             }
         case .porties(let aantal):
             doe { try Weekmenu.zetPorties(aantal, voor: maaltijd.id, kookboek: kookboek, context: context) }

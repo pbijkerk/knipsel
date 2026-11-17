@@ -119,7 +119,8 @@ struct BibliotheekSplit: View {
                     .frame(maxWidth: 560, alignment: .leading)
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, weergave == .kaarten ? 24 : 16)
-                    .padding(.top, 4))
+                    .padding(.top, 4)
+                    .padding(.bottom, 10))
         }
         return AnyView(
             VStack(alignment: .leading, spacing: 10) {

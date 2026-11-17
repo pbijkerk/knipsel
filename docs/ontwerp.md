@@ -268,6 +268,13 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
     privéstore, bij de huisgenoot in de gedeelde store); `Kookboeken.herstel` zet een nieuw item in de juiste
     store, `ThuisDelen` zet Thuis-items in de share en verplaatst ze bij stoppen/vertrekken naar Mijn lijst.
     **CloudKit-schema opnieuw uitrollen** (Deploy Schema Changes).
+  - Modelversie 5 (#41): `Maaltijd` (uuid, datum = begin van de dag in de lokale tijd, receptUUID als tekst,
+    titel als terugval, porties, notitie, restjesVanUUID, kookboek, aangemaaktOp). Alle velden optioneel of
+    met standaard, geen relaties en geen unieke constraints — zoals `BoodschappenItem`: een verwijderd recept
+    laat de maaltijd staan (titel doorgehaald, "kies opnieuw"), en delen sleept niets mee. Eén avondeten per
+    dag per kookboek bewaakt de code (bij dubbelen via iCloud telt de nieuwste). Zelfde zone-regels als de
+    lijst: `Kookboeken.herstel` stap 6, `ThuisDelen` deelt de Thuis-week en zet hem bij stoppen/vertrekken in
+    Mijn week (dagen die daar al bezet zijn houden wat er stond). **Deploy Schema Changes** opnieuw nodig.
 - **Eigen boodschappenlijst (#39):** `Boodschappenlijsten` (lezen, optellen, afvinken, wissen, verplaatsen),
   `LijstOptellen` (puur: zelfde `sleutel` + optelbare maat, hergebruikt `BoodschappenLijst` met hele stuks
   in de winkel; afgevinkte items tellen niet mee; herkomst = recepttitels), `Afdelingen` (woordenlijst van
@@ -276,6 +283,16 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
   een eigen Claude-sleutel stuurt `OnbekendeAfdelingen` de **naam** van onbekende ingrediënten naar Claude,
   elke naam hooguit één keer (cache). Het boodschappenvel van #38 kiest via `VelBestemming` standaard de
   Knipsel-lijst van het kookboek van het recept (instelling: Knipsel-lijst of Herinneringen).
+- **Weekmenu (#41):** `Weekplanning` (puur): week voor een datum met instelbare begindag (`Weekbegin`,
+  standaard maandag; gregoriaans, `nl_NL`, rekenen in hele dagen zodat zomertijd en jaargrens kloppen),
+  verplaatsen (bezette dag = ruilen), kook dubbel (volgende dag "Restjes van …"; bezet = eerst vragen:
+  vervangen of een andere dag), wissen (met de restjes), "vandaag" en de boodschappen-paren vanaf een dag
+  t/m het eind van de week: per recept de porties plus die van zijn restjes; notities en restjes-dagen
+  zelf leveren niets op. `Weekmenu` zet `Maaltijd` om naar waarden, laat `Weekplanning` rekenen en schrijft
+  terug. `WeekScherm` (📅 naast 🛒 op iPhone, zijbalkrij op iPad) toont de week met *Mijn week | Thuis*
+  (`BoodschappenSchakelaar`), `ReceptKiezer`, `DagActies`, slepen tussen dagen en onderin het vel van #40
+  (`VelRecept.start` = geplande porties). `PlanInVel` vanuit ⋯ › *Plan in…* in het recept; `VandaagRij`
+  bovenaan de bibliotheek; `VandaagIntent` voor Siri. Gepland telt niet als gekookt.
 - **Diensten:** `ScanService` (VisionKit/Vision), `Indeler`-protocol met `RegelIndeler`, `ClaudeIndeler` en `ModelIndeler`, `KeychainService`,
   `IngredientParser` (puur, goed testbaar), `VoorleesService` (AVSpeechSynthesizer + uitspraakregels),
   `LuisterService` (AVAudioEngine + SpeechAnalyzer), `CommandoHerkenner` (puur, testbaar),
@@ -320,6 +337,7 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 | 7 | Timers (AlarmKit) en Live Activity | Gebouwd (#8): tijdherkenning, timers, timervraag, Live Activities (widget-extensie `KnipselWidgets`), Siri-timers. Alarm op slot/stil en Dynamic Island nog op toestel te testen |
 | 8 | Delen met huisgenoot | Raakt het datamodel; na stabiel gebruik. Gebouwd (#9): kookboek Thuis, modelversie 3 |
 | — | Boodschappen 1, 2 en 3 | Gebouwd: vel naar Herinneringen (#38); eigen lijst per afdeling met optellen, Thuis-lijst, modelversie 4 (#39); lijst voor meerdere recepten tegelijk (#40). Weekmenu apart |
+| — | Weekmenu (A + B) | Gebouwd (#41): weekoverzicht met kook dubbel/restjes, boodschappen voor de rest van de week, Mijn week / Thuis, Vandaag en Siri; *Plan in* vanuit het recept; modelversie 5. Weekvoorstel (C) later |
 
 ## 10. Eigen suggesties (nog niet ingepland)
 
@@ -341,7 +359,9 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
    recepten (gelijkspel: Mijn lijst), met bovenaan *Zet op: Mijn lijst | Thuis* als Thuis bestaat. Op de eigen
    lijst krijgt elk item alleen de recepten waar het uit komt als herkomst; in Herinneringen staan alle titels
    in de notitie. Na een geslaagde lijst gaat de selectiemodus uit zodra het vel dicht is. Geen modelwijziging.
-   Het weekmenu volgt apart (schetsen `docs/ux/schetsen-boodschappen.html`).
+   Het weekmenu is gebouwd in #41 (schetsen `docs/ux/schetsen-weekmenu.html`, eisen M1–M7): A
+   (weekoverzicht) met B (*Plan in* vanuit het recept). Nog niet: C, een weekvoorstel op basis van wat je
+   lang niet kookte en het seizoen — als knop in het weekoverzicht zodra er genoeg kookgeschiedenis is.
 3. **"Wat kan ik maken met …"** — zoeken op wat je in huis hebt ("prei, ei, kaas").
 4. **Menu koken** — twee of drie recepten tegelijk in de kookmodus, met wisselen per stem ("naar de saus").
 5. **Gekookt-logboek** — datum, sterren en notitie ("minder zout"); tonen bij het recept.

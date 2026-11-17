@@ -376,6 +376,9 @@ struct PlanInVel: View {
     var body: some View {
         NavigationStack {
             VStack(alignment: .leading, spacing: 18) {
+                Text(recept.titelOfStandaard)
+                    .font(.system(.title3, design: .serif).weight(.semibold))
+                    .lineLimit(2)
                 Picker("Week", selection: $volgendeWeek) {
                     Text("Deze week").tag(false)
                     Text("Volgende week").tag(true)
@@ -429,7 +432,7 @@ struct PlanInVel: View {
                 .disabled(dag == nil)
             }
             .padding(20)
-            .navigationTitle("Plan \u{201E}\(recept.titelOfStandaard)\u{201D} in")
+            .navigationTitle("Plan in")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
