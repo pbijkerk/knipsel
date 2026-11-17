@@ -52,6 +52,13 @@ enum AppConfiguratie {
     /// `MeestalInHuis`), alleen op dit toestel.
     static let sleutelMeestalInHuis = "meestalInHuis"
 
+    /// Eigen boodschappenlijst (#39): de afdeling per ingrediënt die je zelf koos of die Claude gaf
+    /// (JSON, `AfdelingGeheugen`), alleen op dit toestel.
+    static let sleutelAfdelingen = "boodschappenAfdelingen"
+
+    /// Waar de hoofdknop van het boodschappenvel heen gaat: "knipsel" (standaard) of "herinneringen".
+    static let sleutelBoodschappenBestemming = "boodschappenBestemming"
+
     /// De lijst in Herinneringen waar boodschappen in komen; Knipsel maakt hem aan als hij er niet is.
     static let boodschappenLijstNaam = "Boodschappen"
 

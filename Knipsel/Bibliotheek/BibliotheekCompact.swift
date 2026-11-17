@@ -14,6 +14,7 @@ struct BibliotheekCompact: View {
     @State private var verder: VerderKeuze?
     @State private var verderGestart: VerderKeuze?
     @State private var toonInbox = false
+    @State private var toonBoodschappen = false
     @Environment(InleesInbox.self) private var inbox
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
 
@@ -60,7 +61,12 @@ struct BibliotheekCompact: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Instellingen", systemImage: "gearshape") { toonInstellingen = true }
                 }
+                // De eigen boodschappenlijst (#39), met het aantal open items.
+                ToolbarItem(placement: .topBarTrailing) {
+                    BoodschappenKnop { toonBoodschappen = true }
+                }
             }
+            .navigationDestination(isPresented: $toonBoodschappen) { BoodschappenScherm() }
             .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox)
         }
         .verderMet($verder, gestart: $verderGestart)

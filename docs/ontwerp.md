@@ -261,6 +261,21 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
   - `Categorie`: naam, symbool, volgorde, verborgen, isStandaard
   - `Label`: naam
   - `Kooklog`: datum, notitie
+  - Modelversie 4 (#39): `BoodschappenItem` (uuid, naam, sleutel, hoeveelheid, eenheid, tekst, afdeling,
+    afgevinkt, afgevinktOp, aangemaaktOp, volgorde, herkomst, kookboek). Alle velden optioneel of met
+    standaard, geen relaties (dus `share(_:to:)` sleept niets mee) en geen unieke constraints. Eén lijst per
+    kookboek: Mijn recepten in de privéstore, Thuis in de zone van de Thuis-share (bij de eigenaar in de
+    privéstore, bij de huisgenoot in de gedeelde store); `Kookboeken.herstel` zet een nieuw item in de juiste
+    store, `ThuisDelen` zet Thuis-items in de share en verplaatst ze bij stoppen/vertrekken naar Mijn lijst.
+    **CloudKit-schema opnieuw uitrollen** (Deploy Schema Changes).
+- **Eigen boodschappenlijst (#39):** `Boodschappenlijsten` (lezen, optellen, afvinken, wissen, verplaatsen),
+  `LijstOptellen` (puur: zelfde `sleutel` + optelbare maat, hergebruikt `BoodschappenLijst` met hele stuks
+  in de winkel; afgevinkte items tellen niet mee; herkomst = recepttitels), `Afdelingen` (woordenlijst van
+  ruim 550 ingrediënten → 13 afdelingen in de volgorde van een Nederlandse supermarkt, onbekend → Overig) en
+  `AfdelingGeheugen` (eigen keuze per sleutel gaat voor woordenlijst, dan Claude; op dit toestel). Alleen met
+  een eigen Claude-sleutel stuurt `OnbekendeAfdelingen` de **naam** van onbekende ingrediënten naar Claude,
+  elke naam hooguit één keer (cache). Het boodschappenvel van #38 kiest via `VelBestemming` standaard de
+  Knipsel-lijst van het kookboek van het recept (instelling: Knipsel-lijst of Herinneringen).
 - **Diensten:** `ScanService` (VisionKit/Vision), `Indeler`-protocol met `RegelIndeler`, `ClaudeIndeler` en `ModelIndeler`, `KeychainService`,
   `IngredientParser` (puur, goed testbaar), `VoorleesService` (AVSpeechSynthesizer + uitspraakregels),
   `LuisterService` (AVAudioEngine + SpeechAnalyzer), `CommandoHerkenner` (puur, testbaar),
@@ -304,6 +319,7 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 | 6 | Siri, App Shortcuts, Spotlight, AirPods/Watch (proef); Actieknop geparkeerd | Bouwt op de `KookSessie` van 3–5. Gebouwd (#7); `ZetTimer` in fase 7 |
 | 7 | Timers (AlarmKit) en Live Activity | Gebouwd (#8): tijdherkenning, timers, timervraag, Live Activities (widget-extensie `KnipselWidgets`), Siri-timers. Alarm op slot/stil en Dynamic Island nog op toestel te testen |
 | 8 | Delen met huisgenoot | Raakt het datamodel; na stabiel gebruik. Gebouwd (#9): kookboek Thuis, modelversie 3 |
+| — | Boodschappen 1 en 2 | Gebouwd: vel naar Herinneringen (#38); eigen lijst per afdeling met optellen, Thuis-lijst, modelversie 4 (#39). Weekmenu (#40) volgt |
 
 ## 10. Eigen suggesties (nog niet ingepland)
 
@@ -313,8 +329,10 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
    geschaald en aangevinkt, "Meestal in huis" uitgevinkt (aan te passen, Knipsel leert wat je vaak uitvinkt),
    naar de lijst "Boodschappen" in Herinneringen of delen als tekst. Herinneringen deelt een lijst van het type
    Boodschappen zelf in per afdeling; EventKit kan dat lijsttype niet zetten, dus dat doet de gebruiker in
-   Herinneringen (Toon lijstinfo › Lijsttype). Een eigen lijst over meerdere recepten en het weekmenu volgen
-   apart (schetsen `docs/ux/schetsen-boodschappen.html`).
+   Herinneringen (Toon lijstinfo › Lijsttype). Stap 2 gebouwd (#39, schets 2A): een eigen lijst in Knipsel
+   over meerdere recepten, opgeteld en per afdeling in winkelvolgorde, met een gedeelde Thuis-lijst; Herinneringen
+   blijft als bestemming (keuze in Instellingen). Het weekmenu volgt apart (schetsen
+   `docs/ux/schetsen-boodschappen.html`).
 3. **"Wat kan ik maken met …"** — zoeken op wat je in huis hebt ("prei, ei, kaas").
 4. **Menu koken** — twee of drie recepten tegelijk in de kookmodus, met wisselen per stem ("naar de saus").
 5. **Gekookt-logboek** — datum, sterren en notitie ("minder zout"); tonen bij het recept.

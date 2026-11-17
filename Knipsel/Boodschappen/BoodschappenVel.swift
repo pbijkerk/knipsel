@@ -1,16 +1,23 @@
+import CoreData
 import SwiftUI
 
 /// Het vel "Boodschappen" (schets 1A): alle ingrediënten geschaald en aangevinkt, behalve wat je meestal
-/// in huis hebt. "Zet n op de lijst" zet ze in Herinneringen; "Delen als tekst" voor WhatsApp of de AH-app.
+/// in huis hebt. De hoofdknop zet ze op de eigen lijst in Knipsel (#39) van het kookboek van het recept,
+/// of — als dat in Instellingen zo staat — in Herinneringen; de andere bestemming en "Delen als tekst"
+/// staan eronder.
 struct BoodschappenVel: View {
     let recept: String
     let porties: Int
     let invoer: [BoodschappenInvoer]
     let factor: Double
     let bestemming: any Boodschappenbestemming
+    /// Kookboek van het recept: een Thuis-recept gaat op de Thuis-lijst.
+    let kookboek: Kookboek
     private let defaults: UserDefaults
+    private let hoofd: VelBestemming
 
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.managedObjectContext) private var context
     @Environment(\.openURL) private var openURL
 
     @State private var meestal: MeestalInHuis
@@ -22,23 +29,29 @@ struct BoodschappenVel: View {
     @State private var foutmelding: String?
     /// De lijst is verstuurd of gedeeld: dan telt wat uitgevinkt stond mee voor "leren".
     @State private var geteld = false
+    /// Per regel-id wat er al op de eigen lijst staat en wat het samen wordt ("2 uien" → "5 uien").
+    @State private var opLijst: [String: (bestaand: String, samen: String?)] = [:]
 
     enum Fase: Equatable {
         case kiezen
         case bezig
         case klaar(Boodschappenresultaat)
+        case klaarLijst(Boodschappenresultaat, Kookboek)
     }
 
     init(
         recept: String, porties: Int, invoer: [BoodschappenInvoer], factor: Double,
-        bestemming: any Boodschappenbestemming, defaults: UserDefaults = .standard, fase: Fase = .kiezen
+        bestemming: any Boodschappenbestemming, kookboek: Kookboek = .mijn, defaults: UserDefaults = .standard,
+        fase: Fase = .kiezen
     ) {
         self.recept = recept
         self.porties = porties
         self.invoer = invoer
         self.factor = factor
         self.bestemming = bestemming
+        self.kookboek = kookboek
         self.defaults = defaults
+        hoofd = VelBestemming.hoofd(standaard: .laad(uit: defaults), kookboek: kookboek)
         let meestal = MeestalInHuis.laad(uit: defaults)
         _meestal = State(initialValue: meestal)
         let regels = BoodschappenLijst.regels(invoer, factor: factor, meestalInHuis: meestal)
@@ -70,6 +83,8 @@ struct BoodschappenVel: View {
             Group {
                 if case .klaar(let resultaat) = fase {
                     bevestiging(resultaat)
+                } else if case .klaarLijst(let resultaat, let boek) = fase {
+                    bevestigingLijst(resultaat, kookboek: boek)
                 } else {
                     lijst
                 }
@@ -83,7 +98,10 @@ struct BoodschappenVel: View {
             }
         }
         .tint(Kookkleuren.accent)
-        .task { await laadDubbele() }
+        .task {
+            laadOpLijst()
+            await laadDubbele()
+        }
         .onDisappear(perform: leer)
         .alert(
             "Er ging iets mis", isPresented: Binding(get: { foutmelding != nil }, set: { if !$0 { foutmelding = nil } })
@@ -150,6 +168,8 @@ struct BoodschappenVel: View {
             .accessibilityHint(aan ? "Tik als je het al in huis hebt" : "Tik om het op de lijst te zetten")
             if aan, let dubbel = dubbele[regel.id] {
                 dubbelKeuze(regel, dubbel)
+            } else if aan, hoofd != .herinneringen, let bekend = opLijst[regel.id] {
+                opLijstRegel(bekend)
             }
         }
     }
@@ -180,6 +200,23 @@ struct BoodschappenVel: View {
             }
             .accessibilityLabel("Wat te doen met \(regel.naam)")
             .accessibilityValue(keuze == .overslaan ? "Overslaan" : tweede.1)
+        }
+        .font(.footnote)
+        .padding(.leading, 34)
+    }
+
+    /// "Staat al op je lijst: 2 uien · wordt 5 uien" (eigen lijst: optellen gaat vanzelf).
+    private func opLijstRegel(_ bekend: (bestaand: String, samen: String?)) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: "checklist")
+                .foregroundStyle(.secondary)
+                .accessibilityHidden(true)
+            Text(
+                bekend.samen.map { "Staat al op je lijst: \(bekend.bestaand) · wordt \($0)" }
+                    ?? "Staat al op je lijst: \(bekend.bestaand)"
+            )
+            .foregroundStyle(.secondary)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
         .font(.footnote)
         .padding(.leading, 34)
@@ -226,29 +263,42 @@ struct BoodschappenVel: View {
 
     private var knoppen: some View {
         VStack(spacing: 10) {
-            if toegang != .geweigerd {
-                Button(action: zetOpLijst) {
-                    HStack(spacing: 8) {
-                        if fase == .bezig { ProgressView().tint(.white) }
-                        Text(aantal == 0 ? "Niets op de lijst" : "Zet \(aantal) op de lijst")
-                    }
-                    .font(.headline.weight(.bold))
-                    .frame(maxWidth: .infinity, minHeight: 50)
-                    .background(Kookkleuren.accent.opacity(aantal == 0 ? 0.4 : 1), in: Capsule())
-                    .foregroundStyle(.white)
-                    .contentShape(Capsule())
+            switch hoofd {
+            case .lijst(let boek):
+                hoofdknop(hoofd.knop(aantal: gekozen.count), hint: "Zet ze op je boodschappenlijst in Knipsel") {
+                    zetOpKnipselLijst(boek)
                 }
-                .buttonStyle(.plain)
-                .disabled(aantal == 0 || fase == .bezig)
-                .accessibilityHint("Zet ze in Herinneringen, in de lijst Boodschappen")
+                .disabled(gekozen.isEmpty || fase == .bezig)
+                HStack(spacing: 10) {
+                    if toegang != .geweigerd {
+                        Button(action: zetOpLijst) {
+                            SwiftUI.Label("Naar Herinneringen", systemImage: "checklist")
+                                .font(.body.weight(.semibold))
+                                .frame(maxWidth: .infinity, minHeight: 44)
+                        }
+                        .disabled(gekozen.isEmpty || fase == .bezig)
+                    }
+                    deelKnop
+                }
+            case .herinneringen:
+                if toegang != .geweigerd {
+                    hoofdknop(hoofd.knop(aantal: aantal), hint: "Zet ze in Herinneringen, in de lijst Boodschappen") {
+                        zetOpLijst()
+                    }
+                    .disabled(aantal == 0 || fase == .bezig)
+                }
+                HStack(spacing: 10) {
+                    Button {
+                        zetOpKnipselLijst(kookboek)
+                    } label: {
+                        SwiftUI.Label(kookboek == .thuis ? "Op de Thuis-lijst" : "Op mijn lijst", systemImage: "cart")
+                            .font(.body.weight(.semibold))
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .disabled(gekozen.isEmpty || fase == .bezig)
+                    deelKnop
+                }
             }
-            ShareLink(item: BoodschappenLijst.tekst(recept: recept, porties: porties, regels: gekozen)) {
-                SwiftUI.Label("Delen als tekst", systemImage: "square.and.arrow.up")
-                    .font(.body.weight(.semibold))
-                    .frame(maxWidth: .infinity, minHeight: 44)
-            }
-            .disabled(gekozen.isEmpty)
-            .simultaneousGesture(TapGesture().onEnded { geteld = true })
         }
         .frame(maxWidth: 520)
         .padding(.horizontal, 20)
@@ -256,6 +306,32 @@ struct BoodschappenVel: View {
         .padding(.bottom, 8)
         .frame(maxWidth: .infinity)
         .background(.bar)
+    }
+
+    private func hoofdknop(_ titel: String, hint: String, actie: @escaping () -> Void) -> some View {
+        Button(action: actie) {
+            HStack(spacing: 8) {
+                if fase == .bezig { ProgressView().tint(.white) }
+                Text(titel)
+            }
+            .font(.headline.weight(.bold))
+            .frame(maxWidth: .infinity, minHeight: 50)
+            .background(Kookkleuren.accent, in: Capsule())
+            .foregroundStyle(.white)
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(hint)
+    }
+
+    private var deelKnop: some View {
+        ShareLink(item: BoodschappenLijst.tekst(recept: recept, porties: porties, regels: gekozen)) {
+            SwiftUI.Label("Delen als tekst", systemImage: "square.and.arrow.up")
+                .font(.body.weight(.semibold))
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .disabled(gekozen.isEmpty)
+        .simultaneousGesture(TapGesture().onEnded { geteld = true })
     }
 
     // MARK: - Bevestiging
@@ -306,10 +382,74 @@ struct BoodschappenVel: View {
         .frame(maxWidth: .infinity)
     }
 
+    private func bevestigingLijst(_ resultaat: Boodschappenresultaat, kookboek boek: Kookboek) -> some View {
+        VStack(spacing: 18) {
+            Spacer(minLength: 12)
+            Image(systemName: "cart.fill.badge.plus")
+                .font(.system(size: 52))
+                .foregroundStyle(Kookkleuren.accent)
+                .accessibilityHidden(true)
+            Text(VelBestemming.lijst(boek).bevestiging(aantal: resultaat.aantal))
+                .font(.title3.weight(.semibold))
+                .multilineTextAlignment(.center)
+            if resultaat.bijgewerkt > 0 {
+                Text(
+                    resultaat.bijgewerkt == 1
+                        ? "1 ervan is opgeteld bij wat er al op stond."
+                        : "\(resultaat.bijgewerkt) ervan zijn opgeteld bij wat er al op stond."
+                )
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+            }
+            Text(
+                boek == .thuis
+                    ? "Je vindt de lijst onder 🛒 in de bibliotheek. Wie Thuis met je deelt, ziet hem ook."
+                    : "Je vindt de lijst onder 🛒 in de bibliotheek, per afdeling in de volgorde van de winkel."
+            )
+            .font(.subheadline)
+            .foregroundStyle(.secondary)
+            .multilineTextAlignment(.center)
+            Button("Klaar") { dismiss() }
+                .font(.headline)
+                .frame(maxWidth: .infinity, minHeight: 50)
+                .buttonStyle(.bordered)
+            Spacer(minLength: 12)
+        }
+        .padding(.horizontal, 28)
+        .frame(maxWidth: 480)
+        .frame(maxWidth: .infinity)
+    }
+
     // MARK: - Acties
 
+    /// Wat er al open op de eigen lijst staat, per regel van het vel.
+    private func laadOpLijst() {
+        guard case .lijst(let boek) = hoofd else { return }
+        let open = Boodschappenlijsten.items(in: boek, context: context).filter { !$0.afgevinkt }
+        var gevonden: [String: (bestaand: String, samen: String?)] = [:]
+        for regel in regels {
+            guard let item = open.first(where: { $0.sleutel == regel.sleutel }) else { continue }
+            let samen = BoodschappenLijst.samengevoegd(Boodschappenlijsten.lijstRegel(item), LijstRegel(regel))
+            gevonden[regel.id] = (item.tekstOfNaam, samen.flatMap { $0.tekst == item.tekstOfNaam ? nil : $0.tekst })
+        }
+        opLijst = gevonden
+    }
+
+    private func zetOpKnipselLijst(_ boek: Kookboek) {
+        do {
+            let resultaat = try Boodschappenlijsten.zetOpLijst(
+                gekozen.map(LijstRegel.init), herkomst: recept, kookboek: boek, context: context)
+            geteld = true
+            fase = .klaarLijst(resultaat, boek)
+            Task { await OnbekendeAfdelingen.gedeeld.deelIn(context: context) }
+        } catch {
+            foutmelding = "Op de lijst zetten lukte niet: \(error.localizedDescription)"
+        }
+    }
+
     private func laadDubbele() async {
-        guard toegang == .toegestaan else { return }
+        guard toegang == .toegestaan, hoofd == .herinneringen else { return }
         dubbele = await bestemming.dubbele(in: regels)
     }
 

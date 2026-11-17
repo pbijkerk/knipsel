@@ -53,7 +53,7 @@ final class ThuisDelen {
             forName: .NSManagedObjectContextDidSave, object: context, queue: .main
         ) { [weak self] melding in
             let thuis = ((melding.userInfo?[NSInsertedObjectsKey] as? Set<NSManagedObject>) ?? [])
-                .contains { ($0 as? Recept)?.isThuis == true }
+                .contains { ($0 as? Recept)?.isThuis == true || ($0 as? BoodschappenItem)?.kookboekWaarde == .thuis }
             guard thuis else { return }
             MainActor.assumeIsolated { self?.planDelen() }
         }
@@ -69,11 +69,13 @@ final class ThuisDelen {
         }
     }
 
-    /// Zet Thuis-recepten die nog niet in de share staan erin (maakt de share zo nodig aan).
+    /// Zet Thuis-recepten en de items van de Thuis-boodschappenlijst (#39) die nog niet in de share
+    /// staan erin (maakt de share zo nodig aan).
     func deelOpenstaande() async {
         guard dienst.isBeschikbaar else { return }
         let recepten = (try? Kookboeken.recepten(in: .thuis, context: context)) ?? []
-        let open = dienst.nietGedeeld(recepten.map(\.objectID))
+        let items = Boodschappenlijsten.items(in: .thuis, context: context)
+        let open = dienst.nietGedeeld(recepten.map(\.objectID) + items.map(\.objectID))
         guard !open.isEmpty else { return }
         do {
             try await dienst.deel(open)
@@ -112,6 +114,7 @@ final class ThuisDelen {
         bezig = true
         defer { bezig = false }
         try Kookboeken.verplaatsAlles(van: .thuis, naar: .mijn, in: context)
+        try Boodschappenlijsten.verplaatsAlles(van: .thuis, naar: .mijn, verwijderBron: true, context: context)
         try await dienst.stopMetDelen()
         await vernieuw()
     }
@@ -123,6 +126,7 @@ final class ThuisDelen {
         defer { bezig = false }
         if kopieer {
             try Kookboeken.kopieerAlles(van: .thuis, naar: .mijn, in: context)
+            try Boodschappenlijsten.verplaatsAlles(van: .thuis, naar: .mijn, verwijderBron: false, context: context)
         }
         try await dienst.verlaat()
         await vernieuw()

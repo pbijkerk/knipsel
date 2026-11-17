@@ -231,6 +231,39 @@
           }
         }
       }
+    },
+    "Wat staat er op mijn boodschappenlijst in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat staat er op mijn boodschappenlijst in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Boodschappenlijst in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Boodschappenlijst in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Wat moet ik kopen in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat moet ik kopen in ${applicationName}"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

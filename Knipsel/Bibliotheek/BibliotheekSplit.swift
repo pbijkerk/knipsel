@@ -32,28 +32,17 @@ struct BibliotheekSplit: View {
                     }
                 }
         } detail: {
-            NavigationStack(path: $pad) {
-                ReceptLijst(filter: filter, weergave: weergave, kop: kop)
-                    .safeAreaInset(edge: .bottom, spacing: 0) {
-                        HStack {
-                            Spacer()
-                            KnipKnop { toonKnippen = true }
-                        }
-                        .padding(.horizontal, 24)
-                        .padding(.bottom, 12)
-                    }
-                    .navigationTitle(lijstTitel)
-                    .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
-                    .navigationDestination(for: NSManagedObjectID.self) { id in
-                        ReceptScherm(
-                            id: id, naVerwijderen: { pad.removeAll { $0 == id } },
-                            naVerplaatsen: { nieuw in pad = pad.map { $0 == id ? nieuw : $0 } })
-                    }
-                    .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox, slepen: true)
+            if zijbalkKeuze == .boodschappen {
+                // De eigen boodschappenlijst (#39) in de detailkolom.
+                NavigationStack { BoodschappenScherm() }
+            } else {
+                receptenKolom
             }
         }
         .onChange(of: zijbalkKeuze) { _, nieuw in
             switch nieuw ?? .kookboek(nil) {
+            case .boodschappen:
+                break
             case .kookboek(let kookboek):
                 // Een kookboek kiezen begint met al zijn recepten.
                 filter.kookboek = kookboek
@@ -70,6 +59,28 @@ struct BibliotheekSplit: View {
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
         .sheet(isPresented: $toonKnippen) { KnipStart() }
+    }
+
+    private var receptenKolom: some View {
+        NavigationStack(path: $pad) {
+            ReceptLijst(filter: filter, weergave: weergave, kop: kop)
+                .safeAreaInset(edge: .bottom, spacing: 0) {
+                    HStack {
+                        Spacer()
+                        KnipKnop { toonKnippen = true }
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 12)
+                }
+                .navigationTitle(lijstTitel)
+                .searchable(text: $filter.zoekterm, prompt: "Zoek op recept of ingrediënt")
+                .navigationDestination(for: NSManagedObjectID.self) { id in
+                    ReceptScherm(
+                        id: id, naVerwijderen: { pad.removeAll { $0 == id } },
+                        naVerplaatsen: { nieuw in pad = pad.map { $0 == id ? nieuw : $0 } })
+                }
+                .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox, slepen: true)
+        }
     }
 
     /// "Verder met…" en "Nog te controleren" boven het raster, naast elkaar als er ruimte is; niet
@@ -122,6 +133,8 @@ struct BibliotheekSplit: View {
 /// Wat er in de zijbalk gekozen is: een kookboek (Alles, Mijn recepten, Thuis) of een categorie
 /// binnen het gekozen kookboek.
 enum ZijbalkKeuze: Hashable {
+    /// De eigen boodschappenlijst (#39), bovenaan.
+    case boodschappen
     case kookboek(Kookboek?)
     case categorie(CategorieKeuze)
 }
@@ -143,9 +156,16 @@ struct Zijbalk: View {
     ])
     private var alleLabels: FetchedResults<ReceptLabel>
     @FetchRequest(sortDescriptors: []) private var recepten: FetchedResults<Recept>
+    @FetchRequest(sortDescriptors: [], predicate: Boodschappenlijsten.predicaatOpen(kookboek: nil))
+    private var openBoodschappen: FetchedResults<BoodschappenItem>
 
     var body: some View {
         List(selection: $keuze) {
+            Section {
+                SwiftUI.Label("Boodschappen", systemImage: "cart")
+                    .badge(openBoodschappen.count)
+                    .tag(ZijbalkKeuze.boodschappen)
+            }
             Section("Kookboeken") {
                 SwiftUI.Label("Alles", systemImage: "books.vertical")
                     .badge(recepten.count)

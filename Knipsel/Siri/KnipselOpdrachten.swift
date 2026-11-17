@@ -60,6 +60,14 @@ struct KnipselOpdrachten: AppShortcutsProvider {
                 "Hoelang nog in \(.applicationName)",
             ],
             shortTitle: "Hoe lang nog?", systemImageName: "hourglass")
+        AppShortcut(
+            intent: BoodschappenlijstIntent(),
+            phrases: [
+                "Wat staat er op mijn boodschappenlijst in \(.applicationName)",
+                "Boodschappenlijst in \(.applicationName)",
+                "Wat moet ik kopen in \(.applicationName)",
+            ],
+            shortTitle: "Boodschappenlijst", systemImageName: "cart")
     }
 
     static let shortcutTileColor: ShortcutTileColor = .orange

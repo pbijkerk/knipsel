@@ -65,7 +65,9 @@ struct InstellingenView: View {
                         SwiftUI.Label("Boodschappen", systemImage: "cart")
                     }
                 } footer: {
-                    Text("Wat je meestal in huis hebt, staat op je boodschappenlijst standaard uitgevinkt.")
+                    Text(
+                        "Waar boodschappen uit een recept heen gaan, en wat je meestal in huis hebt (staat standaard uitgevinkt)."
+                    )
                 }
                 Section {
                     Toggle(isOn: $webFotoBewaren) {

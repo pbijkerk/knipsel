@@ -113,7 +113,7 @@ struct ReceptWeergave: View {
             BoodschappenVel(
                 recept: recept.titelOfStandaard, porties: recept.porties > 0 ? porties : 0,
                 invoer: recept.gesorteerdeIngredienten.map { BoodschappenInvoer($0) }, factor: factor,
-                bestemming: HerinneringenDienst.gedeeld
+                bestemming: HerinneringenDienst.gedeeld, kookboek: recept.kookboekWaarde
             )
             .presentationDetents([.medium, .large])
         }
