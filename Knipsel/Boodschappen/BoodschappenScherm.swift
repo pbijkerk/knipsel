@@ -312,19 +312,21 @@ struct BoodschappenKnop: View {
 
     var body: some View {
         Button(action: actie) {
-            Image(systemName: "cart")
-                .overlay(alignment: .topTrailing) {
-                    if open.count > 0 {
-                        Text(open.count > 99 ? "99+" : "\(open.count)")
-                            .font(.caption2.weight(.bold))
-                            .monospacedDigit()
-                            .foregroundStyle(.white)
-                            .padding(.horizontal, 5)
-                            .frame(minWidth: 18, minHeight: 18)
-                            .background(Kookkleuren.accent, in: Capsule())
-                            .offset(x: 10, y: -8)
-                    }
+            // Het getal als superscript naast de kar (schets 2A), binnen de knop: een overlay buiten het
+            // frame snijdt de glazen knop af.
+            HStack(alignment: .top, spacing: 1) {
+                Image(systemName: "cart")
+                if open.count > 0 {
+                    Text(open.count > 99 ? "99+" : "\(open.count)")
+                        .font(.system(size: 11, weight: .bold))
+                        .monospacedDigit()
+                        .foregroundStyle(.white)
+                        .padding(.horizontal, 4)
+                        .frame(minWidth: 16, minHeight: 16)
+                        .background(Kookkleuren.accent, in: Capsule())
+                        .offset(y: -2)
                 }
+            }
         }
         .accessibilityLabel(open.isEmpty ? "Boodschappen" : "Boodschappen, \(open.count) open")
     }

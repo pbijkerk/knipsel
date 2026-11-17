@@ -271,7 +271,7 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 - **Eigen boodschappenlijst (#39):** `Boodschappenlijsten` (lezen, optellen, afvinken, wissen, verplaatsen),
   `LijstOptellen` (puur: zelfde `sleutel` + optelbare maat, hergebruikt `BoodschappenLijst` met hele stuks
   in de winkel; afgevinkte items tellen niet mee; herkomst = recepttitels), `Afdelingen` (woordenlijst van
-  ruim 300 ingrediënten → 13 afdelingen in de volgorde van een Nederlandse supermarkt, onbekend → Overig) en
+  ruim 550 ingrediënten → 13 afdelingen in de volgorde van een Nederlandse supermarkt, onbekend → Overig) en
   `AfdelingGeheugen` (eigen keuze per sleutel gaat voor woordenlijst, dan Claude; op dit toestel). Alleen met
   een eigen Claude-sleutel stuurt `OnbekendeAfdelingen` de **naam** van onbekende ingrediënten naar Claude,
   elke naam hooguit één keer (cache). Het boodschappenvel van #38 kiest via `VelBestemming` standaard de

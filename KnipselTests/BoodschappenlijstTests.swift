@@ -127,6 +127,13 @@ struct AfdelingenTests {
         #expect(Afdelingen.afdeling(voor: naam) == verwacht, "\(naam)")
     }
 
+    @Test func groenteUitBlikIsHoudbaar() {
+        let geheugen = AfdelingGeheugen()
+        #expect(geheugen.afdeling(naam: "tomaten", sleutel: "tomaat", eenheid: "blik") == .houdbaar)
+        #expect(geheugen.afdeling(naam: "tomaten", sleutel: "tomaat", eenheid: nil) == .groenteFruit)
+        #expect(geheugen.afdeling(naam: "tonijn", sleutel: "tonijn", eenheid: "blikje") != .groenteFruit)
+    }
+
     @Test func onbekendIsOverig() {
         #expect(Afdelingen.uitWoordenlijst("wc-papier") == nil)
         #expect(Afdelingen.afdeling(voor: "afwasmiddel") == .overig)

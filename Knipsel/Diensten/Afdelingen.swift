@@ -113,6 +113,12 @@ enum Afdelingen {
         return nil
     }
 
+    /// Een eenheid die op een blik wijst: groente daaruit staat bij Houdbaar.
+    static func isBlik(_ eenheid: String?) -> Bool {
+        guard let eenheid = eenheid?.lowercased() else { return false }
+        return ["blik", "blikken", "blikje", "blikjes"].contains(eenheid)
+    }
+
     /// De afdeling zonder geheugen: woordenlijst, anders Overig.
     static func afdeling(voor naam: String) -> Afdeling { uitWoordenlijst(naam) ?? .overig }
 

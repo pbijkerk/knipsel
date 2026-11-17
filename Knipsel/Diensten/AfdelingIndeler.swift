@@ -9,10 +9,13 @@ struct AfdelingGeheugen: Codable, Equatable, Sendable {
     /// Antwoorden van Claude voor namen die niet in de woordenlijst staan.
     var claude: [String: Afdeling] = [:]
 
-    /// Gebruikerskeuze, dan de woordenlijst, dan Claude, anders Overig.
-    func afdeling(naam: String, sleutel: String) -> Afdeling {
+    /// Gebruikerskeuze, dan de woordenlijst, dan Claude, anders Overig. Uit blik ("1 blik tomaten") is
+    /// groente houdbaar.
+    func afdeling(naam: String, sleutel: String, eenheid: String? = nil) -> Afdeling {
         if let keuze = keuzes[sleutel] { return keuze }
-        if let bekend = Afdelingen.uitWoordenlijst(naam) { return bekend }
+        if let bekend = Afdelingen.uitWoordenlijst(naam) {
+            return bekend == .groenteFruit && Afdelingen.isBlik(eenheid) ? .houdbaar : bekend
+        }
         return claude[sleutel] ?? .overig
     }
 

@@ -86,7 +86,8 @@ enum Boodschappenlijsten {
                 item.kookboek = kookboek.rawValue
                 zet(regel, op: item)
                 item.herkomst = BoodschappenLijst.herkomst(nil, plus: herkomst)
-                item.afdeling = geheugen.afdeling(naam: regel.naam, sleutel: regel.sleutel).rawValue
+                item.afdeling =
+                    geheugen.afdeling(naam: regel.naam, sleutel: regel.sleutel, eenheid: regel.eenheid).rawValue
                 item.volgorde = volgende
                 volgende += 1
                 open.append(item)
