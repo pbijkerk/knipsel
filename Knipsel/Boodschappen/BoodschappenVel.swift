@@ -1,3 +1,4 @@
+import CoreData
 import SwiftUI
 
 /// Het vel "Boodschappen" (schets 1A): alle ingrediënten geschaald en aangevinkt, behalve wat je meestal
