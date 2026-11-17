@@ -81,7 +81,9 @@ struct BoodschappenVel: View {
         self.naSucces = naSucces
         standaard = .laad(uit: defaults)
         _kookboek = State(initialValue: VelBestemming.kookboek(voor: recepten.map(\.kookboek)))
-        let porties = Dictionary(recepten.map { ($0.id, $0.standaard) }, uniquingKeysWith: { a, _ in a })
+        let porties = Dictionary(
+            recepten.map { ($0.id, $0.start.flatMap { $0 > 0 ? $0 : nil } ?? $0.standaard) },
+            uniquingKeysWith: { a, _ in a })
         _porties = State(initialValue: porties)
         let meestal = MeestalInHuis.laad(uit: defaults)
         _meestal = State(initialValue: meestal)
@@ -622,13 +624,20 @@ struct VelRecept: Identifiable, Equatable {
     let invoer: [BoodschappenInvoer]
     let standaard: Int
     let kookboek: Kookboek
+    /// Met hoeveel personen het vel begint; `nil` = de standaardporties (vanuit het weekmenu, #41:
+    /// de geplande porties, met restjes dubbel).
+    let start: Int?
 
-    init(id: String, titel: String, invoer: [BoodschappenInvoer], standaard: Int, kookboek: Kookboek = .mijn) {
+    init(
+        id: String, titel: String, invoer: [BoodschappenInvoer], standaard: Int, kookboek: Kookboek = .mijn,
+        start: Int? = nil
+    ) {
         self.id = id
         self.titel = titel
         self.invoer = invoer
         self.standaard = standaard
         self.kookboek = kookboek
+        self.start = start
     }
 
     init(_ recept: Recept) {
@@ -636,6 +645,14 @@ struct VelRecept: Identifiable, Equatable {
             id: recept.objectID.uriRepresentation().absoluteString, titel: recept.titelOfStandaard,
             invoer: recept.gesorteerdeIngredienten.map { BoodschappenInvoer($0) }, standaard: Int(recept.porties),
             kookboek: recept.kookboekWaarde)
+    }
+
+    /// Vanuit het weekmenu (#41): met de geplande porties.
+    init(_ recept: Recept, porties: Int?) {
+        self.init(
+            id: recept.objectID.uriRepresentation().absoluteString, titel: recept.titelOfStandaard,
+            invoer: recept.gesorteerdeIngredienten.map { BoodschappenInvoer($0) }, standaard: Int(recept.porties),
+            kookboek: recept.kookboekWaarde, start: porties)
     }
 
     /// Titel van het vel: "Boodschappen · 3 recepten".

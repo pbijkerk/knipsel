@@ -48,7 +48,7 @@ struct ModelTests {
         let model = Opslag.model
         #expect(
             Set(model.entities.compactMap(\.name)) == [
-                "Recept", "Ingredient", "Stap", "Categorie", "Label", "Kooklog", "BoodschappenItem",
+                "Recept", "Ingredient", "Stap", "Categorie", "Label", "Kooklog", "BoodschappenItem", "Maaltijd",
             ])
         for entiteit in model.entities {
             #expect(entiteit.uniquenessConstraints.isEmpty, "\(entiteit.name ?? "")")

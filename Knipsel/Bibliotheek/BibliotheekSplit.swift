@@ -23,9 +23,12 @@ struct BibliotheekSplit: View {
     /// Zijbalk standaard zichtbaar, zoals in de schets.
     @State private var kolommen: NavigationSplitViewVisibility = .all
 
-    /// - Parameter selectie: begin in selectiemodus (#40), voor voorbeelden en tests.
-    init(selectie: ReceptSelectie = ReceptSelectie()) {
+    /// - Parameters:
+    ///   - selectie: begin in selectiemodus (#40), voor voorbeelden en tests.
+    ///   - zijbalk: wat in de zijbalk gekozen is (bijv. het weekmenu), voor voorbeelden en tests.
+    init(selectie: ReceptSelectie = ReceptSelectie(), zijbalk: ZijbalkKeuze? = .kookboek(nil)) {
         _selectie = State(initialValue: selectie)
+        _zijbalkKeuze = State(initialValue: zijbalk)
     }
 
     var body: some View {
@@ -41,13 +44,16 @@ struct BibliotheekSplit: View {
             if zijbalkKeuze == .boodschappen {
                 // De eigen boodschappenlijst (#39) in de detailkolom.
                 NavigationStack { BoodschappenScherm() }
+            } else if zijbalkKeuze == .weekmenu {
+                // Het weekmenu (#41) in de detailkolom.
+                NavigationStack { WeekScherm() }
             } else {
                 receptenKolom
             }
         }
         .onChange(of: zijbalkKeuze) { _, nieuw in
             switch nieuw ?? .kookboek(nil) {
-            case .boodschappen:
+            case .boodschappen, .weekmenu:
                 break
             case .kookboek(let kookboek):
                 // Een kookboek kiezen begint met al zijn recepten.
@@ -104,12 +110,26 @@ struct BibliotheekSplit: View {
     /// "Verder met…" en "Nog te controleren" boven het raster, naast elkaar als er ruimte is; niet
     /// tijdens het zoeken.
     private var kop: AnyView? {
+        guard filter.zoekterm.isEmpty else { return nil }
         let inboxZichtbaar = !inbox.items.isEmpty
-        guard verder != nil || inboxZichtbaar, filter.zoekterm.isEmpty else { return nil }
+        guard verder != nil || inboxZichtbaar else {
+            // Alleen "Vandaag: …" (#41); verdwijnt vanzelf als er niets gepland is.
+            return AnyView(
+                VandaagRij()
+                    .frame(maxWidth: 560, alignment: .leading)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, weergave == .kaarten ? 24 : 16)
+                    .padding(.top, 4)
+                    .padding(.bottom, 10))
+        }
         return AnyView(
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 12) { kopKaarten }
-                VStack(spacing: 10) { kopKaarten }
+            VStack(alignment: .leading, spacing: 10) {
+                VandaagRij()
+                    .frame(maxWidth: 560, alignment: .leading)
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .top, spacing: 12) { kopKaarten }
+                    VStack(spacing: 10) { kopKaarten }
+                }
             }
             .padding(.horizontal, weergave == .kaarten ? 24 : 16)
             .padding(.top, 4)
@@ -153,6 +173,8 @@ struct BibliotheekSplit: View {
 enum ZijbalkKeuze: Hashable {
     /// De eigen boodschappenlijst (#39), bovenaan.
     case boodschappen
+    /// Het weekmenu (#41), onder de boodschappen.
+    case weekmenu
     case kookboek(Kookboek?)
     case categorie(CategorieKeuze)
 }
@@ -183,6 +205,8 @@ struct Zijbalk: View {
                 SwiftUI.Label("Boodschappen", systemImage: "cart")
                     .badge(openBoodschappen.count)
                     .tag(ZijbalkKeuze.boodschappen)
+                SwiftUI.Label("Weekmenu", systemImage: "calendar")
+                    .tag(ZijbalkKeuze.weekmenu)
             }
             Section("Kookboeken") {
                 SwiftUI.Label("Alles", systemImage: "books.vertical")

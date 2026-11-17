@@ -15,6 +15,7 @@ struct BibliotheekCompact: View {
     @State private var verderGestart: VerderKeuze?
     @State private var toonInbox = false
     @State private var toonBoodschappen = false
+    @State private var toonWeek = false
     @State private var selectie = ReceptSelectie()
     @Environment(InleesInbox.self) private var inbox
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
@@ -30,6 +31,13 @@ struct BibliotheekCompact: View {
                 filter: filter, weergave: weergave,
                 kop: AnyView(
                     VStack(spacing: 0) {
+                        // Wat er vandaag op het weekmenu staat (#41); niets als er niets gepland is.
+                        if filter.zoekterm.isEmpty, !selectie.actief {
+                            VandaagRij()
+                                .padding(.horizontal, 16)
+                                .padding(.top, 4)
+                                .padding(.bottom, verder == nil && inbox.items.isEmpty ? 0 : 6)
+                        }
                         if let verder, filter.zoekterm.isEmpty {
                             VerderMetKaart(
                                 keuze: verder, verder: { verderGestart = verder },
@@ -72,7 +80,10 @@ struct BibliotheekCompact: View {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Instellingen", systemImage: "gearshape") { toonInstellingen = true }
                 }
-                // De eigen boodschappenlijst (#39), met het aantal open items.
+                // Het weekmenu (#41) naast de eigen boodschappenlijst (#39, met het aantal open items).
+                ToolbarItem(placement: .topBarTrailing) {
+                    WeekKnop { toonWeek = true }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     BoodschappenKnop { toonBoodschappen = true }
                 }
@@ -84,6 +95,7 @@ struct BibliotheekCompact: View {
                 }
             }
             .navigationDestination(isPresented: $toonBoodschappen) { BoodschappenScherm() }
+            .navigationDestination(isPresented: $toonWeek) { WeekScherm() }
             .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox)
         }
         .verderMet($verder, gestart: $verderGestart)
