@@ -159,6 +159,53 @@ final class Kooklog: NSManagedObject {
     static func verzoek() -> NSFetchRequest<Kooklog> { NSFetchRequest(entityName: "Kooklog") }
 }
 
+/// Eén regel op de eigen boodschappenlijst (#39, modelversie 4): "3 uien", "1,2 l bouillon" of letterlijk
+/// "peper en zout". Eén lijst per kookboek: Mijn recepten (privéstore) of Thuis (gedeeld, in dezelfde
+/// zone als de Thuis-recepten). Geen relaties: een item hangt nergens aan, dus delen neemt niets mee.
+@objc(BoodschappenItem)
+final class BoodschappenItem: NSManagedObject {
+    @NSManaged var uuid: UUID?
+    /// De naam zoals in het recept of ingetypt ("uien", "kokosmelk"); bij een regel zonder hoeveelheid
+    /// de hele tekst.
+    @NSManaged var naam: String?
+    /// Genormaliseerde naam (`BoodschappenLijst.sleutel`): optellen en de afdeling onthouden.
+    @NSManaged var sleutel: String?
+    @NSManaged var hoeveelheid: NSNumber?
+    @NSManaged var eenheid: String?
+    /// Wat er op de lijst staat ("3 uien"); ook de terugval als de rest ontbreekt.
+    @NSManaged var tekst: String?
+    /// Ruwe waarde van `Afdeling`; leeg = nog niet ingedeeld (telt als Overig).
+    @NSManaged var afdeling: String?
+    @NSManaged var afgevinkt: Bool
+    @NSManaged var aangemaaktOp: Date?
+    @NSManaged var afgevinktOp: Date?
+    /// Volgorde binnen de afdeling (oplopend; nieuw onderaan).
+    @NSManaged var volgorde: Int32
+    /// Uit welke recepten dit komt: "Pompoensoep, Linzensalade".
+    @NSManaged var herkomst: String?
+    /// Ruwe waarde van `Kookboek`; standaard "mijn".
+    @NSManaged var kookboek: String
+
+    static func verzoek() -> NSFetchRequest<BoodschappenItem> { NSFetchRequest(entityName: "BoodschappenItem") }
+
+    override func awakeFromInsert() {
+        super.awakeFromInsert()
+        uuid = UUID()
+        aangemaaktOp = .now
+    }
+
+    var kookboekWaarde: Kookboek { Kookboek(veld: kookboekVeld) }
+    var afdelingWaarde: Afdeling { Afdeling(veld: afdeling) }
+    var tekstOfNaam: String { tekst?.nietLeegOfNil ?? naam?.nietLeegOfNil ?? "" }
+}
+
+extension String {
+    fileprivate var nietLeegOfNil: String? {
+        let schoon = trimmingCharacters(in: .whitespacesAndNewlines)
+        return schoon.isEmpty ? nil : schoon
+    }
+}
+
 // MARK: - Kookboek
 
 extension NSManagedObject {

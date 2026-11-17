@@ -36,7 +36,7 @@ enum Kookboeken {
     /// iets staat: een share van een ander kan niet leeg beginnen.
     static func thuisIsGedeeldeStore(in context: NSManagedObjectContext) -> Bool {
         guard let gedeeld = store(.gedeeld, in: context.persistentStoreCoordinator) else { return false }
-        for entiteit in ["Recept", "Categorie", "Label"] {
+        for entiteit in ["Recept", "Categorie", "Label", "BoodschappenItem"] {
             let verzoek = NSFetchRequest<NSManagedObject>(entityName: entiteit)
             verzoek.affectedStores = [gedeeld]
             verzoek.fetchLimit = 1
@@ -120,6 +120,12 @@ enum Kookboeken {
             {
                 context.assign(object, to: doel)
             }
+        }
+        // 5. Nieuwe boodschappen (#39): de lijst van hun kookboek, in dezelfde store en zone als de
+        // recepten daarvan.
+        for item in context.insertedObjects.compactMap({ $0 as? BoodschappenItem })
+        where item.objectID.persistentStore == nil {
+            if let doel = storeVoor(item.kookboekWaarde) { context.assign(item, to: doel) }
         }
     }
 

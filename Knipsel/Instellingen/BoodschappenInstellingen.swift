@@ -1,19 +1,34 @@
 import SwiftUI
 
-/// Instellingen › Boodschappen: wat je meestal in huis hebt (L2). Die woorden staan op de
+/// Instellingen › Boodschappen: waar de boodschappen uit een recept heen gaan (#39: de eigen lijst in
+/// Knipsel of Herinneringen) en wat je meestal in huis hebt (L2). Die woorden staan op de
 /// boodschappenlijst standaard uitgevinkt.
 struct BoodschappenInstellingen: View {
     private let defaults: UserDefaults
     @State private var meestal: MeestalInHuis
     @State private var nieuw = ""
+    @State private var standaard: BoodschappenStandaard
 
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         _meestal = State(initialValue: MeestalInHuis.laad(uit: defaults))
+        _standaard = State(initialValue: BoodschappenStandaard.laad(uit: defaults))
     }
 
     var body: some View {
         List {
+            Section {
+                Picker("Standaard bestemming", selection: $standaard) {
+                    ForEach(BoodschappenStandaard.allCases) { Text($0.naam).tag($0) }
+                }
+                .onChange(of: standaard) { _, nieuw in
+                    defaults.set(nieuw.rawValue, forKey: AppConfiguratie.sleutelBoodschappenBestemming)
+                }
+            } footer: {
+                Text(
+                    "Waar \"Zet op de lijst\" in een recept heen gaat. De Knipsel-lijst vind je onder 🛒 in de bibliotheek, per afdeling; een recept uit Thuis gaat op de Thuis-lijst. Naar Herinneringen en delen als tekst kan altijd ook."
+                )
+            }
             Section {
                 ForEach(meestal.woorden, id: \.self) { woord in
                     Text(woord)
@@ -45,7 +60,7 @@ struct BoodschappenInstellingen: View {
                 .disabled(meestal.woorden == MeestalInHuis.standaardWoorden)
             } footer: {
                 Text(
-                    "Knipsel zet je boodschappen in Herinneringen, in de lijst Boodschappen, of je deelt ze als tekst. Alleen wat je zelf aanvinkt gaat erheen."
+                    "Alleen wat je zelf aanvinkt gaat op de lijst."
                 )
             }
         }

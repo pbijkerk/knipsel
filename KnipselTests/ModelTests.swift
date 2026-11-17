@@ -47,7 +47,9 @@ struct ModelTests {
     @Test func modelVoldoetAanCloudKitRegels() {
         let model = Opslag.model
         #expect(
-            Set(model.entities.compactMap(\.name)) == ["Recept", "Ingredient", "Stap", "Categorie", "Label", "Kooklog"])
+            Set(model.entities.compactMap(\.name)) == [
+                "Recept", "Ingredient", "Stap", "Categorie", "Label", "Kooklog", "BoodschappenItem",
+            ])
         for entiteit in model.entities {
             #expect(entiteit.uniquenessConstraints.isEmpty, "\(entiteit.name ?? "")")
             for attribuut in entiteit.attributesByName.values {
