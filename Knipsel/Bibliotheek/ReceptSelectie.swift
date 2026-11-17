@@ -89,7 +89,7 @@ struct SelectieBalk: View {
                 .frame(minHeight: 50)
                 .padding(.horizontal, 6)
             Button(action: open) {
-                Text("🛒 " + ReceptSelectie.knop(aantal: selectie.aantal))
+                SwiftUI.Label(ReceptSelectie.knop(aantal: selectie.aantal), systemImage: "cart.fill")
                     .font(.headline.weight(.bold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)

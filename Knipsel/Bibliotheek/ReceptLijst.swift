@@ -100,11 +100,8 @@ struct ReceptLijst: View {
                             ForEach(recepten, id: \.objectID) { recept in
                                 if let selectie, selectie.wrappedValue.actief {
                                     kiesKnop(recept, selectie: selectie) {
-                                        ReceptKaart(recept: recept)
-                                            .overlay(alignment: .topLeading) {
-                                                SelectieVinkje(aan: selectie.wrappedValue.bevat(recept.objectID))
-                                                    .padding(8)
-                                            }
+                                        ReceptKaart(
+                                            recept: recept, gekozen: selectie.wrappedValue.bevat(recept.objectID))
                                     }
                                 } else {
                                     NavigationLink(value: recept.objectID) {
