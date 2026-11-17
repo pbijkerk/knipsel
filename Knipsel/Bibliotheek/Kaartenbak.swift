@@ -21,6 +21,9 @@ enum BibliotheekWeergave: String, CaseIterable, Identifiable, Sendable {
 /// achtergrond, met een donker verloop onderin en de titel in wit.
 struct ReceptKaart: View {
     @ObservedObject var recept: Recept
+    /// In selectiemodus (#40): gekozen of niet. Het vinkje staat dan op de plek van het symbool, en
+    /// een gekozen kaart krijgt een rand in tomaat.
+    var gekozen: Bool?
     @ScaledMetric(relativeTo: .headline) private var minHoogte: CGFloat = 168
     @ScaledMetric(relativeTo: .title2) private var symboolMaat: CGFloat = 28
 
@@ -36,6 +39,12 @@ struct ReceptKaart: View {
         }
         .overlay(alignment: .topTrailing) {
             if recept.isThuis { ThuisTeken(opFoto: recept.heeftFoto).padding(10) }
+        }
+        .overlay(alignment: .topLeading) {
+            if let gekozen, recept.heeftFoto { SelectieVinkje(aan: gekozen).padding(12) }
+        }
+        .overlay {
+            if gekozen == true { vorm.strokeBorder(Kookkleuren.accent, lineWidth: 3) }
         }
         .contentShape(.contextMenuPreview, vorm)
         .contentShape(vorm)
@@ -81,10 +90,14 @@ struct ReceptKaart: View {
 
     private var zonderFoto: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: recept.kaartSymbool)
-                .font(.system(size: symboolMaat, weight: .regular))
-                .foregroundStyle(Kaartkleuren.titel.kleur.opacity(0.85))
-                .accessibilityHidden(true)
+            if let gekozen {
+                SelectieVinkje(aan: gekozen)
+            } else {
+                Image(systemName: recept.kaartSymbool)
+                    .font(.system(size: symboolMaat, weight: .regular))
+                    .foregroundStyle(Kaartkleuren.titel.kleur.opacity(0.85))
+                    .accessibilityHidden(true)
+            }
             Spacer(minLength: 4)
             Text(recept.titelOfStandaard)
                 .font(.system(.headline, design: .serif).weight(.bold))

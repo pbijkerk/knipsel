@@ -55,6 +55,8 @@ struct ReceptLijst: View {
     private let filter: ReceptFilter
     private let weergave: BibliotheekWeergave
     private let kop: AnyView?
+    /// Selectiemodus (#40): een tik vinkt aan of uit in plaats van het recept te openen.
+    private let selectie: Binding<ReceptSelectie>?
     @State private var teVerwijderen: Recept?
     @State private var foutmelding: String?
 
@@ -69,10 +71,15 @@ struct ReceptLijst: View {
     static let minimaleKaartbreedteBreed: CGFloat = 180
 
     /// - Parameter kop: iets boven de recepten dat meescrolt ("Verder met…", de filterchips op iPhone).
-    init(filter: ReceptFilter, weergave: BibliotheekWeergave = .lijst, kop: AnyView? = nil) {
+    /// - Parameter selectie: met selectiemodus (#40): "Selecteer" in het contextmenu, en tikken vinkt aan.
+    init(
+        filter: ReceptFilter, weergave: BibliotheekWeergave = .lijst, kop: AnyView? = nil,
+        selectie: Binding<ReceptSelectie>? = nil
+    ) {
         self.filter = filter
         self.weergave = weergave
         self.kop = kop
+        self.selectie = selectie
         _recepten = FetchRequest(
             sortDescriptors: ReceptFilter.sortering, predicate: filter.predicaat, animation: .default)
     }
@@ -91,11 +98,21 @@ struct ReceptLijst: View {
                         if let kop { kop }
                         LazyVGrid(columns: kolommen, spacing: 12) {
                             ForEach(recepten, id: \.objectID) { recept in
-                                NavigationLink(value: recept.objectID) {
-                                    ReceptKaart(recept: recept)
+                                if let selectie, selectie.wrappedValue.actief {
+                                    kiesKnop(recept, selectie: selectie) {
+                                        ReceptKaart(
+                                            recept: recept, gekozen: selectie.wrappedValue.bevat(recept.objectID))
+                                    }
+                                } else {
+                                    NavigationLink(value: recept.objectID) {
+                                        ReceptKaart(recept: recept)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .contextMenu {
+                                        selecteerKnop(recept)
+                                        verwijderKnop(recept)
+                                    }
                                 }
-                                .buttonStyle(.plain)
-                                .contextMenu { verwijderKnop(recept) }
                             }
                         }
                         .padding(.horizontal, breedte == .regular ? 24 : 16)
@@ -111,11 +128,25 @@ struct ReceptLijst: View {
                             .listRowSeparator(.hidden)
                     }
                     ForEach(recepten, id: \.objectID) { recept in
-                        NavigationLink(value: recept.objectID) {
-                            ReceptRij(recept: recept)
+                        if let selectie, selectie.wrappedValue.actief {
+                            kiesKnop(recept, selectie: selectie) {
+                                HStack(spacing: 12) {
+                                    SelectieVinkje(aan: selectie.wrappedValue.bevat(recept.objectID), opKaart: false)
+                                    ReceptRij(recept: recept)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                                .contentShape(Rectangle())
+                            }
+                        } else {
+                            NavigationLink(value: recept.objectID) {
+                                ReceptRij(recept: recept)
+                            }
+                            .swipeActions { verwijderKnop(recept) }
+                            .contextMenu {
+                                selecteerKnop(recept)
+                                verwijderKnop(recept)
+                            }
                         }
-                        .swipeActions { verwijderKnop(recept) }
-                        .contextMenu { verwijderKnop(recept) }
                     }
                 }
                 .listStyle(.plain)
@@ -140,6 +171,34 @@ struct ReceptLijst: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(foutmelding ?? "")
+        }
+    }
+
+    /// In selectiemodus: tik = aan of uit.
+    private func kiesKnop(
+        _ recept: Recept, selectie: Binding<ReceptSelectie>, @ViewBuilder label: () -> some View
+    ) -> some View {
+        let aan = selectie.wrappedValue.bevat(recept.objectID)
+        return Button {
+            selectie.wrappedValue.wissel(recept.objectID)
+        } label: {
+            label()
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(recept.titelOfStandaard)
+        .accessibilityValue(aan ? "gekozen" : "niet gekozen")
+        .accessibilityAddTraits(aan ? .isSelected : [])
+        .accessibilityHint(aan ? "Tik om niet te kiezen" : "Tik om te kiezen voor de boodschappen")
+    }
+
+    /// "Selecteer" in het contextmenu: selectiemodus aan, met dit recept al gekozen.
+    @ViewBuilder private func selecteerKnop(_ recept: Recept) -> some View {
+        if let selectie {
+            Button {
+                selectie.wrappedValue.start(met: recept.objectID)
+            } label: {
+                SwiftUI.Label("Selecteer", systemImage: "checkmark.circle")
+            }
         }
     }
 

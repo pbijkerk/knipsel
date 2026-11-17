@@ -52,6 +52,8 @@ struct BoodschappenRegel: Identifiable, Equatable, Sendable {
     let tekst: String
     /// Staat standaard uitgevinkt, onderaan in "Meestal in huis".
     let meestalInHuis: Bool
+    /// Uit welke recepten de regel komt, in de volgorde van het vel (#40); leeg bij één recept.
+    var herkomst: [String] = []
 
     /// Zonder hoeveelheid (L3): de letterlijke tekst, niet op te tellen.
     var isTekst: Bool { hoeveelheid == nil }
@@ -69,37 +71,53 @@ enum BoodschappenLijst {
     static func regels(
         _ invoer: [BoodschappenInvoer], factor: Double, meestalInHuis: MeestalInHuis = .standaard
     ) -> [BoodschappenRegel] {
+        // Zonder titel blijft de herkomst leeg.
+        regels(recepten: [ReceptBoodschappen(titel: "", invoer: invoer, factor: factor)], meestalInHuis: meestalInHuis)
+    }
+
+    /// Eén lijst voor meerdere recepten (#40): elk recept geschaald met zijn eigen factor, daarna
+    /// opgeteld op naam en optelbare maat ("2 uien" + "1 ui" = "3 uien", "200 ml" + "0,5 l" = "700 ml").
+    /// Hele stuks worden pas op het totaal naar boven afgerond (½ ui + ½ ui = 1 ui, niet 2). Elke regel
+    /// weet uit welke recepten hij komt.
+    static func regels(
+        recepten: [ReceptBoodschappen], meestalInHuis: MeestalInHuis = .standaard
+    ) -> [BoodschappenRegel] {
         var volgorde: [String] = []
         var stapels: [String: Stapel] = [:]
 
-        for ingredient in invoer {
-            let ruw = IngredientParser.zonderOpsommingsteken(ingredient.ruweTekst)
-            guard let hoeveelheid = ingredient.hoeveelheid, let naam = ingredient.naam?.trimmed, !naam.isEmpty
-            else {
-                guard !ruw.isEmpty, IngredientParser.groepskop(ruw) == nil, !IngredientParser.isKopje(ruw) else {
+        for recept in recepten {
+            let factor = recept.factor
+            for ingredient in recept.invoer {
+                let ruw = IngredientParser.zonderOpsommingsteken(ingredient.ruweTekst)
+                guard let hoeveelheid = ingredient.hoeveelheid, let naam = ingredient.naam?.trimmed, !naam.isEmpty
+                else {
+                    guard !ruw.isEmpty, IngredientParser.groepskop(ruw) == nil, !IngredientParser.isKopje(ruw) else {
+                        continue
+                    }
+                    let naam = ingredient.naam?.trimmed.nietLeeg ?? ruw
+                    let id = "tekst:" + sleutel(ruw)
+                    if stapels[id] == nil {
+                        volgorde.append(id)
+                        stapels[id] = Stapel(naam: naam, tekst: ruw, sleutel: sleutel(naam))
+                    }
+                    stapels[id]?.komtUit(recept.titel)
                     continue
                 }
-                let naam = ingredient.naam?.trimmed.nietLeeg ?? ruw
-                let id = "tekst:" + sleutel(ruw)
-                if stapels[id] == nil {
+                let maat = Maat(eenheid: ingredient.eenheid)
+                let id = sleutel(naam) + "|" + maat.soort
+                let van = hoeveelheid * factor * maat.naarBasis
+                let tot = ingredient.hoeveelheidTot.map { $0 * factor * maat.naarBasis }
+                let toelichting = maatToelichting(ingredient.toelichting, factor: factor)
+                if var stapel = stapels[id] {
+                    stapel.voegToe(van: van, tot: tot, eenheid: maat.eenheid, toelichting: toelichting, factor: factor)
+                    stapels[id] = stapel
+                } else {
                     volgorde.append(id)
-                    stapels[id] = Stapel(naam: naam, tekst: ruw, sleutel: sleutel(naam))
+                    stapels[id] = Stapel(
+                        naam: naam, sleutel: sleutel(naam), van: van, tot: tot, eenheden: [maat.eenheid],
+                        toelichting: toelichting, aantal: 1, factor: factor)
                 }
-                continue
-            }
-            let maat = Maat(eenheid: ingredient.eenheid)
-            let id = sleutel(naam) + "|" + maat.soort
-            let van = hoeveelheid * factor * maat.naarBasis
-            let tot = ingredient.hoeveelheidTot.map { $0 * factor * maat.naarBasis }
-            let toelichting = maatToelichting(ingredient.toelichting, factor: factor)
-            if var stapel = stapels[id] {
-                stapel.voegToe(van: van, tot: tot, eenheid: maat.eenheid, toelichting: toelichting)
-                stapels[id] = stapel
-            } else {
-                volgorde.append(id)
-                stapels[id] = Stapel(
-                    naam: naam, sleutel: sleutel(naam), van: van, tot: tot, eenheden: [maat.eenheid],
-                    toelichting: toelichting, aantal: 1, factor: factor)
+                stapels[id]?.komtUit(recept.titel)
             }
         }
 
@@ -114,6 +132,19 @@ enum BoodschappenLijst {
         let personen = Weergave.porties(porties).map { " (\($0))" } ?? ""
         let kop = "Boodschappen · \(recept)\(personen)"
         return ([kop] + regels.map { "• \($0.tekst)" }).joined(separator: "\n")
+    }
+
+    /// Platte tekst voor meerdere recepten (#40): kop, per recept een regel met het aantal personen,
+    /// en dan "• 3 uien" per regel. Eén recept geeft dezelfde tekst als `tekst(recept:porties:regels:)`.
+    static func tekst(recepten: [(titel: String, porties: Int)], regels: [BoodschappenRegel]) -> String {
+        guard recepten.count > 1 else {
+            return tekst(recept: recepten.first?.titel ?? "", porties: recepten.first?.porties ?? 0, regels: regels)
+        }
+        let kop = "Boodschappen · \(recepten.count) recepten"
+        let titels = recepten.map { recept in
+            "– \(recept.titel)" + (Weergave.porties(recept.porties).map { " (\($0))" } ?? "")
+        }
+        return ([kop] + titels + [""] + regels.map { "• \($0.tekst)" }).joined(separator: "\n")
     }
 
     /// "3 uien" op de lijst en "2 uien" erbij → "5 uien". `nil` als het niet op te tellen is (geen
@@ -202,6 +233,9 @@ enum BoodschappenLijst {
         var toelichting: String?
         var aantal = 0
         var factor: Double = 1
+        /// Een van de delen is geschaald: dan afronden op wat je afmeet.
+        var geschaald = false
+        var herkomst: [String] = []
 
         init(naam: String, tekst: String, sleutel: String) {
             self.naam = naam
@@ -221,9 +255,18 @@ enum BoodschappenLijst {
             self.toelichting = toelichting
             self.aantal = aantal
             self.factor = factor
+            geschaald = abs(factor - 1) > 0.0001
         }
 
-        mutating func voegToe(van extra: Double, tot extraTot: Double?, eenheid: String?, toelichting nieuw: String?) {
+        mutating func komtUit(_ titel: String) {
+            guard !titel.isEmpty, !herkomst.contains(titel) else { return }
+            herkomst.append(titel)
+        }
+
+        mutating func voegToe(
+            van extra: Double, tot extraTot: Double?, eenheid: String?, toelichting nieuw: String?, factor: Double
+        ) {
+            if abs(factor - 1) > 0.0001 { geschaald = true }
             if tot != nil || extraTot != nil { tot = (tot ?? van) + (extraTot ?? extra) }
             van += extra
             eenheden.append(eenheid)
@@ -236,11 +279,11 @@ enum BoodschappenLijst {
             if let tekst {
                 return BoodschappenRegel(
                     id: id, sleutel: sleutel, naam: naam, hoeveelheid: nil, hoeveelheidTot: nil, eenheid: nil,
-                    tekst: tekst, meestalInHuis: meestalInHuis.bevat(tekst))
+                    tekst: tekst, meestalInHuis: meestalInHuis.bevat(tekst), herkomst: herkomst)
             }
             let (eenheid, deler) = Maat.weergave(eenheden, basis: van)
             // Ongeschaald en niet opgeteld blijft de hoeveelheid precies zoals in het recept.
-            let afronden = abs(factor - 1) > 0.0001 || aantal > 1
+            let afronden = geschaald || aantal > 1
             func waarde(_ basis: Double) -> Double {
                 let w = afronden ? Portieschaling.rond(basis / deler, eenheid: eenheid) : basis / deler
                 return BoodschappenLijst.inWinkel(w, eenheid: eenheid)
@@ -255,8 +298,27 @@ enum BoodschappenLijst {
             if let toelichting { tekst += " (\(toelichting))" }
             return BoodschappenRegel(
                 id: id, sleutel: sleutel, naam: naam, hoeveelheid: hoeveelheid, hoeveelheidTot: bovengrens,
-                eenheid: eenheid, tekst: tekst, meestalInHuis: meestalInHuis.bevat(naam))
+                eenheid: eenheid, tekst: tekst, meestalInHuis: meestalInHuis.bevat(naam), herkomst: herkomst)
         }
+    }
+}
+
+/// Eén recept op het vel voor meerdere recepten (#40): titel, ingrediënten en de factor voor het gekozen
+/// aantal personen.
+struct ReceptBoodschappen: Equatable, Sendable {
+    var titel: String
+    var invoer: [BoodschappenInvoer]
+    var factor: Double
+
+    init(titel: String, invoer: [BoodschappenInvoer], factor: Double = 1) {
+        self.titel = titel
+        self.invoer = invoer
+        self.factor = factor
+    }
+
+    /// Van de standaardporties van het recept naar het gekozen aantal (0 = onbekend: niet schalen).
+    init(titel: String, invoer: [BoodschappenInvoer], standaard: Int, porties: Int) {
+        self.init(titel: titel, invoer: invoer, factor: Portieschaling.factor(van: standaard, naar: porties))
     }
 }
 

@@ -71,10 +71,20 @@ enum Boodschappenlijsten {
         _ regels: [LijstRegel], herkomst: String?, kookboek: Kookboek, context: NSManagedObjectContext,
         geheugen: AfdelingGeheugen = .laad()
     ) throws -> Boodschappenresultaat {
+        try zetOpLijst(regels.map { ($0, herkomst) }, kookboek: kookboek, context: context, geheugen: geheugen)
+    }
+
+    /// Zoals hierboven, met per regel een eigen herkomst: bij meerdere recepten (#40) komen alleen de
+    /// recepten waar de regel echt uit komt erbij.
+    @discardableResult
+    static func zetOpLijst(
+        _ regels: [(regel: LijstRegel, herkomst: String?)], kookboek: Kookboek, context: NSManagedObjectContext,
+        geheugen: AfdelingGeheugen = .laad()
+    ) throws -> Boodschappenresultaat {
         var resultaat = Boodschappenresultaat()
         var open = items(in: kookboek, context: context).filter { !$0.afgevinkt }
         var volgende = (open.map(\.volgorde).max() ?? 0) + 1
-        for regel in regels where !regel.tekst.isEmpty || !regel.naam.isEmpty {
+        for (regel, herkomst) in regels where !regel.tekst.isEmpty || !regel.naam.isEmpty {
             if let (item, samen) = open.lazy.compactMap({ item in
                 BoodschappenLijst.samengevoegd(lijstRegel(item), regel).map { (item, $0) }
             }).first {

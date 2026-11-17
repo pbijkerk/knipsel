@@ -34,6 +34,17 @@ enum VelBestemming: Equatable, Sendable {
         }
     }
 
+    /// Bij meerdere recepten (#40): de lijst van het kookboek waar de meeste recepten in staan; bij
+    /// gelijkspel Mijn lijst.
+    static func kookboek(voor kookboeken: [Kookboek]) -> Kookboek {
+        let thuis = kookboeken.filter { $0 == .thuis }.count
+        return thuis > kookboeken.count - thuis ? .thuis : .mijn
+    }
+
+    /// Of het vel voor meerdere recepten "Zet op: Mijn lijst | Thuis" toont: alleen als Thuis bestaat
+    /// (gedeeld, of er staat al iets in), en niet als alles naar Herinneringen gaat.
+    static func toonKookboekKeuze(meerdere: Bool, thuisBestaat: Bool) -> Bool { meerdere && thuisBestaat }
+
     /// "Zet 5 op mijn lijst", "Zet 5 op de Thuis-lijst", "Zet 5 in Herinneringen".
     func knop(aantal: Int) -> String {
         guard aantal > 0 else { return "Niets op de lijst" }

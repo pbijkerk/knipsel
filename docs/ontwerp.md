@@ -319,7 +319,7 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
 | 6 | Siri, App Shortcuts, Spotlight, AirPods/Watch (proef); Actieknop geparkeerd | Bouwt op de `KookSessie` van 3–5. Gebouwd (#7); `ZetTimer` in fase 7 |
 | 7 | Timers (AlarmKit) en Live Activity | Gebouwd (#8): tijdherkenning, timers, timervraag, Live Activities (widget-extensie `KnipselWidgets`), Siri-timers. Alarm op slot/stil en Dynamic Island nog op toestel te testen |
 | 8 | Delen met huisgenoot | Raakt het datamodel; na stabiel gebruik. Gebouwd (#9): kookboek Thuis, modelversie 3 |
-| — | Boodschappen 1 en 2 | Gebouwd: vel naar Herinneringen (#38); eigen lijst per afdeling met optellen, Thuis-lijst, modelversie 4 (#39). Weekmenu (#40) volgt |
+| — | Boodschappen 1, 2 en 3 | Gebouwd: vel naar Herinneringen (#38); eigen lijst per afdeling met optellen, Thuis-lijst, modelversie 4 (#39); lijst voor meerdere recepten tegelijk (#40). Weekmenu apart |
 
 ## 10. Eigen suggesties (nog niet ingepland)
 
@@ -331,8 +331,17 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
    Boodschappen zelf in per afdeling; EventKit kan dat lijsttype niet zetten, dus dat doet de gebruiker in
    Herinneringen (Toon lijstinfo › Lijsttype). Stap 2 gebouwd (#39, schets 2A): een eigen lijst in Knipsel
    over meerdere recepten, opgeteld en per afdeling in winkelvolgorde, met een gedeelde Thuis-lijst; Herinneringen
-   blijft als bestemming (keuze in Instellingen). Het weekmenu volgt apart (schetsen
-   `docs/ux/schetsen-boodschappen.html`).
+   blijft als bestemming (keuze in Instellingen). Stap 3 gebouwd (#40, schets 3A): *Selecteer* in de
+   bibliotheek (iPhone en iPad, kaarten en lijst, ook via het contextmenu van een kaart); tik = aan/uit met een
+   tomaatkleurig vinkje, onderaan *🛒 Boodschappen voor n recepten* en *Annuleer*. Dat opent hetzelfde vel
+   (`BoodschappenVel`, geen kopie) met bovenaan per recept de porties (start op de standaardporties), alles
+   opgeteld via `BoodschappenLijst.regels(recepten:)` — eerst per recept geschaald, dan opgeteld op naam en
+   optelbare maat, hele stuks pas op het totaal naar boven (½ + ½ citroen = 1) — en onder elke regel uit welke
+   recepten hij komt. Bij gemengde kookboeken gaat het op de lijst van het kookboek met de meeste gekozen
+   recepten (gelijkspel: Mijn lijst), met bovenaan *Zet op: Mijn lijst | Thuis* als Thuis bestaat. Op de eigen
+   lijst krijgt elk item alleen de recepten waar het uit komt als herkomst; in Herinneringen staan alle titels
+   in de notitie. Na een geslaagde lijst gaat de selectiemodus uit zodra het vel dicht is. Geen modelwijziging.
+   Het weekmenu volgt apart (schetsen `docs/ux/schetsen-boodschappen.html`).
 3. **"Wat kan ik maken met …"** — zoeken op wat je in huis hebt ("prei, ei, kaas").
 4. **Menu koken** — twee of drie recepten tegelijk in de kookmodus, met wisselen per stem ("naar de saus").
 5. **Gekookt-logboek** — datum, sterren en notitie ("minder zout"); tonen bij het recept.
