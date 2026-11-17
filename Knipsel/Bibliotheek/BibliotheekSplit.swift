@@ -23,9 +23,12 @@ struct BibliotheekSplit: View {
     /// Zijbalk standaard zichtbaar, zoals in de schets.
     @State private var kolommen: NavigationSplitViewVisibility = .all
 
-    /// - Parameter selectie: begin in selectiemodus (#40), voor voorbeelden en tests.
-    init(selectie: ReceptSelectie = ReceptSelectie()) {
+    /// - Parameters:
+    ///   - selectie: begin in selectiemodus (#40), voor voorbeelden en tests.
+    ///   - zijbalk: wat in de zijbalk gekozen is (bijv. het weekmenu), voor voorbeelden en tests.
+    init(selectie: ReceptSelectie = ReceptSelectie(), zijbalk: ZijbalkKeuze? = .kookboek(nil)) {
         _selectie = State(initialValue: selectie)
+        _zijbalkKeuze = State(initialValue: zijbalk)
     }
 
     var body: some View {
