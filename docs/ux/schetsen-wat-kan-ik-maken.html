@@ -1,0 +1,156 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><title>Knipsel — wat kan ik maken?</title><style>
+:root{--tomaat:#D9613C;--tomaat-d:#B24B2A;--papier:#FBF7F0;--kaart:#F0E8DC;--inkt:#2B2622;--gedimd:#6F665C;--lijn:#E2D8C9;
+--serif:"New York","Iowan Old Style",Charter,Georgia,serif;--sans:-apple-system,"SF Pro Text",system-ui,sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:#EDE6DA;color:var(--inkt);padding:28px 20px 60px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-family:var(--serif);font-size:34px;letter-spacing:-.5px}
+h2{font-family:var(--serif);font-size:24px;margin:34px 0 10px}
+.lead{color:var(--gedimd);max-width:820px;margin-top:8px;font-size:15px}
+.note{background:#fff8;border-left:4px solid var(--tomaat);padding:10px 14px;margin:14px 0;font-size:14px;max-width:900px;border-radius:0 8px 8px 0}
+table.eisen{border-collapse:collapse;width:100%;font-size:13.5px;background:#fffc;border-radius:12px;overflow:hidden}
+.eisen th,.eisen td{padding:9px 11px;text-align:left;vertical-align:top;border-bottom:1px solid var(--lijn)}
+.eisen th{background:var(--kaart);font-size:12px;text-transform:uppercase;letter-spacing:.5px;color:var(--gedimd)}
+.eisen td:first-child{font-weight:700;color:var(--tomaat-d);white-space:nowrap}
+/* tabs, CSS-only */
+.tabs input{display:none}
+.tabbar{display:flex;gap:8px;flex-wrap:wrap;margin:26px 0 18px;position:sticky;top:0;background:#EDE6DA;padding:8px 0;z-index:5}
+.tabbar label{padding:9px 16px;border-radius:999px;background:#fff;cursor:pointer;font-weight:600;font-size:14px;border:1px solid var(--lijn)}
+.panel{display:none}
+#t1:checked~.tabbar label[for=t1],#t2:checked~.tabbar label[for=t2],#t3:checked~.tabbar label[for=t3],#t4:checked~.tabbar label[for=t4],#t5:checked~.tabbar label[for=t5]{background:var(--tomaat);color:#fff;border-color:var(--tomaat)}
+#t1:checked~#p1,#t2:checked~#p2,#t3:checked~#p3,#t4:checked~#p4,#t5:checked~#p5{display:block}
+.nu{background:#fff;border-radius:14px;padding:14px 18px;margin-bottom:18px;font-size:14px}
+.nu b{color:var(--tomaat-d)}
+.nu ul{margin:6px 0 0 18px}
+.rij{display:flex;gap:26px;flex-wrap:wrap;align-items:flex-start}
+.optie{width:340px}
+.optie h3{font-family:var(--serif);font-size:19px;margin:12px 0 4px}
+.optie .tag{display:inline-block;font-size:11px;font-weight:700;background:var(--kaart);color:var(--tomaat-d);padding:2px 7px;border-radius:6px;margin:0 4px 4px 0}
+.optie p{font-size:13.5px;margin:5px 0}
+.optie p b{color:var(--gedimd);font-weight:600}
+.btn{display:inline-block;margin-top:8px;background:var(--inkt);color:#fff;border:0;border-radius:10px;padding:8px 14px;font-weight:600;font-size:13px;cursor:pointer}
+.aanrader{background:var(--tomaat);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;margin-left:6px;vertical-align:middle;font-family:var(--sans)}
+/* telefoon */
+.tel{width:340px;height:700px;border-radius:46px;background:#111;padding:11px;box-shadow:0 18px 40px #0003}
+.scherm{width:100%;height:100%;border-radius:36px;background:#fff;overflow:hidden;position:relative;font-size:13px}
+.status{height:40px;display:flex;justify-content:space-between;align-items:center;padding:0 26px;font-weight:600;font-size:13px}
+.ipad{width:760px;height:540px;border-radius:30px;background:#111;padding:12px;box-shadow:0 18px 40px #0003}
+.ipad .scherm{border-radius:20px}
+.optie.breed{width:760px}
+/* bouwstenen */
+.nav{display:flex;justify-content:space-between;align-items:center;padding:4px 16px}
+.rond{width:34px;height:34px;border-radius:50%;background:#f2f0ed;display:flex;align-items:center;justify-content:center;font-size:15px}
+.groot{font-family:var(--serif);font-weight:700;font-size:28px;padding:4px 16px 8px}
+.chips{display:flex;gap:6px;padding:4px 16px 10px;overflow:hidden;white-space:nowrap}
+.chip{padding:5px 11px;border-radius:999px;background:#f2f0ed;font-size:12px;font-weight:500}
+.chip.aan{background:#fff;border:1.5px solid var(--tomaat);color:var(--tomaat-d)}
+.zoek{position:absolute;left:16px;right:16px;bottom:22px;height:42px;border-radius:21px;background:#fff;box-shadow:0 4px 18px #0002;display:flex;align-items:center;padding:0 14px;color:#888;gap:8px}
+.serif{font-family:var(--serif)}
+.klein{font-size:11px;color:var(--gedimd)}
+.tom{color:var(--tomaat-d)}
+.fab{position:absolute;right:18px;bottom:78px;height:52px;padding:0 20px;border-radius:26px;background:var(--tomaat);color:#fff;display:flex;align-items:center;gap:8px;font-weight:700;box-shadow:0 6px 18px #D9613C66}
+/* receptkaarten */
+.raster{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 14px}
+.rkaart{border-radius:16px;height:150px;padding:12px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden}
+.rkaart .t{font-family:var(--serif);font-weight:700;font-size:15px;line-height:1.15}
+.rkaart .sym{font-size:30px;opacity:.9}
+.k-soep{background:#F6E3C8}.k-sal{background:#DDE9CF}.k-hoofd{background:#EBD3CB}.k-na{background:#EADCF0}.k-lunch{background:#F3EBC5}.k-brood{background:#EFE2D1}
+.foto{background-size:cover;background-position:center;color:#fff}
+.foto::after{content:"";position:absolute;inset:0;background:linear-gradient(transparent 35%,#0009)}
+.foto>*{position:relative;z-index:1}
+.f1{background-image:radial-gradient(circle at 35% 40%,#F2A54A 0 22%,#E07B28 23% 36%,#5b3a22 37% 40%,#efe6d6 41%)}
+.f2{background-image:radial-gradient(circle at 60% 55%,#7aa35a 0 18%,#b9d38f 19% 30%,#e6d8b8 31% 36%,#3d5c3a 37%)}
+.f3{background-image:radial-gradient(ellipse at 50% 60%,#8a3324 0 30%,#5a2318 31% 40%,#d9c7ad 41%)}
+/* lijst */
+.lrij{display:flex;gap:12px;align-items:center;padding:10px 16px;border-bottom:1px solid #eee}
+.lsym{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.ltitel{font-family:var(--serif);font-weight:700;font-size:15px}
+/* recept */
+.balk-onder{position:absolute;left:12px;right:12px;bottom:18px;height:62px;border-radius:31px;background:#fff;box-shadow:0 6px 24px #0002;display:flex;align-items:center;padding:0 8px 0 18px;gap:10px}
+.kookknop{margin-left:auto;background:var(--tomaat);color:#fff;font-weight:700;border-radius:24px;height:46px;padding:0 20px;display:flex;align-items:center;gap:6px}
+.stepper{display:flex;align-items:center;gap:10px;font-weight:600}
+.stepper span{width:28px;height:28px;border-radius:50%;background:#f2f0ed;display:flex;align-items:center;justify-content:center}
+.ing{display:flex;gap:9px;padding:5px 16px;font-family:var(--serif);font-size:14px}
+.ing i{width:15px;height:15px;border-radius:50%;border:1.5px solid var(--tomaat);flex:none;margin-top:3px}
+.ing i.af{background:var(--tomaat)}
+.ing.af{color:#aaa;text-decoration:line-through}
+.seg{display:flex;margin:6px 16px 10px;background:#f2f0ed;border-radius:10px;padding:3px}
+.seg div{flex:1;text-align:center;padding:6px;border-radius:8px;font-weight:600;font-size:12px;color:var(--gedimd)}
+.seg .aan{background:#fff;color:var(--inkt);box-shadow:0 1px 3px #0002}
+.blok{background:#f7f4ef;border-radius:16px;margin:8px 14px;padding:12px}
+.tijdlijn{display:flex;gap:6px;margin:6px 16px}
+.tijdlijn div{flex:1;background:#f7f4ef;border-radius:12px;padding:8px;text-align:center}
+.tijdlijn b{display:block;font-size:15px}
+/* kookmodus */
+.kook{background:var(--papier);height:calc(100% - 40px);position:relative}
+.ipad .kook{height:100%}
+.voortgang{display:flex;gap:4px;padding:6px 16px}
+.voortgang div{flex:1;height:5px;border-radius:3px;background:var(--lijn)}
+.voortgang .g{background:var(--tomaat)}.voortgang .h{background:var(--inkt)}
+.stap{font-family:var(--serif);font-size:29px;line-height:1.22;padding:14px 18px}
+.stap em{font-style:normal;color:var(--tomaat-d);font-weight:700}
+.nodig{background:var(--kaart);border-radius:14px;margin:4px 16px;padding:10px 12px}
+.navknoppen{position:absolute;left:12px;right:12px;bottom:18px;display:flex;gap:10px}
+.navknoppen div{height:76px;border-radius:22px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
+.terug{width:96px;background:var(--kaart)}
+.verder{flex:1;background:var(--inkt);color:var(--papier)}
+.mic{display:flex;align-items:center;gap:6px;background:#fff;border-radius:999px;padding:6px 12px;font-size:12px;font-weight:600;margin:0 16px;width:max-content}
+.mic .stip{width:8px;height:8px;border-radius:50%;background:#3BA55C;box-shadow:0 0 0 4px #3BA55C33}
+.gluur{position:absolute;left:0;right:0;bottom:0;height:150px;background:#fff;border-radius:26px 26px 0 0;box-shadow:0 -6px 20px #0001;padding:12px 18px}
+.greep{width:40px;height:5px;border-radius:3px;background:#ddd;margin:0 auto 10px}
+.timerchip{display:inline-flex;align-items:center;gap:8px;background:var(--tomaat);color:#fff;border-radius:16px;padding:12px 16px;font-weight:700;font-size:16px;margin:6px 16px}
+.zone{position:absolute;top:110px;bottom:120px;width:50%;display:flex;align-items:center;justify-content:center;color:#0002;font-size:44px;font-weight:200}
+/* ipad */
+.kol{position:absolute;top:0;bottom:0;overflow:hidden}
+
+.invoer{margin:4px 16px 8px;background:#f2f0ed;border-radius:14px;padding:8px 10px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;min-height:44px}
+.tok{background:#fff;border:1.5px solid var(--tomaat);color:var(--tomaat-d);border-radius:999px;padding:3px 9px;font-size:12px;font-weight:600}
+.tok.x::after{content:" ✕";opacity:.6}
+.plh{color:#aaa;font-size:12px}
+.res{display:flex;gap:10px;padding:9px 16px;border-bottom:1px solid #f0ebe3;align-items:center}
+.res .lsym{width:44px;height:44px}
+.mist{font-size:11px;color:var(--gedimd)}
+.mist b{color:var(--tomaat-d)}
+.meter{height:5px;border-radius:3px;background:var(--lijn);width:56px;overflow:hidden;flex:none;margin-left:auto}
+.meter i{display:block;height:100%;background:var(--tomaat)}
+.kopsec{font-size:10.5px;font-weight:700;letter-spacing:.5px;color:var(--gedimd);padding:10px 16px 2px}
+.minik{font-size:10px;background:var(--kaart);border-radius:6px;padding:2px 6px;color:var(--tomaat-d);font-weight:700;margin-left:6px}
+.vk{display:flex;gap:8px;flex-wrap:wrap;padding:4px 16px}
+.vk span{background:#f2f0ed;border-radius:10px;padding:5px 9px;font-size:12px}
+.vk span.op{opacity:.45;text-decoration:line-through}
+.knopbreed{height:48px;border-radius:24px;background:var(--tomaat);color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center}
+.siri{margin:14px 16px;border-radius:22px;background:linear-gradient(135deg,#2b2b3a,#1b1b25);color:#fff;padding:14px}
+</style></head><body><div class="wrap">
+<h1>Knipsel — wat kan ik maken met wat ik in huis heb?</h1>
+<p class="lead">Schetsen · 17 november 2026. Verzoek van Peter: vanuit ingrediënten (wat je in huis hebt) zoeken naar geschikte recepten. Stond al als suggestie 3 in <code>docs/ontwerp.md</code> §10. Recepten zijn verzonnen.</p>
+<div class="note"><b>Nu al:</b> het zoekveld vindt recepten met één ingrediënt erin ("prei"). Wat ontbreekt: meerdere ingrediënten tegelijk, rangschikken op hoe goed het past, en zien wat er nog mist.</div>
+<h2>Eisen W1–W6</h2><table class="eisen"><tr><th>Eis</th><th>Wat</th><th>Basis</th></tr><tr><td>W1</td><td><b>Begrijpt gewone woorden</b><br>"uien", "ui", "rode ui" en "sjalot"? Enkelvoud/meervoud, varianten, samenstellingen ("preiringen").</td><td>Woordenlijst en de bestaande ingrediëntparser; Claude optioneel (B10).</td></tr><tr><td>W2</td><td><b>Toont wat er mist</b><br>Niet alleen "bevat prei", maar "je mist nog bladerdeeg".</td><td>Teng e.a. (2012); Supercook.</td></tr><tr><td>W3</td><td><b>Basis telt mee</b><br>Zout, peper, olie… ("meestal in huis" uit de boodschappenlijst) hoef je niet in te typen.</td><td>Hergebruik van #38.</td></tr><tr><td>W4</td><td><b>Naar de boodschappenlijst</b><br>Ontbrekende met één tik op de lijst.</td><td>Sluit de cirkel met #38.</td></tr><tr><td>W5</td><td><b>Geen valse zekerheid</b><br>Liever even vragen dan een voorraad die niet klopt.</td><td>Parasuraman & Manzey (2010), automation bias.</td></tr><tr><td>W6</td><td><b>Handsfree</b><br>Ook te vragen aan Siri.</td><td>Bouwt op fase 6.</td></tr></table>
+<h2>Drie richtingen</h2><div class="rij"><div class="optie"><div class="tel"><div class="scherm"><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">‹</div><div class="rond">⋯</div></div>
+<div class="groot" style="font-size:24px">Wat kan ik maken?</div>
+<div class="invoer"><span class="tok x">prei</span><span class="tok x">eieren</span><span class="tok x">oude kaas</span><span class="plh">＋ nog iets…</span></div>
+<div class="klein" style="padding:0 16px">Zout, peper, olie en boter tellen als „in huis”.</div>
+<div class="kopsec">ALLES IN HUIS</div>
+<div class="res"><div class="lsym k-lunch">🥧</div><div><div class="ltitel">Prei-quiche met oude kaas</div><div class="mist">alles in huis · 1 u</div></div><div class="meter"><i style="width:100%"></i></div></div>
+<div class="kopsec">NOG 1 NODIG</div>
+<div class="res"><div class="lsym k-soep">🥣</div><div><div class="ltitel">Preisoep met kaasstengels</div><div class="mist">mist <b>bladerdeeg</b></div></div><div class="meter"><i style="width:85%"></i></div></div>
+<div class="res"><div class="lsym k-lunch">🍳</div><div><div class="ltitel">Omelet met prei en ham</div><div class="mist">mist <b>ham</b></div></div><div class="meter"><i style="width:80%"></i></div></div>
+<div class="kopsec">NOG 2 NODIG</div>
+<div class="res"><div class="lsym k-hoofd">🍲</div><div><div class="ltitel">Ovenschotel met prei</div><div class="mist">mist <b>aardappels, room</b></div></div><div class="meter"><i style="width:60%"></i></div></div>
+<div class="knopbreed" style="position:absolute;left:0;right:0;bottom:22px;margin:0 16px;font-size:13px">🛒 Ontbrekende op de lijst</div></div></div><h3>A · In huis-zoeker<span class="aanrader">mijn voorkeur</span></h3><div><span class="tag">W1</span><span class="tag">W2</span><span class="tag">W3</span><span class="tag">W4</span></div><p><b>Idee</b> — Een scherm "Wat kan ik maken?" (vanaf ＋ of het zoekveld). Je tikt in of zegt wat je hebt; elk ingrediënt wordt een chip. Recepten staan in groepen: <b>alles in huis</b>, <b>nog 1 nodig</b>, <b>nog 2 nodig</b>, met wat er mist. Een knop zet de ontbrekende op je boodschappenlijst. Zout, peper, olie enz. (je lijst "meestal in huis") tellen vanzelf mee.</p><p><b>Basis</b> — Zo werkt Supercook, de bekendste app hiervoor. Rangschikken op hoeveel er al klopt is wat mensen in onderzoek naar ingrediënt-zoeken zoeken: niet "bevat prei" maar "wat mist nog" (Teng, Lin & Adamic, 2012, <i>recipe recommendation using ingredient networks</i>). Nederlandse huishoudens gooien ±34 kg eten per persoon per jaar weg (Voedingscentrum, 2019); koken met wat er is helpt daartegen.</p><p><b>Afweging</b> — Het matchen moet slim zijn: "uien" = "ui" = "rode ui"? "oude kaas" ≈ "geraspte kaas"? Begin met een woordenlijst (enkelvoud/meervoud, varianten), Claude alleen als die aan staat. Je typt elke keer opnieuw wat je hebt.</p><button class="btn" data-hermes-send="Knipsel wat-kan-ik-maken: werk A (in huis-zoeker) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm"><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="nav"><div class="rond">⚙︎</div><div class="rond">＋</div></div>
+<div class="groot">Recepten</div>
+<div class="chips"><span class="chip">Alles</span><span class="chip aan">✓ Kan ik nu maken · 3</span><span class="chip">Soepen</span></div>
+<div class="raster">
+<div class="rkaart k-lunch"><div class="sym">🥧</div><div><div class="t">Prei-quiche</div><div class="klein">alles in huis</div></div></div>
+<div class="rkaart k-soep"><div class="sym">🥣</div><div><div class="t">Pompoensoep</div><div class="klein">alles in huis</div></div></div>
+<div class="rkaart k-sal"><div class="sym">🥗</div><div><div class="t">Linzensalade</div><div class="klein">mist feta</div></div></div></div>
+<div class="sec" style="padding:14px 16px 4px;font-size:10.5px;font-weight:700;color:var(--gedimd)">VOORRAADKAST · bijgewerkt na boodschappen</div>
+<div class="vk"><span>prei</span><span>eieren</span><span>oude kaas</span><span>pompoen</span><span>linzen</span><span class="op">uien</span><span>kokosmelk</span><span>＋</span></div></div></div><h3>B · Voorraadkast</h3><div><span class="tag">W2</span><span class="tag">W5</span></div><p><b>Idee</b> — Knipsel houdt bij wat je in huis hebt: wat je afvinkt op de boodschappenlijst komt erin, wat je kookt gaat eruit (of jij haalt het weg). In de bibliotheek een filter "Kan ik nu maken", en op elke kaart wat er mist.</p><p><b>Basis</b> — Eén keer bijhouden, daarna altijd paraat. Apps als Paprika en Pantry Check werken zo.</p><p><b>Afweging</b> — Een voorraad klopt bijna nooit: wat je op is vergeet je weg te halen, en wat je van de markt meeneemt staat er niet in. Een verkeerde voorraad is erger dan geen voorraad (vertrouwen in automatisering, Parasuraman & Manzey, 2010). Veel werk, ook in het datamodel.</p><button class="btn" data-hermes-send="Knipsel wat-kan-ik-maken: werk B (voorraadkast) uit">Uitwerken</button></div><div class="optie"><div class="tel"><div class="scherm"><div class="status"><span>9:41</span><span>●●● ▮</span></div><div class="siri"><div style="font-size:12px;opacity:.7">Siri</div><div style="font-size:15px;margin-top:4px">„Wat kan ik maken met prei in Knipsel?”</div>
+<div style="font-size:12px;opacity:.8;margin-top:8px">Ik vond 4 recepten met prei. Het snelst is Omelet met prei, 20 minuten.</div></div>
+<div class="groot" style="font-size:22px">Met prei</div>
+<div class="chips"><span class="chip aan">Snelst eerst</span><span class="chip">Meeste prei</span><span class="chip">Lang niet gekookt</span></div>
+<div class="res"><div class="lsym k-lunch">🍳</div><div><div class="ltitel">Omelet met prei en ham</div><div class="mist">20 min · 1 prei</div></div><div class="meter"><i style="width:100%"></i></div></div>
+<div class="res"><div class="lsym k-lunch">🥧</div><div><div class="ltitel">Prei-quiche met oude kaas</div><div class="mist">1 u · 2 preien</div></div><div class="meter"><i style="width:100%"></i></div></div>
+<div class="res"><div class="lsym k-soep">🥣</div><div><div class="ltitel">Preisoep met kaasstengels<span class="minik">8 wk niet</span></div><div class="mist">45 min · 3 preien</div></div><div class="meter"><i style="width:100%"></i></div></div></div></div><h3>C · Restje opmaken (één ingrediënt)</h3><div><span class="tag">W1</span><span class="tag">W6</span></div><p><b>Idee</b> — Zoeken op één ingrediënt dat op moet, ook via Siri: "Wat kan ik maken met prei in Knipsel?". Sorteren op snelst, meeste van dat ingrediënt, of lang niet gekookt.</p><p><b>Basis</b> — Vaak is de vraag niet "wat heb ik allemaal" maar "die prei moet op". Siri is er al (fase 6); dit is een kleine uitbreiding.</p><p><b>Afweging</b> — Werkt alleen voor één ingrediënt tegelijk; de rest (A) is dan nog los te bouwen. Goed als aanvulling.</p><button class="btn" data-hermes-send="Knipsel wat-kan-ik-maken: werk C (restje opmaken) uit">Uitwerken</button></div></div>
+<h2>Mijn voorstel</h2><p class="lead">Bouw <b>A</b> (in huis-zoeker) met de knop naar de boodschappenlijst, en neem <b>C</b> mee als Siri-zin en snelle ingang ("met prei" = A met één chip). <b>B</b> (voorraadkast) parkeren: past later bij de eigen boodschappenlijst (#39) en het weekmenu (#41), als je merkt dat je steeds hetzelfde intypt.</p>
+<h2>Bronnen</h2><p class="lead" style="font-size:13px">Teng, C.-Y., Lin, Y.-R., & Adamic, L. A. (2012). Recipe recommendation using ingredient networks. <i>ACM WebSci</i> · Parasuraman, R., & Manzey, D. H. (2010). <i>Human Factors</i>, 52(3) · Voedingscentrum (2019). Factsheet voedselverspilling door consumenten · Praktijk: Supercook, Paprika, Pantry Check.</p>
+</div></body></html>
