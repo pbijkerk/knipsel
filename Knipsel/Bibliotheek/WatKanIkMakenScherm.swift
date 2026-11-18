@@ -101,7 +101,9 @@ extension View {
 /// "Vandaag: …" (#41). Met de ingrediënten die je de vorige keer opgaf.
 struct WatKanIkMakenRij: View {
     let actie: () -> Void
-    @State private var chips: [String] = WatKanIkMaken.laadChips()
+    @AppStorage(AppConfiguratie.sleutelWatKanIkMaken) private var opgeslagen = ""
+
+    private var chips: [String] { WatKanIkMaken.chips(uitTekst: opgeslagen) }
 
     var body: some View {
         Button(action: actie) {
@@ -130,7 +132,6 @@ struct WatKanIkMakenRij: View {
             chips.isEmpty ? "Wat kan ik maken?" : "Wat kan ik maken met \(chips.joined(separator: ", "))"
         )
         .accessibilityHint("Zoek recepten met wat je in huis hebt")
-        .onAppear { chips = WatKanIkMaken.laadChips() }
     }
 }
 

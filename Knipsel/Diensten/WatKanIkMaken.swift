@@ -273,17 +273,22 @@ enum WatKanIkMaken {
         return uit
     }
 
-    /// Je chips blijven bewaard tot je ze wist, zodat je later verder kunt (alleen op dit toestel).
+    /// Je chips blijven bewaard tot je ze wist, zodat je later verder kunt (alleen op dit toestel). Als
+    /// één tekst met een regel per chip, zodat de rij in de bibliotheek ze via `@AppStorage` volgt.
     static func laadChips(uit defaults: UserDefaults = .standard) -> [String] {
-        defaults.stringArray(forKey: AppConfiguratie.sleutelWatKanIkMaken) ?? []
+        chips(uitTekst: defaults.string(forKey: AppConfiguratie.sleutelWatKanIkMaken) ?? "")
     }
 
     static func bewaar(_ chips: [String], in defaults: UserDefaults = .standard) {
         if chips.isEmpty {
             defaults.removeObject(forKey: AppConfiguratie.sleutelWatKanIkMaken)
         } else {
-            defaults.set(chips, forKey: AppConfiguratie.sleutelWatKanIkMaken)
+            defaults.set(chips.joined(separator: "\n"), forKey: AppConfiguratie.sleutelWatKanIkMaken)
         }
+    }
+
+    static func chips(uitTekst tekst: String) -> [String] {
+        tekst.components(separatedBy: "\n").filter { !$0.isEmpty }
     }
 
     /// De regel onder de chips: "Zout, peper, olie… tellen als in huis."
