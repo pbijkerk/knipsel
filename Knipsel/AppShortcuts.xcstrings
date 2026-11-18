@@ -297,6 +297,50 @@
           }
         }
       }
+    },
+    "Wat kan ik maken met ${ingredient} in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat kan ik maken met ${ingredient} in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Wat kan ik maken met ${ingredient} ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat kan ik maken met ${ingredient} ${applicationName}"
+          }
+        }
+      }
+    },
+    "Wat kan ik koken met ${ingredient} in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat kan ik koken met ${ingredient} in ${applicationName}"
+          }
+        }
+      }
+    },
+    "Wat kan ik maken in ${applicationName}": {
+      "extractionState": "manual",
+      "localizations": {
+        "nl": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wat kan ik maken in ${applicationName}"
+          }
+        }
+      }
     }
   },
   "version": "1.0"

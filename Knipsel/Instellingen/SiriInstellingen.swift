@@ -13,6 +13,7 @@ struct SiriInstellingen: View {
         ("\"Vorige stap in Knipsel\"", "een stap terug"),
         ("\"Herhaal de stap in Knipsel\"", "stap opnieuw voorlezen"),
         ("\"Wat heb ik nodig in Knipsel\"", "ingrediënten van deze stap"),
+        ("\"Wat kan ik maken met prei in Knipsel\"", "recepten met wat je in huis hebt"),
     ]
 
     var body: some View {

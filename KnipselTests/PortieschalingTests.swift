@@ -18,7 +18,7 @@ struct PortieschalingTests {
         Geval(regel: "2 uien, gesnipperd", van: 4, naar: 6, verwacht: "3 uien, gesnipperd"),
         Geval(regel: "1 flespompoen (ca. 1 kg)", van: 4, naar: 6, verwacht: "1½ flespompoen, ca. 1½ kg"),
         Geval(
-            regel: "1 blik tomatenblokjes (400 g)", van: 2, naar: 3, verwacht: "1½ blikken tomatenblokjes, 600 g"),
+            regel: "1 blik tomatenblokjes (400 g)", van: 2, naar: 3, verwacht: "1½ blik tomatenblokjes, 600 g"),
         Geval(regel: "3 cm verse gember", van: 4, naar: 6, verwacht: "4½ cm verse gember"),
         Geval(regel: "1 l groentebouillon", van: 4, naar: 6, verwacht: "1½ l groentebouillon"),
         Geval(regel: "200 ml kokosmelk", van: 4, naar: 6, verwacht: "300 ml kokosmelk"),
@@ -83,7 +83,8 @@ struct PortieschalingTests {
     @Test func enkelvoudEnMeervoudVanEenheid() {
         #expect(Portieschaling.eenheid("teen", voor: 3) == "tenen")
         #expect(Portieschaling.eenheid("tenen", voor: 1) == "teen")
-        #expect(Portieschaling.eenheid("blik", voor: 1.5) == "blikken")
+        #expect(Portieschaling.eenheid("blik", voor: 1.5) == "blik")
+        #expect(Portieschaling.eenheid("blik", voor: 2) == "blikken")
         #expect(Portieschaling.eenheid("el", voor: 3) == "el")
     }
 
@@ -107,8 +108,10 @@ struct PortieschalingTests {
         // Met een eenheid blijft de naam staan: 500 g uien → 250 g uien.
         Geval(regel: "500 g uien", van: 4, naar: 2, verwacht: "250 g uien"),
         Geval(regel: "2 courgettes", van: 2, naar: 1, verwacht: "1 courgette"),
+        // Op -oen (#44): pompoen → pompoenen, ook in een samenstelling.
+        Geval(regel: "2 flespompoenen", van: 4, naar: 2, verwacht: "1 flespompoen"),
         // Onbekende woorden blijven zoals ze zijn.
-        Geval(regel: "2 flespompoenen", van: 4, naar: 2, verwacht: "1 flespompoenen"),
+        Geval(regel: "2 venkelknollen", van: 4, naar: 2, verwacht: "1 venkelknollen"),
     ]
 
     @Test(arguments: telgevallen)

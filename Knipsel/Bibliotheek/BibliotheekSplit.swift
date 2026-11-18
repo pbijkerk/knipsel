@@ -18,6 +18,8 @@ struct BibliotheekSplit: View {
     @State private var verderGestart: VerderKeuze?
     @State private var toonInbox = false
     @State private var selectie = ReceptSelectie()
+    @State private var toonWatKanIk = false
+    @State private var watKanIkVersie = UUID()
     @Environment(InleesInbox.self) private var inbox
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
     /// Zijbalk standaard zichtbaar, zoals in de schets.
@@ -68,6 +70,11 @@ struct BibliotheekSplit: View {
         }
         .verderMet($verder, gestart: $verderGestart)
         .toonReceptVerzoek(pad: $pad)
+        .watKanIkMakenVerzoek(toon: $toonWatKanIk, versie: $watKanIkVersie) {
+            // Siri (#44): naar de recepten, ook als de boodschappen of het weekmenu open stonden.
+            if zijbalkKeuze == .boodschappen || zijbalkKeuze == .weekmenu { zijbalkKeuze = .kookboek(filter.kookboek) }
+            selectie.stop()
+        }
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
         .sheet(isPresented: $toonKnippen) { KnipStart() }
@@ -104,19 +111,27 @@ struct BibliotheekSplit: View {
                         naVerplaatsen: { nieuw in pad = pad.map { $0 == id ? nieuw : $0 } })
                 }
                 .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox, slepen: true)
+                .navigationDestination(isPresented: $toonWatKanIk) {
+                    WatKanIkMakenScherm(kookboek: filter.kookboek).id(watKanIkVersie)
+                }
         }
     }
 
-    /// "Verder met…" en "Nog te controleren" boven het raster, naast elkaar als er ruimte is; niet
-    /// tijdens het zoeken.
+    /// "Vandaag: …" (#41) en "Wat kan ik maken?" (#44), met "Verder met…" en "Nog te controleren" naast
+    /// elkaar als er ruimte is; niet tijdens het zoeken of selecteren.
     private var kop: AnyView? {
-        guard filter.zoekterm.isEmpty else { return nil }
+        guard filter.zoekterm.isEmpty, !selectie.actief else { return nil }
         let inboxZichtbaar = !inbox.items.isEmpty
+        let rijen = VStack(alignment: .leading, spacing: 10) {
+            // "Vandaag: …" verdwijnt vanzelf als er niets gepland is.
+            VandaagRij()
+                .frame(maxWidth: 560, alignment: .leading)
+            WatKanIkMakenRij { toonWatKanIk = true }
+                .frame(maxWidth: 560, alignment: .leading)
+        }
         guard verder != nil || inboxZichtbaar else {
-            // Alleen "Vandaag: …" (#41); verdwijnt vanzelf als er niets gepland is.
             return AnyView(
-                VandaagRij()
-                    .frame(maxWidth: 560, alignment: .leading)
+                rijen
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, weergave == .kaarten ? 24 : 16)
                     .padding(.top, 4)
@@ -124,8 +139,7 @@ struct BibliotheekSplit: View {
         }
         return AnyView(
             VStack(alignment: .leading, spacing: 10) {
-                VandaagRij()
-                    .frame(maxWidth: 560, alignment: .leading)
+                rijen
                 ViewThatFits(in: .horizontal) {
                     HStack(alignment: .top, spacing: 12) { kopKaarten }
                     VStack(spacing: 10) { kopKaarten }

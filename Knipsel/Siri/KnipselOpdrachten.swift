@@ -76,6 +76,16 @@ struct KnipselOpdrachten: AppShortcutsProvider {
                 "Wat staat er vandaag op het menu in \(.applicationName)",
             ],
             shortTitle: "Wat eten we vandaag?", systemImageName: "calendar")
+        // Met één ingrediënt (#44, C). Siri kent in een zin alleen entiteiten, geen vrije tekst.
+        AppShortcut(
+            intent: WatKanIkMakenIntent(),
+            phrases: [
+                "Wat kan ik maken met \(\.$ingredient) in \(.applicationName)",
+                "Wat kan ik maken met \(\.$ingredient) \(.applicationName)",
+                "Wat kan ik koken met \(\.$ingredient) in \(.applicationName)",
+                "Wat kan ik maken in \(.applicationName)",
+            ],
+            shortTitle: "Wat kan ik maken?", systemImageName: "basket")
     }
 
     static let shortcutTileColor: ShortcutTileColor = .orange

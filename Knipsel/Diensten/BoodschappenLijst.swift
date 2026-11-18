@@ -197,9 +197,15 @@ enum BoodschappenLijst {
         }
 
         /// Welke eenheid een opgeteld totaal krijgt: dezelfde als alles dezelfde was, anders g/kg of
-        /// ml/l naar grootte.
+        /// ml/l naar grootte. Vanaf 1000 g of 1000 ml altijd kg of l: "1,6 l" in plaats van "1600 ml".
         static func weergave(_ eenheden: [String?], basis: Double) -> (eenheid: String?, deler: Double) {
             let uniek = Set(eenheden.map { $0 ?? "" })
+            let soort = Maat(eenheid: eenheden.first ?? nil).soort
+            if basis >= 1000, soort == "gewicht" || soort == "volume",
+                uniek.allSatisfy({ Maat(eenheid: $0).soort == soort })
+            {
+                return soort == "gewicht" ? ("kg", 1000) : ("l", 1000)
+            }
             if uniek.count == 1, let enige = eenheden.first {
                 return (enige, Maat(eenheid: enige).naarBasis)
             }
@@ -282,8 +288,9 @@ enum BoodschappenLijst {
                     tekst: tekst, meestalInHuis: meestalInHuis.bevat(tekst), herkomst: herkomst)
             }
             let (eenheid, deler) = Maat.weergave(eenheden, basis: van)
-            // Ongeschaald en niet opgeteld blijft de hoeveelheid precies zoals in het recept.
-            let afronden = geschaald || aantal > 1
+            // Ongeschaald, niet opgeteld en niet omgerekend (1600 ml → 1,6 l) blijft de hoeveelheid precies
+            // zoals in het recept.
+            let afronden = geschaald || aantal > 1 || eenheid != (eenheden.first ?? nil)
             func waarde(_ basis: Double) -> Double {
                 let w = afronden ? Portieschaling.rond(basis / deler, eenheid: eenheid) : basis / deler
                 return BoodschappenLijst.inWinkel(w, eenheid: eenheid)
