@@ -8,6 +8,11 @@ struct KnipselApp: App {
 
     init() {
         opslag.richIn()
+        #if DEBUG
+            // Alleen Debug (Development-omgeving): het CloudKit-schema één keer per modelversie
+            // klaarzetten, zodat Deploy Schema Changes daarna alle recordtypes en velden ziet.
+            CloudKitSchema.gedeeld.startVanzelf()
+        #endif
         // "Verder met…" van vóór fase 8 wees naar het objectID; nu naar de uuid van het recept.
         KookVoortgang().migreer(in: opslag.context)
         // Recepten vindbaar in Spotlight en voor Siri ("Kook … met Knipsel").

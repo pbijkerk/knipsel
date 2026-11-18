@@ -33,17 +33,22 @@ struct ThuisDelenScherm: View {
                 }
             }
 
-            switch delen.status.rol {
-            case .nietGedeeld: nietGedeeld
-            case .eigenaar: eigenaar
-            case .deelnemer: deelnemer
-            }
-
             if let fout = delen.fout {
                 Section {
                     SwiftUI.Label(fout, systemImage: "exclamationmark.triangle")
                         .foregroundStyle(.orange)
+                    if delen.dienst.isBeschikbaar {
+                        Button("Probeer opnieuw", systemImage: "arrow.clockwise") {
+                            Task { await delen.probeerOpnieuw() }
+                        }
+                    }
                 }
+            }
+
+            switch delen.status.rol {
+            case .nietGedeeld: nietGedeeld
+            case .eigenaar: eigenaar
+            case .deelnemer: deelnemer
             }
         }
         .navigationTitle("Thuis delen")
@@ -185,7 +190,7 @@ struct DeelnemerRij: View {
                 .foregroundStyle(deelnemer.status == .doetMee ? Color.accentColor : .secondary)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 2) {
-                Text(deelnemer.isIkZelf ? "\(deelnemer.naam) (jij)" : deelnemer.naam)
+                Text(deelnemer.weergaveNaam)
                 if let contact = deelnemer.contact, contact != deelnemer.naam {
                     Text(contact)
                         .font(.footnote)

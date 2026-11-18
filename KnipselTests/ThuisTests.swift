@@ -19,9 +19,18 @@ final class NepDeelDienst: DeelDienst {
     /// Hoeveel Thuis-recepten er nog waren op het moment van stoppen of vertrekken.
     private(set) var thuisBijStoppen: Int?
     var context: NSManagedObjectContext?
+    /// Laat `deel` falen zodra er een object van deze entiteit bij zit (entiteitnaam → fout).
+    var faaltVoor: [String: any Error] = [:]
+    /// Elke aanroep van `deel`, met de entiteiten erin.
+    private(set) var aanroepen: [Set<String>] = []
 
     func status() async throws -> ThuisStatus { nepStatus }
-    func deel(_ objecten: [NSManagedObjectID]) async throws { gedeeld += objecten }
+    func deel(_ objecten: [NSManagedObjectID]) async throws {
+        let entiteiten = Set(objecten.compactMap(\.entity.name))
+        aanroepen.append(entiteiten)
+        if let fout = entiteiten.lazy.compactMap({ self.faaltVoor[$0] }).first { throw fout }
+        gedeeld += objecten
+    }
     func nietGedeeld(_ objecten: [NSManagedObjectID]) -> [NSManagedObjectID] {
         objecten.filter { !gedeeld.contains($0) }
     }
