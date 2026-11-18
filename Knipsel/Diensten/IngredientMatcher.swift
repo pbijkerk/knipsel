@@ -326,7 +326,11 @@ struct IngredientMatcher {
             for woord in woorden where woord != ouder { tabel[woord, default: []].append(ouder) }
         }
         // Kaassoorten uit de woordenlijst, behalve wat je niet als kaas gebruikt.
-        let geenKaas: Set<String> = ["roomkaas", "ricotta", "cottage cheese", "huttenkase", "kaas"]
+        // Zachte en verse kazen vervangen geen "kaas" (oude kaas is geen feta).
+        let geenKaas: Set<String> = [
+            "roomkaas", "ricotta", "cottage cheese", "huttenkase", "kaas", "feta", "mozzarella", "buffelmozzarella",
+            "burrata", "mascarpone", "halloumi", "paneer", "labneh", "geitenkaas", "stracchino", "kwark",
+        ]
         let kazen = Afdelingen.woordenlijst.first { $0.0 == .kaas }?.1.map {
             Afdelingen.woordenIn($0).joined(separator: " ")
         }
@@ -365,7 +369,7 @@ struct IngredientMatcher {
     /// molen, en een aardappel geen appel.
     static let geenSoortVan: Set<String> = Set([
         "zoete aardappel", "rode peper", "groene peper", "cayennepeper", "lange vinger", "aardappel",
-        "sinaasappel", "granaatappel", "pindakaas", "roomkaas", "kokosmelk", "kokosroom", "karnemelk",
+        "sinaasappel", "granaatappel", "pindakaas", "roomkaas", "geitenkaas", "kokosmelk", "kokosroom", "karnemelk",
         "kikkererwt", "jeneverbes", "paneermeel", "amandelmeel", "zuiveringszout", "kokosnoot", "nootmuskaat",
         "rozenwater", "kokoswater", "bruiswater", "hamburger", "pindasaus", "vanillesuiker", "bloemkool",
         "boerenkool", "spruitkool", "kant en klaar deeg", "tomatenpuree", "appelstroop", "pompoenpit",

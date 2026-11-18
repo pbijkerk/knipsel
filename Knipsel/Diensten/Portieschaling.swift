@@ -56,7 +56,8 @@ enum Portieschaling {
         return getal(naam, voor: geschaald.tot ?? geschaald.hoeveelheid)
     }
 
-    /// Het eerste bekende woord in `naam` naar enkelvoud (≤ 1) of meervoud (> 1); hoofdletter blijft.
+    /// Het eerste bekende woord in `naam` naar enkelvoud (< 2) of meervoud (≥ 2); hoofdletter blijft.
+    /// "1½ ui" zoals "anderhalve ui", "anderhalf blik".
     /// Bekend is een woord uit de lijst, een samenstelling die erop eindigt ("flespompoen",
     /// "cherrytomaten") of een woord op -oen ("pompoen" → "pompoenen").
     static func getal(_ naam: String, voor waarde: Double) -> String {
@@ -65,7 +66,7 @@ enum Portieschaling {
             let klein = woord.lowercased()
             let meervoud = naamMeervoud(klein)
             let enkelvoud = naamEnkelvoud(klein)
-            let vervanging: String? = waarde > 1 ? meervoud : enkelvoud
+            let vervanging: String? = waarde >= 2 ? meervoud : enkelvoud
             guard meervoud != nil || enkelvoud != nil else { continue }
             guard let vervanging else { return naam }
             let eerste = woord.first.map { $0.isUppercase } ?? false
@@ -199,8 +200,8 @@ enum Portieschaling {
 
     /// "teen" bij 3 → "tenen", "tenen" bij 1 → "teen". Maten (el, g) veranderen niet.
     static func eenheid(_ eenheid: String, voor waarde: Double) -> String {
-        if waarde > 1, let meervoud = meervouden[eenheid] { return meervoud }
-        if waarde <= 1, let enkelvoud = enkelvouden[eenheid] { return enkelvoud }
+        if waarde >= 2, let meervoud = meervouden[eenheid] { return meervoud }
+        if waarde < 2, let enkelvoud = enkelvouden[eenheid] { return enkelvoud }
         return eenheid
     }
 }

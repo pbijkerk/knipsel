@@ -49,5 +49,6 @@ en dit project volgt [Semantic Versioning](https://semver.org/lang/nl/).
 
 ### Opgelost
 - Boodschappenlijst: "2 flespompoenen" in plaats van "2 flespompoen" (meervoud op -oen en samenstellingen als cherrytomaten), en grote hoeveelheden in liter en kilo: "1,6 l" in plaats van "1600 ml", "1½ kg" in plaats van "1500 g" (#44)
+- Onder de 2 enkelvoud, zoals in gewoon Nederlands: "1½ ui" en voorgelezen "anderhalve ui", "anderhalf blik" (was "1½ uien", "1½ blikken"). Wat kan ik maken?: zachte en verse kazen (feta, mozzarella, geitenkaas…) tellen niet meer als "kaas" (#44)
 - Spraakbediening: "volgende", "vorige" en "herhaal" werden twee keer uitgevoerd (eerst bij het voorlopige resultaat, ± 2 s later nog eens bij het eindresultaat van dezelfde uiting)
 - Porties schalen geeft "1 ui" en "2 eieren" in plaats van "1 uien" en "2 ei" (enkelvoud/meervoud voor veelvoorkomende ingrediënten)

@@ -16,9 +16,9 @@ struct PortieschalingTests {
         // De rekensom uit het issue: 1½ × ½ tl = ¾ tl.
         Geval(regel: "½ tl kerriepoeder", van: 4, naar: 6, verwacht: "¾ tl kerriepoeder"),
         Geval(regel: "2 uien, gesnipperd", van: 4, naar: 6, verwacht: "3 uien, gesnipperd"),
-        Geval(regel: "1 flespompoen (ca. 1 kg)", van: 4, naar: 6, verwacht: "1½ flespompoenen, ca. 1½ kg"),
+        Geval(regel: "1 flespompoen (ca. 1 kg)", van: 4, naar: 6, verwacht: "1½ flespompoen, ca. 1½ kg"),
         Geval(
-            regel: "1 blik tomatenblokjes (400 g)", van: 2, naar: 3, verwacht: "1½ blikken tomatenblokjes, 600 g"),
+            regel: "1 blik tomatenblokjes (400 g)", van: 2, naar: 3, verwacht: "1½ blik tomatenblokjes, 600 g"),
         Geval(regel: "3 cm verse gember", van: 4, naar: 6, verwacht: "4½ cm verse gember"),
         Geval(regel: "1 l groentebouillon", van: 4, naar: 6, verwacht: "1½ l groentebouillon"),
         Geval(regel: "200 ml kokosmelk", van: 4, naar: 6, verwacht: "300 ml kokosmelk"),
@@ -83,7 +83,8 @@ struct PortieschalingTests {
     @Test func enkelvoudEnMeervoudVanEenheid() {
         #expect(Portieschaling.eenheid("teen", voor: 3) == "tenen")
         #expect(Portieschaling.eenheid("tenen", voor: 1) == "teen")
-        #expect(Portieschaling.eenheid("blik", voor: 1.5) == "blikken")
+        #expect(Portieschaling.eenheid("blik", voor: 1.5) == "blik")
+        #expect(Portieschaling.eenheid("blik", voor: 2) == "blikken")
         #expect(Portieschaling.eenheid("el", voor: 3) == "el")
     }
 

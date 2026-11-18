@@ -120,6 +120,10 @@ struct IngredientMatcherTests {
         #expect(dekking(recept: "zoete aardappel", inHuis: "aardappel") == nil)
         #expect(dekking(recept: "kokosmelk", inHuis: "melk") == nil)
         #expect(dekking(recept: "pindakaas", inHuis: "kaas") == nil)
+        // Zachte en verse kazen zijn geen vervanging voor kaas, en andersom.
+        #expect(dekking(recept: "feta", inHuis: "oude kaas") == nil)
+        #expect(dekking(recept: "mozzarella", inHuis: "kaas") == nil)
+        #expect(dekking(recept: "kaas", inHuis: "geitenkaas") == nil)
     }
 
     @Test func naarSmaakOptioneelEnKopjesTellenNiet() {
