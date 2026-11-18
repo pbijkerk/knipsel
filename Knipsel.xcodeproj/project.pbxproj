@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		024157641687A6692F2EDFDD /* ReceptVerplaatsen.swift in Sources */ = {isa = PBXBuildFile; fileRef = A875A58DA63CCCD1D49EC53C /* ReceptVerplaatsen.swift */; };
 		04D69F4EEBC95458623E127C /* KaartkleurenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129BF70483D327699E4C49C0 /* KaartkleurenTests.swift */; };
+		06E639BFBC6B00B1D56903DD /* ThuisExport.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC94202C4659493BA887B27E /* ThuisExport.swift */; };
 		087C1209F9A42A5A9ABF5F25 /* InleesInbox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B42E9457C61334527D4484D /* InleesInbox.swift */; };
 		0B0429404EFF7C1862F6714F /* Portieschaling.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5080A8C816A2DC91ED20E4C3 /* Portieschaling.swift */; };
 		0B582623C7E89AE42A4F9CA9 /* Weekmenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = C37D787D8CAB98801D848375 /* Weekmenu.swift */; };
@@ -65,6 +66,7 @@
 		50B8C7A06DC494A30B7D6687 /* PaginaLezer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8EC04F583037D6A7D7391788 /* PaginaLezer.swift */; };
 		533531E7A3263CF942DCC9AA /* BoodschappenItemBewerken.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB2E3F13CE8951E18853C42E /* BoodschappenItemBewerken.swift */; };
 		56CF8037A5CC90F908E72622 /* ModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB79EBDFADD9D84884EA2AA3 /* ModelTests.swift */; };
+		576C8FDA41310962447B604A /* ThuisExportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 228314FC7672C8DD045BC308 /* ThuisExportTests.swift */; };
 		599934D3722175B437502504 /* DeelBevestiging.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2399AB91613E2B8960E397D /* DeelBevestiging.swift */; };
 		5A413D5D05D22D1D25A32931 /* KnipSessie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E8BD8AE303F6F0F02868C2A /* KnipSessie.swift */; };
 		5A60F344D4E5646802D23BDF /* KnipselScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 171A25B1BCB38B52FB9ABA51 /* KnipselScherm.swift */; };
@@ -260,6 +262,7 @@
 		212AD1B4E678214154D53ECE /* TijdHerkenner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TijdHerkenner.swift; sourceTree = "<group>"; };
 		21430A5E8EB0D9FEF0ECF84C /* DeelDienst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeelDienst.swift; sourceTree = "<group>"; };
 		21FEAF2FF5F4627F6A808452 /* MeestalInHuis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeestalInHuis.swift; sourceTree = "<group>"; };
+		228314FC7672C8DD045BC308 /* ThuisExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThuisExportTests.swift; sourceTree = "<group>"; };
 		273104A8883B9B5AE9FAFE1E /* WatKanIkMakenIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatKanIkMakenIntent.swift; sourceTree = "<group>"; };
 		2A0A091AC7276F0B6291F3A6 /* SpraakbedieningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpraakbedieningTests.swift; sourceTree = "<group>"; };
 		2A989570D162883BA4071D14 /* Knipsel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Knipsel 3.xcdatamodel"; sourceTree = "<group>"; };
@@ -377,6 +380,7 @@
 		D7F049FD6FEEBDD9A5DA3A40 /* Bibliotheekbeheer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bibliotheekbeheer.swift; sourceTree = "<group>"; };
 		D80C99AFFC80C26C1CE6B452 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		DC094C8E260E00709A10A41E /* ActivityIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIntents.swift; sourceTree = "<group>"; };
+		DC94202C4659493BA887B27E /* ThuisExport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThuisExport.swift; sourceTree = "<group>"; };
 		DD32DDA41BF7995385751615 /* StapSplitser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StapSplitser.swift; sourceTree = "<group>"; };
 		DD4A72CEC245DF458099EDC9 /* KookVoortgangTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookVoortgangTests.swift; sourceTree = "<group>"; };
 		E106950816385404FA5F67F7 /* KnipselWidgets.appex */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = "wrapper.app-extension"; path = KnipselWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -478,6 +482,7 @@
 				A875A58DA63CCCD1D49EC53C /* ReceptVerplaatsen.swift */,
 				6E65C07FD146CD3E2BE25FE9 /* ThuisDelen.swift */,
 				BF42938953FC73C07EA132FC /* ThuisDelenScherm.swift */,
+				DC94202C4659493BA887B27E /* ThuisExport.swift */,
 				CDC349A2666A3BA717305377 /* UitnodigingOntvangen.swift */,
 			);
 			path = Thuis;
@@ -566,6 +571,7 @@
 				11CB265982A24C2A3B0302B3 /* StappenEnClaudeTests.swift */,
 				7A02B0F5AF954E0650120592 /* StapSplitserTests.swift */,
 				1E1A41154B3736B1900DD614 /* ThuisDelenFoutTests.swift */,
+				228314FC7672C8DD045BC308 /* ThuisExportTests.swift */,
 				EABB8821D775F7C074547320 /* ThuisTests.swift */,
 				88F2A62551961BC12AF1FDB0 /* TijdHerkennerTests.swift */,
 				6D7DDE88F293BB85887EEFA9 /* TimerServiceTests.swift */,
@@ -957,6 +963,7 @@
 				91060DEE56D43C5338C835C8 /* StapSplitserTests.swift in Sources */,
 				D411A1BA50A1A4111D4E4BC8 /* StappenEnClaudeTests.swift in Sources */,
 				5BBA953FCB67F9003E438229 /* ThuisDelenFoutTests.swift in Sources */,
+				576C8FDA41310962447B604A /* ThuisExportTests.swift in Sources */,
 				2482827169D7E429866A06A9 /* ThuisTests.swift in Sources */,
 				A733B246B566371C8A76B611 /* TijdHerkennerTests.swift in Sources */,
 				9583B501201662C5E6CE3743 /* TimerServiceTests.swift in Sources */,
@@ -1070,6 +1077,7 @@
 				3F4FD1FFE27E833F03FE2AE3 /* StappenHerindelen.swift in Sources */,
 				FA5195C687540FBDEAD82986 /* ThuisDelen.swift in Sources */,
 				738173462C9B4FBECD8620D2 /* ThuisDelenScherm.swift in Sources */,
+				06E639BFBC6B00B1D56903DD /* ThuisExport.swift in Sources */,
 				35D8B3462A6D3D327A0987E4 /* TijdHerkenner.swift in Sources */,
 				28F57686838DB1C194C4F957 /* Tijdweergave.swift in Sources */,
 				BE8954C6D004BD9FBE2E1329 /* TimerIntents.swift in Sources */,

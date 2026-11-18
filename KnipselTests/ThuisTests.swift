@@ -23,16 +23,40 @@ final class NepDeelDienst: DeelDienst {
     var faaltVoor: [String: any Error] = [:]
     /// Elke aanroep van `deel`, met de entiteiten erin.
     private(set) var aanroepen: [Set<String>] = []
+    /// Laat `deel` falen met 1570 op `recordMetadata` zodra een van deze objecten erbij zit.
+    var metadataOntbreektVoor: Set<NSManagedObjectID> = []
+    /// Laat één aanroep van `deel` falen met deze fout (`nil` = niet).
+    var faaltVoorAanroep: (([NSManagedObjectID]) -> (any Error)?)?
+    /// Elke aanroep van `deel`, met de object-ID's erin.
+    private(set) var aanroepIDs: [[NSManagedObjectID]] = []
+
+    /// Zoals op het toestel: Core Data-validatie 1570 bij een `NSCKRecordZoneMoveReceipt`.
+    static func recordMetadataFout() -> NSError {
+        NSError(
+            domain: NSCocoaErrorDomain, code: NSValidationMissingMandatoryPropertyError,
+            userInfo: [
+                NSValidationKeyErrorKey: "recordMetadata",
+                NSLocalizedDescriptionKey: "%{PROPERTY}@ is een vereiste waarde.",
+            ])
+    }
 
     func status() async throws -> ThuisStatus { nepStatus }
     func deel(_ objecten: [NSManagedObjectID]) async throws {
         let entiteiten = Set(objecten.compactMap(\.entity.name))
         aanroepen.append(entiteiten)
+        aanroepIDs.append(objecten)
         if let fout = entiteiten.lazy.compactMap({ self.faaltVoor[$0] }).first { throw fout }
+        if let fout = faaltVoorAanroep?(objecten) { throw fout }
+        if !metadataOntbreektVoor.isDisjoint(with: objecten) { throw Self.recordMetadataFout() }
         gedeeld += objecten
     }
     func nietGedeeld(_ objecten: [NSManagedObjectID]) -> [NSManagedObjectID] {
         objecten.filter { !gedeeld.contains($0) }
+    }
+    /// Wat nog niet naar iCloud is geëxporteerd (standaard: alles wel).
+    var nietGeexporteerd: Set<NSManagedObjectID> = []
+    func geexporteerd(_ objecten: [NSManagedObjectID]) -> Set<NSManagedObjectID> {
+        Set(objecten).subtracting(nietGeexporteerd)
     }
     func uitnodiging() async throws -> (share: CKShare, container: CKContainer)? { nil }
     func stopMetDelen() async throws {

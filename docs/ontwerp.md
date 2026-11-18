@@ -274,6 +274,32 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
     om in "bij een boodschap ontbreekt 'veld'" en CloudKit-fouten in gewone taal ("iCloud-schema ontbreekt
     — Deploy Schema Changes nodig"); het log (`Thuis`) toont domein, code, `userInfo`-sleutels en
     entiteit.veld, zonder inhoud.
+  - **Pas delen na de export.** `share(_:to:)` verhuist objecten naar de zone van de share en legt dat
+    intern vast in een `NSCKRecordZoneMoveReceipt`, met een verplichte verwijzing (`recordMetadata`)
+    naar de `NSCKRecordMetadata` van het object. Die metadata ontstaat pas bij de eerste export naar
+    CloudKit. Een recept dat net naar Thuis ging (verplaatsen maakt een nieuw object), of waarvan de
+    export eerder faalde doordat het Production-schema ontbrak, gaf daardoor fout 1570 op
+    `recordMetadata`. Daarom (`ThuisExport`, `ThuisDelen`):
+    1. Per open object de **graaf** die `share(_:to:)` meeneemt: alle relaties, ook via de
+       Thuis-categorieën en -labels naar de andere recepten daarin. `DeelDienst.geexporteerd(_:)`
+       (CloudKit: `NSPersistentCloudKitContainer.records(for:)`, de Swift-overlay; geeft alleen een
+       record voor wat al geëxporteerd is, ook in de privéstore vóór het delen) zegt wat al in iCloud
+       staat. Alleen objecten waarvan de hele graaf geëxporteerd is, gaan de share in; de rest **wacht**.
+    2. `NSPersistentCloudKitContainer.eventChangedNotification`: na een geslaagde `.export`
+       (`endDate != nil && succeeded`) en 2 s rust probeert `naExport()` het opnieuw. Staat een
+       onderdeel dan nog steeds niet in iCloud, dan raakt Knipsel het één keer per app-start aan
+       (zie 3) zodat Core Data het opnieuw exporteert. Een soort met een échte fout blijft
+       geblokkeerd tot *Probeer opnieuw*.
+    3. **Vangnet**: komt 1570 op `recordMetadata` toch, dan deelt Knipsel de objecten één voor één,
+       raakt het probleemgeval en zijn directe onderdelen aan en wacht op de volgende export; max 3
+       pogingen per object per app-start, daarna de melding "Een recept is nog niet in iCloud bewaard.
+       Knipsel probeert het opnieuw zodra dat gebeurd is." *Aanraken* moet een echte wijziging zijn
+       (dezelfde waarde opnieuw zetten komt niet in de persistent history en exporteert niets, gemeten):
+       `Recept.gewijzigdOp = nu`; anders een gevulde datum 1 ms later; anders een tekstveld (`naam`,
+       `tekst`, …, nooit `kookboek`) even met een spatie bewaren en meteen terugzetten.
+    4. **Melding**: wachten is geen fout. Instellingen › Thuis delen toont dan een grijze regel
+       "2 recepten wachten op iCloud — ze worden gedeeld zodra ze geüpload zijn." (alleen bij > 0);
+       de oranje melding alleen bij echte fouten.
 - **Model (eerste versie):**
   - `Recept`: titel, intro, porties, bereidingstijd, totale tijd, notities, bronNaam, bronDatum, bronPagina,
     beoordeling, laatstGekooktOp, aangemaaktOp, kookboek (Mijn recepten / Thuis); veel-op-veel met `Categorie`.

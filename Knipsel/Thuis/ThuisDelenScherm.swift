@@ -33,6 +33,14 @@ struct ThuisDelenScherm: View {
                 }
             }
 
+            if delen.dienst.isBeschikbaar, let wacht = delen.wachtMelding {
+                Section {
+                    SwiftUI.Label(wacht, systemImage: "icloud.and.arrow.up")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             if let fout = delen.fout {
                 Section {
                     SwiftUI.Label(fout, systemImage: "exclamationmark.triangle")
@@ -53,7 +61,10 @@ struct ThuisDelenScherm: View {
         }
         .navigationTitle("Thuis delen")
         .navigationBarTitleDisplayMode(.inline)
-        .task { await delen.vernieuw() }
+        .task {
+            await delen.vernieuw()
+            await delen.deelOpenstaande()
+        }
         .refreshable { await delen.vernieuw() }
         .confirmationDialog("Stoppen met delen?", isPresented: $bevestigStop, titleVisibility: .visible) {
             Button("Stop met delen", role: .destructive) { voerUit { try await delen.stopMetDelen() } }
