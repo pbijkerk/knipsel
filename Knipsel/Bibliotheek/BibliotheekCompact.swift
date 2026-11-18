@@ -16,6 +16,8 @@ struct BibliotheekCompact: View {
     @State private var toonInbox = false
     @State private var toonBoodschappen = false
     @State private var toonWeek = false
+    @State private var toonWatKanIk = false
+    @State private var watKanIkVersie = UUID()
     @State private var selectie = ReceptSelectie()
     @Environment(InleesInbox.self) private var inbox
     @AppStorage(AppConfiguratie.sleutelBibliotheekWeergave) private var weergave = BibliotheekWeergave.kaarten
@@ -36,6 +38,10 @@ struct BibliotheekCompact: View {
                             VandaagRij()
                                 .padding(.horizontal, 16)
                                 .padding(.top, 4)
+                            // Recepten bij wat je in huis hebt (#44).
+                            WatKanIkMakenRij { toonWatKanIk = true }
+                                .padding(.horizontal, 16)
+                                .padding(.top, 6)
                                 .padding(.bottom, verder == nil && inbox.items.isEmpty ? 0 : 6)
                         }
                         if let verder, filter.zoekterm.isEmpty {
@@ -96,10 +102,14 @@ struct BibliotheekCompact: View {
             }
             .navigationDestination(isPresented: $toonBoodschappen) { BoodschappenScherm() }
             .navigationDestination(isPresented: $toonWeek) { WeekScherm() }
+            .navigationDestination(isPresented: $toonWatKanIk) {
+                WatKanIkMakenScherm(kookboek: filter.kookboek).id(watKanIkVersie)
+            }
             .inleesInvoer(nieuw: { toonNieuw = true }, toonInbox: $toonInbox)
         }
         .verderMet($verder, gestart: $verderGestart)
         .toonReceptVerzoek(pad: $pad)
+        .watKanIkMakenVerzoek(toon: $toonWatKanIk, versie: $watKanIkVersie) { selectie.stop() }
         .sheet(isPresented: $toonInstellingen) { InstellingenView() }
         .sheet(isPresented: $toonNieuw) { ReceptBewerken(recept: nil) }
         .sheet(isPresented: $toonKnippen) { KnipStart() }

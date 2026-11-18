@@ -59,6 +59,9 @@ enum AppConfiguratie {
     /// Waar de hoofdknop van het boodschappenvel heen gaat: "knipsel" (standaard) of "herinneringen".
     static let sleutelBoodschappenBestemming = "boodschappenBestemming"
 
+    /// "Wat kan ik maken?" (#44): de ingrediënten die je opgaf, tot je ze wist (alleen op dit toestel).
+    static let sleutelWatKanIkMaken = "watKanIkMakenIngredienten"
+
     /// Weekmenu (#41): op welke dag de week begint (`Weekbegin`, standaard maandag).
     static let sleutelWeekBegin = "weekBegin"
 

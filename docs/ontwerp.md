@@ -362,7 +362,24 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
    Het weekmenu is gebouwd in #41 (schetsen `docs/ux/schetsen-weekmenu.html`, eisen M1–M7): A
    (weekoverzicht) met B (*Plan in* vanuit het recept). Nog niet: C, een weekvoorstel op basis van wat je
    lang niet kookte en het seizoen — als knop in het weekoverzicht zodra er genoeg kookgeschiedenis is.
-3. **"Wat kan ik maken met …"** — zoeken op wat je in huis hebt ("prei, ei, kaas").
+3. **"Wat kan ik maken met …"** — gebouwd in #44 (schetsen `docs/ux/schetsen-wat-kan-ik-maken.html`, eisen
+   W1–W6): A, de in huis-zoeker, met C, de Siri-zin voor één ingrediënt. Bovenaan de bibliotheek (iPhone en
+   iPad) staat de rij *Wat kan ik maken?*; daar typ of dicteer je wat je hebt als chips (komma of enter,
+   suggesties uit de ingrediënten van je recepten, ✕ per chip; ze blijven bewaard tot je *Wis* tikt). Wat je
+   meestal in huis hebt (#38) telt mee. De recepten van het gekozen kookboek staan in groepen *Alles in huis*,
+   *Nog 1 nodig*, *Nog 2 nodig* en *Nog 3 of meer nodig* (achter *Toon meer*), binnen een groep eerst wie
+   de meeste van jouw ingrediënten gebruikt en dan de kortste tijd; recepten zonder een van jouw
+   ingrediënten staan er niet. Per recept "mist: bladerdeeg" of "alles in huis", een kleine meter en de
+   varianten ("rode ui ≈ ui"); 🛒 (ook vegen of lang drukken) zet wat ontbreekt op de lijst uit Instellingen ›
+   Boodschappen. Het vergelijken (`IngredientMatcher`) is een woordenlijst zonder netwerk: enkelvoud/meervoud,
+   bijvoeglijke woorden weg ("verse", "geraspte", "oude" bij kaas), samenstellingen op hun kopwoord
+   ("preiringen" → prei), een paar synoniemen (slagroom = room). De regel voor varianten: wat je hebt dekt
+   het recept als het hetzelfde of specifieker is (rode ui in huis → recept met ui); iets algemeners of
+   verwants (ui in huis → recept met rode ui; sjalot ≈ ui; kaas ≈ parmezaan) telt als *bijna*: wel in huis,
+   maar zichtbaar (W5). "Naar smaak", "optioneel", "voor erbij" en kopjes tellen niet als ontbrekend. Siri:
+   "Wat kan ik maken met prei in Knipsel" noemt het aantal en het snelste recept en opent het scherm met die
+   chip; met één chip kies je *Snelst* of *Lang niet gekookt*. Claude als aanvulling op de woordenlijst is
+   een mogelijk vervolg; B (voorraadkast) blijft geparkeerd.
 4. **Menu koken** — twee of drie recepten tegelijk in de kookmodus, met wisselen per stem ("naar de saus").
 5. **Gekookt-logboek** — datum, sterren en notitie ("minder zout"); tonen bij het recept.
 6. **Eigen foto van het resultaat** — handig in de lijst (plaatjes zeggen meer dan woorden), los van de

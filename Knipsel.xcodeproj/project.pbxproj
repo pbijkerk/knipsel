@@ -17,6 +17,7 @@
 		0F6D1C64CFB543AA0F7315FF /* KnipselApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F50F041C4CB953D585CFF4 /* KnipselApp.swift */; };
 		0F90ABEB9681DFA057ED0955 /* Knipsel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 505ED222FD53F0E1D9450FE9 /* Knipsel.xcdatamodeld */; };
 		1059F3A9B0F9838D8C5D3CAC /* WeekmenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A120302CA5D253F1451FFEA0 /* WeekmenuTests.swift */; };
+		13BB0151D5CBFE5B297611EF /* WatKanIkMaken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2094A592A64ED803105FC1 /* WatKanIkMaken.swift */; };
 		16C4657DF374C61D4E114303 /* IngredientParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E25895FFF0EB680702572E /* IngredientParser.swift */; };
 		1A723DE3D53B135D4EFCB341 /* ReceptOpbouw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81D29371C90818259BC8A361 /* ReceptOpbouw.swift */; };
 		1C5692984B791BD523F0E864 /* GerechtFotoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34FC0C7915749A131F9DE78 /* GerechtFotoTests.swift */; };
@@ -48,6 +49,7 @@
 		40223C27B8698382ADCC7FCA /* LijstOptellen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 485654091ECDBCE9736D2F18 /* LijstOptellen.swift */; };
 		421E45A979D84361386E592C /* NuSpeelt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2DB74B4ED2A2E3EF41E2587B /* NuSpeelt.swift */; };
 		427784EFE93E1404E9C8F1E5 /* ModelIndeler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A0059719A9B2CB0E15C31E9 /* ModelIndeler.swift */; };
+		43619372F2853BB5228951AC /* WatKanIkMakenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 730BE20C8BE6648720E35A55 /* WatKanIkMakenTests.swift */; };
 		450719FC3AA154174CE23D97 /* kookzender.html in Resources */ = {isa = PBXBuildFile; fileRef = FF5C1CC84520EBEC57921E15 /* kookzender.html */; };
 		458D5796AF86AE9BEDADB5D6 /* testpagina.png in Resources */ = {isa = PBXBuildFile; fileRef = 0610FBAD74DF1C4D24580715 /* testpagina.png */; };
 		468BD70A4EE22C297692F80B /* betaalmuur-krant.html in Resources */ = {isa = PBXBuildFile; fileRef = F293CAF652184041C9BF4062 /* betaalmuur-krant.html */; };
@@ -72,6 +74,7 @@
 		5EB75E63CC2445910674E630 /* Leesinstellingen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 790BF937A6F007903FA6296E /* Leesinstellingen.swift */; };
 		5F64AC1300CD86FC93C2D78F /* WeekScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FB046F2292433124DD8A833 /* WeekScherm.swift */; };
 		61415B4C72E20CA83283D1E8 /* ActivityWeergave.swift in Sources */ = {isa = PBXBuildFile; fileRef = E27CF3A5879BFA34A814BA6A /* ActivityWeergave.swift */; };
+		61BDF611470B85283FF36E20 /* WatKanIkMakenScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 45B2C1712DF866C7129222DD /* WatKanIkMakenScherm.swift */; };
 		62A4B7FEF78084C7D58BC135 /* UitspraakregelsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1B54162573059F6F84A4F70A /* UitspraakregelsTests.swift */; };
 		62CF42088FA815E3B2A315D4 /* KnipselWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0322264E82115CA175F5BDCB /* KnipselWidgets.swift */; };
 		63A3A9DDC34069C603FAC723 /* Voorbeeldrecepten.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B57464F0562ED0CD3B7E10D /* Voorbeeldrecepten.swift */; };
@@ -109,6 +112,7 @@
 		9958265122AC0BC0143D6456 /* BibliotheekSplit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70348AEE499D0174DF2070DD /* BibliotheekSplit.swift */; };
 		9C643EB7A3BDD2C596C5F80C /* InrichtingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60413F059A1031C88D3543B7 /* InrichtingTests.swift */; };
 		9DE66E63367D0D53E95912CF /* KookVoortgang.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356210E76021417EAA9C7A59 /* KookVoortgang.swift */; };
+		A0F32CEF60B83914D7664243 /* IngredientMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AE68BD7AFEFA1091A4E69C3 /* IngredientMatcher.swift */; };
 		A3A95563BFFB12A3DA9A18CB /* VerderMet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0FFD90A42F8677539465BCBF /* VerderMet.swift */; };
 		A61A610DFC1F0EA4AF7DCF2C /* Onderdelen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A14448637693678765D2F37 /* Onderdelen.swift */; };
 		A6ED7160A6A1D28C92D4680C /* ReceptEntiteit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F3E0E386DC84E412E8F73FE /* ReceptEntiteit.swift */; };
@@ -172,6 +176,7 @@
 		FC304514D17E8AB62E692B3B /* SiriInstellingen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17E2EA310696D39FC0F54C71 /* SiriInstellingen.swift */; };
 		FCEC1C0E9DEB19E603099D2D /* ControleScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4BE9C8B7966041B2EE3CBE9A /* ControleScherm.swift */; };
 		FDC2E1DC7D16EBCB8D8C5D9B /* DeelLezer.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4DD0044B4A01309F9EDC9DF /* DeelLezer.swift */; };
+		FE64F8577FD8E727D022FBDA /* WatKanIkMakenIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273104A8883B9B5AE9FAFE1E /* WatKanIkMakenIntent.swift */; };
 		FEC013674BF2FBD092AC6930 /* BoodschappenBestemming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551FFF0A44204647B24F37D7 /* BoodschappenBestemming.swift */; };
 		FEE8A464D1C206106FDAE1BA /* HTMLTekst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1349CCA6120F7D327342988E /* HTMLTekst.swift */; };
 /* End PBXBuildFile section */
@@ -251,6 +256,7 @@
 		212AD1B4E678214154D53ECE /* TijdHerkenner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TijdHerkenner.swift; sourceTree = "<group>"; };
 		21430A5E8EB0D9FEF0ECF84C /* DeelDienst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeelDienst.swift; sourceTree = "<group>"; };
 		21FEAF2FF5F4627F6A808452 /* MeestalInHuis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeestalInHuis.swift; sourceTree = "<group>"; };
+		273104A8883B9B5AE9FAFE1E /* WatKanIkMakenIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatKanIkMakenIntent.swift; sourceTree = "<group>"; };
 		2A0A091AC7276F0B6291F3A6 /* SpraakbedieningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpraakbedieningTests.swift; sourceTree = "<group>"; };
 		2A989570D162883BA4071D14 /* Knipsel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Knipsel 3.xcdatamodel"; sourceTree = "<group>"; };
 		2AB18677647FD308C8B3C413 /* TimervraagTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimervraagTests.swift; sourceTree = "<group>"; };
@@ -273,6 +279,7 @@
 		425CB2FC9C8FE0D0C29E8EBF /* Weergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Weergave.swift; sourceTree = "<group>"; };
 		42CF62E78CF2F1A8B36C22AF /* ReceptIndex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptIndex.swift; sourceTree = "<group>"; };
 		43DED447E3765D41102FF685 /* KnipselOpdrachten.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipselOpdrachten.swift; sourceTree = "<group>"; };
+		45B2C1712DF866C7129222DD /* WatKanIkMakenScherm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatKanIkMakenScherm.swift; sourceTree = "<group>"; };
 		485654091ECDBCE9736D2F18 /* LijstOptellen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LijstOptellen.swift; sourceTree = "<group>"; };
 		4920C55C5B359D793E921673 /* ReceptLijst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptLijst.swift; sourceTree = "<group>"; };
 		4A14448637693678765D2F37 /* Onderdelen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Onderdelen.swift; sourceTree = "<group>"; };
@@ -293,6 +300,7 @@
 		579E35F670326A740E862739 /* GerechtFoto.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GerechtFoto.swift; sourceTree = "<group>"; };
 		57A4556C4DD100088C5AED8B /* secties.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = secties.html; sourceTree = "<group>"; };
 		5A3FE115062D432C76EB5842 /* VoorlezenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoorlezenTests.swift; sourceTree = "<group>"; };
+		5B2094A592A64ED803105FC1 /* WatKanIkMaken.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatKanIkMaken.swift; sourceTree = "<group>"; };
 		5EC4BDE74E1685FD4F24AD58 /* ReceptInlezer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptInlezer.swift; sourceTree = "<group>"; };
 		60413F059A1031C88D3543B7 /* InrichtingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InrichtingTests.swift; sourceTree = "<group>"; };
 		60DA71CFE59E93EE40F1AEDE /* KookActivityTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookActivityTypes.swift; sourceTree = "<group>"; };
@@ -310,6 +318,7 @@
 		6F13650094C100D28D45EBD5 /* PerenInRodeWijn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PerenInRodeWijn.swift; sourceTree = "<group>"; };
 		70348AEE499D0174DF2070DD /* BibliotheekSplit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BibliotheekSplit.swift; sourceTree = "<group>"; };
 		728DD04894EA7365C28CAE13 /* WeekOnderdelen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekOnderdelen.swift; sourceTree = "<group>"; };
+		730BE20C8BE6648720E35A55 /* WatKanIkMakenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatKanIkMakenTests.swift; sourceTree = "<group>"; };
 		790BF937A6F007903FA6296E /* Leesinstellingen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Leesinstellingen.swift; sourceTree = "<group>"; };
 		7A02B0F5AF954E0650120592 /* StapSplitserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StapSplitserTests.swift; sourceTree = "<group>"; };
 		7D4165F2A7B45293FB2A33FF /* KnipStart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KnipStart.swift; sourceTree = "<group>"; };
@@ -321,6 +330,7 @@
 		88F2A62551961BC12AF1FDB0 /* TijdHerkennerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TijdHerkennerTests.swift; sourceTree = "<group>"; };
 		893C0E4CB8D5AACF1A1B5065 /* GerechtFotoKiezer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GerechtFotoKiezer.swift; sourceTree = "<group>"; };
 		8ACA3B89B434F3EE963E7CDD /* VoorleesService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoorleesService.swift; sourceTree = "<group>"; };
+		8AE68BD7AFEFA1091A4E69C3 /* IngredientMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IngredientMatcher.swift; sourceTree = "<group>"; };
 		8DFD1018CCCD7B136A859D31 /* KnipselDelen.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = KnipselDelen.entitlements; sourceTree = "<group>"; };
 		8EC04F583037D6A7D7391788 /* PaginaLezer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaginaLezer.swift; sourceTree = "<group>"; };
 		9253C1E711E4D4809D2D3A4B /* TimerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimerService.swift; sourceTree = "<group>"; };
@@ -432,6 +442,7 @@
 				579E35F670326A740E862739 /* GerechtFoto.swift */,
 				E79401E15A93EE7924E6656C /* HerinneringenDienst.swift */,
 				021F75B011F22D7BDC256846 /* Indeler.swift */,
+				8AE68BD7AFEFA1091A4E69C3 /* IngredientMatcher.swift */,
 				03E25895FFF0EB680702572E /* IngredientParser.swift */,
 				8579C78469AD96BD3CD5D529 /* KeychainService.swift */,
 				485654091ECDBCE9736D2F18 /* LijstOptellen.swift */,
@@ -446,6 +457,7 @@
 				DD32DDA41BF7995385751615 /* StapSplitser.swift */,
 				212AD1B4E678214154D53ECE /* TijdHerkenner.swift */,
 				1800D3286A33FA25D0CDB692 /* Uitspraakregels.swift */,
+				5B2094A592A64ED803105FC1 /* WatKanIkMaken.swift */,
 				60BF42D6BE472211F82D27CD /* Inlezen */,
 			);
 			path = Diensten;
@@ -552,6 +564,7 @@
 				2AB18677647FD308C8B3C413 /* TimervraagTests.swift */,
 				1B54162573059F6F84A4F70A /* UitspraakregelsTests.swift */,
 				5A3FE115062D432C76EB5842 /* VoorlezenTests.swift */,
+				730BE20C8BE6648720E35A55 /* WatKanIkMakenTests.swift */,
 				A120302CA5D253F1451FFEA0 /* WeekmenuTests.swift */,
 			);
 			path = KnipselTests;
@@ -685,6 +698,7 @@
 				42CF62E78CF2F1A8B36C22AF /* ReceptIndex.swift */,
 				0D9FBFB09709822703D87FA9 /* TimerIntents.swift */,
 				F7F9DB363FC8119FAFE1321B /* VandaagIntent.swift */,
+				273104A8883B9B5AE9FAFE1E /* WatKanIkMakenIntent.swift */,
 			);
 			path = Siri;
 			sourceTree = "<group>";
@@ -724,6 +738,7 @@
 				4920C55C5B359D793E921673 /* ReceptLijst.swift */,
 				1A9A788E92CD0E79634071AA /* ReceptSelectie.swift */,
 				0FFD90A42F8677539465BCBF /* VerderMet.swift */,
+				45B2C1712DF866C7129222DD /* WatKanIkMakenScherm.swift */,
 			);
 			path = Bibliotheek;
 			sourceTree = "<group>";
@@ -938,6 +953,7 @@
 				D1B66851654681F3C76957B1 /* TimervraagTests.swift in Sources */,
 				62A4B7FEF78084C7D58BC135 /* UitspraakregelsTests.swift in Sources */,
 				BE9091BC6A792CECF5823970 /* VoorlezenTests.swift in Sources */,
+				43619372F2853BB5228951AC /* WatKanIkMakenTests.swift in Sources */,
 				1059F3A9B0F9838D8C5D3CAC /* WeekmenuTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -979,6 +995,7 @@
 				48A2F598004D962180075CA5 /* HerinneringenDienst.swift in Sources */,
 				D30E192477AD60342F38D01F /* InboxLijst.swift in Sources */,
 				E482A35DA62B0DA757E8AF89 /* Indeler.swift in Sources */,
+				A0F32CEF60B83914D7664243 /* IngredientMatcher.swift in Sources */,
 				16C4657DF374C61D4E114303 /* IngredientParser.swift in Sources */,
 				D500E8261F43F354A466E5AD /* Ingredientkoppeling.swift in Sources */,
 				087C1209F9A42A5A9ABF5F25 /* InleesInbox.swift in Sources */,
@@ -1054,6 +1071,9 @@
 				63A3A9DDC34069C603FAC723 /* Voorbeeldrecepten.swift in Sources */,
 				4FF07964A61B3E0C425DD2CD /* VoorleesInstellingen.swift in Sources */,
 				F959B4F95664F3D97D46A55C /* VoorleesService.swift in Sources */,
+				13BB0151D5CBFE5B297611EF /* WatKanIkMaken.swift in Sources */,
+				FE64F8577FD8E727D022FBDA /* WatKanIkMakenIntent.swift in Sources */,
+				61BDF611470B85283FF36E20 /* WatKanIkMakenScherm.swift in Sources */,
 				475C1ED4FF81F4B6DED8A468 /* WeekOnderdelen.swift in Sources */,
 				5F64AC1300CD86FC93C2D78F /* WeekScherm.swift in Sources */,
 				0B582623C7E89AE42A4F9CA9 /* Weekmenu.swift in Sources */,
