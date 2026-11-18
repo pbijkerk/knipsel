@@ -84,7 +84,7 @@ struct VoorlezenTests {
         #expect(tekst.hasPrefix("Stap 3. Voeg de pompoen en het kerriepoeder toe en bak 2 minuten mee."))
         #expect(
             tekst.hasSuffix(
-                "Je hebt nodig: anderhalve flespompoen, anderhalve liter groentebouillon, driekwart theelepel kerriepoeder."
+                "Je hebt nodig: anderhalve flespompoenen, anderhalve liter groentebouillon, driekwart theelepel kerriepoeder."
             ))
     }
 

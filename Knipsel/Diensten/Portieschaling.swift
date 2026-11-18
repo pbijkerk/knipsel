@@ -57,13 +57,16 @@ enum Portieschaling {
     }
 
     /// Het eerste bekende woord in `naam` naar enkelvoud (≤ 1) of meervoud (> 1); hoofdletter blijft.
+    /// Bekend is een woord uit de lijst, een samenstelling die erop eindigt ("flespompoen",
+    /// "cherrytomaten") of een woord op -oen ("pompoen" → "pompoenen").
     static func getal(_ naam: String, voor waarde: Double) -> String {
         var woorden = naam.components(separatedBy: " ")
         for (index, woord) in woorden.enumerated() {
             let klein = woord.lowercased()
-            let vervanging: String? =
-                waarde > 1 ? naamMeervouden[klein] : naamEnkelvouden[klein]
-            guard naamMeervouden[klein] != nil || naamEnkelvouden[klein] != nil else { continue }
+            let meervoud = naamMeervoud(klein)
+            let enkelvoud = naamEnkelvoud(klein)
+            let vervanging: String? = waarde > 1 ? meervoud : enkelvoud
+            guard meervoud != nil || enkelvoud != nil else { continue }
             guard let vervanging else { return naam }
             let eerste = woord.first.map { $0.isUppercase } ?? false
             woorden[index] = eerste ? vervanging.prefix(1).uppercased() + vervanging.dropFirst() : vervanging
@@ -163,6 +166,36 @@ enum Portieschaling {
         tabel["avocados"] = "avocado"
         return tabel
     }()
+
+    /// Samenstellingen met een bekend woord achteraan, langste eerst ("aardappel" vóór "appel"); korte
+    /// woorden als "ui" en "ei" niet ("prei" is geen samenstelling).
+    private static let samenstelbareMeervouden: [(String, String)] = naamMeervouden.filter { $0.key.count >= 4 }
+        .sorted { $0.key.count > $1.key.count }.map { ($0.key, $0.value) }
+    private static let samenstelbareEnkelvouden: [(String, String)] = naamEnkelvouden.filter { $0.key.count >= 4 }
+        .sorted { $0.key.count > $1.key.count }.map { ($0.key, $0.value) }
+
+    /// Het meervoud als `woord` (kleine letters) een bekend enkelvoud is, anders `nil`.
+    static func naamMeervoud(_ woord: String) -> String? {
+        if let meervoud = naamMeervouden[woord] { return meervoud }
+        if naamEnkelvouden[woord] != nil { return nil }
+        for (enkel, meer) in samenstelbareMeervouden where woord.count > enkel.count && woord.hasSuffix(enkel) {
+            return String(woord.dropLast(enkel.count)) + meer
+        }
+        // Pompoen en flespompoen: -oen → -oenen (citroen en limoen staan al in de lijst).
+        if woord.hasSuffix("oen"), woord.count >= 5, woord != "groen" { return woord + "en" }
+        return nil
+    }
+
+    /// Het enkelvoud als `woord` (kleine letters) een bekend meervoud is, anders `nil`.
+    static func naamEnkelvoud(_ woord: String) -> String? {
+        if let enkelvoud = naamEnkelvouden[woord] { return enkelvoud }
+        if naamMeervouden[woord] != nil { return nil }
+        for (meer, enkel) in samenstelbareEnkelvouden where woord.count > meer.count && woord.hasSuffix(meer) {
+            return String(woord.dropLast(meer.count)) + enkel
+        }
+        if woord.hasSuffix("oenen"), woord.count >= 7, woord != "groenen" { return String(woord.dropLast(2)) }
+        return nil
+    }
 
     /// "teen" bij 3 → "tenen", "tenen" bij 1 → "teen". Maten (el, g) veranderen niet.
     static func eenheid(_ eenheid: String, voor waarde: Double) -> String {
