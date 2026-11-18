@@ -21,13 +21,21 @@ final class ThuisDelen {
     let opslag: Opslag
     let dienst: any DeelDienst
     private(set) var status = ThuisStatus.nietGedeeld
-    /// Laatste fout van het delen, voor Instellingen › Thuis delen.
-    private(set) var fout: String?
+    /// Laatste fout van het delen, voor Instellingen › Thuis delen: per soort die niet lukte een regel.
+    var fout: String? {
+        let regels = ThuisSoort.allCases.compactMap { foutPerSoort[$0] } + [algemeneFout].compactMap { $0 }
+        return regels.isEmpty ? nil : regels.joined(separator: "\n")
+    }
+    private(set) var foutPerSoort: [ThuisSoort: String] = [:]
+    /// Een fout buiten het delen per soort (accepteren van een uitnodiging).
+    private var algemeneFout: String?
     private(set) var bezig = false
 
     @ObservationIgnored private let logger = Logger(subsystem: "com.peterbijkerk.knipsel", category: "Thuis")
     @ObservationIgnored private var gestart = false
     @ObservationIgnored private var deelTaak: Task<Void, Never>?
+    /// Soorten die deze app-start al eens faalden: niet vanzelf opnieuw proberen.
+    @ObservationIgnored private(set) var mislukt: Set<ThuisSoort> = []
 
     init(opslag: Opslag, dienst: any DeelDienst) {
         self.opslag = opslag
@@ -74,20 +82,47 @@ final class ThuisDelen {
 
     /// Zet Thuis-recepten, de items van de Thuis-boodschappenlijst (#39) en de Thuis-week (#41) die
     /// nog niet in de share staan erin (maakt de share zo nodig aan).
+    ///
+    /// Per soort een eigen aanroep: als bijvoorbeeld de boodschappen niet lukken (een recordtype dat
+    /// nog niet in het iCloud-schema staat), gaan de recepten en het weekmenu gewoon door, en de
+    /// melding zegt welke soort het was. Een soort die faalde, probeert Knipsel deze app-start niet
+    /// vanzelf opnieuw (anders bij elke bewaarbeurt dezelfde fout); *Probeer opnieuw* kan wel.
     func deelOpenstaande() async {
         guard dienst.isBeschikbaar else { return }
-        let recepten = (try? Kookboeken.recepten(in: .thuis, context: context)) ?? []
-        let items = Boodschappenlijsten.items(in: .thuis, context: context)
-        let week = Weekmenu.alle(in: .thuis, context: context)
-        let open = dienst.nietGedeeld(recepten.map(\.objectID) + items.map(\.objectID) + week.map(\.objectID))
-        guard !open.isEmpty else { return }
-        do {
-            try await dienst.deel(open)
-            fout = nil
-            await vernieuw()
-        } catch {
-            fout = "Thuis bijwerken in iCloud lukte niet: \(error.localizedDescription)"
-            logger.error("Delen mislukt: \(error.localizedDescription, privacy: .public)")
+        var ietsGedeeld = false
+        for soort in ThuisSoort.allCases where !mislukt.contains(soort) {
+            let open = dienst.nietGedeeld(objecten(van: soort))
+            guard !open.isEmpty else {
+                foutPerSoort[soort] = nil
+                continue
+            }
+            do {
+                try await dienst.deel(open)
+                foutPerSoort[soort] = nil
+                ietsGedeeld = true
+            } catch {
+                mislukt.insert(soort)
+                foutPerSoort[soort] = DeelFout.melding(error, soort: soort)
+                logger.error(
+                    "Delen van \(soort.rawValue, privacy: .public) mislukt: \(DeelFout.logregel(error), privacy: .public)"
+                )
+            }
+        }
+        if ietsGedeeld { await vernieuw() }
+    }
+
+    /// De knop bij de foutmelding: alle soorten weer proberen, ook wat eerder deze app-start faalde.
+    func probeerOpnieuw() async {
+        mislukt.removeAll()
+        await deelOpenstaande()
+    }
+
+    /// De Thuis-objecten van één soort.
+    private func objecten(van soort: ThuisSoort) -> [NSManagedObjectID] {
+        switch soort {
+        case .recepten: ((try? Kookboeken.recepten(in: .thuis, context: context)) ?? []).map(\.objectID)
+        case .boodschappen: Boodschappenlijsten.items(in: .thuis, context: context).map(\.objectID)
+        case .maaltijden: Weekmenu.alle(in: .thuis, context: context).map(\.objectID)
         }
     }
 
@@ -142,13 +177,16 @@ final class ThuisDelen {
     func accepteer(_ metadata: CKShare.Metadata) async {
         do {
             try await dienst.accepteer(metadata)
-            fout = nil
+            algemeneFout = nil
         } catch {
-            fout = "De uitnodiging voor Thuis kon niet worden geaccepteerd: \(error.localizedDescription)"
-            logger.error("Accepteren mislukt: \(error.localizedDescription, privacy: .public)")
+            algemeneFout = "De uitnodiging voor Thuis kon niet worden geaccepteerd: \(DeelFout.uitleg(error))"
+            logger.error("Accepteren mislukt: \(DeelFout.logregel(error), privacy: .public)")
         }
         await vernieuw()
     }
 
-    func wisFout() { fout = nil }
+    func wisFout() {
+        foutPerSoort.removeAll()
+        algemeneFout = nil
+    }
 }

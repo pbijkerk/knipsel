@@ -68,3 +68,20 @@ Advies: **extern**, groep `Familie`, uitnodigen op e-mailadres (geen openbare li
 
 Let op: TestFlight-builds praten met de **Production**-omgeving van CloudKit. Rol eerst het schema uit
 (CloudKit Console › Knipsel-container › *Deploy Schema Changes*), anders werkt sync en delen niet.
+
+### CloudKit-schema klaarzetten (na elke nieuwe modelversie)
+
+*Deploy Schema Changes* zet alleen over wat al in **Development** staat. Zegt de Console "geen
+wijzigingen" terwijl er een modelversie bij kwam, dan heeft Development de nieuwe recordtypes nog niet.
+Zo komen ze erin:
+
+1. Draai de app vanuit Xcode (**Debug**, ⌘R) op een iPhone of iPad met iCloud aan.
+2. Wacht op **"CloudKit-schema klaar"**: Instellingen › Over Knipsel › *CloudKit-schema (Development)*
+   (alleen zichtbaar in Debug), of in het log (categorie `CloudKitSchema`). Lukte het niet, tik dan op
+   *Zet CloudKit-schema klaar*.
+3. Verplaats in diezelfde Debug-run een recept naar Thuis en zet een boodschap en een maaltijd in Thuis,
+   zodat ook de velden voor delen in Development komen.
+4. CloudKit Console › Knipsel-container › *Deploy Schema Changes* — nu staan er wijzigingen
+   (o.a. `CD_BoodschappenItem`, `CD_Maaltijd`).
+5. Test daarna de TestFlight-build (Production). Staat er in Instellingen › Thuis delen nog een melding,
+   tik *Probeer opnieuw*.

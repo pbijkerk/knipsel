@@ -98,6 +98,9 @@ struct InstellingenView: View {
                 Section {
                     LabeledContent("Versie", value: ContentView.versie)
                     LabeledContent("iCloud-sync", value: Opslag.gedeeld.synchroniseert ? "Aan" : "Uit")
+                    #if DEBUG
+                        CloudKitSchemaRij()
+                    #endif
                 } header: {
                     Text("Over Knipsel")
                 } footer: {
@@ -115,6 +118,22 @@ struct InstellingenView: View {
         }
     }
 }
+
+#if DEBUG
+    /// Alleen in Debug-builds (vanuit Xcode): het CloudKit-schema in Development klaarzetten vóór
+    /// CloudKit Console › Deploy Schema Changes (`CloudKitSchema`). Bestaat niet in TestFlight.
+    struct CloudKitSchemaRij: View {
+        var schema: CloudKitSchema = .gedeeld
+
+        var body: some View {
+            LabeledContent("CloudKit-schema (Development)", value: schema.toestand.tekst)
+            Button("Zet CloudKit-schema klaar", systemImage: "icloud.and.arrow.up") {
+                Task { await schema.zetKlaar() }
+            }
+            .disabled(!schema.kanStarten)
+        }
+    }
+#endif
 
 // MARK: - Indelen met Claude
 

@@ -250,6 +250,30 @@ Een recept heeft één of meer categorieën (B6) en nul of meer labels.
     gedeelde database samen.
   - CloudKit-eisen: alle attributen optioneel of met standaardwaarde, geen unieke constraints,
     relaties met inverse.
+  - **CloudKit-schema naar Development en Production.** *Deploy Schema Changes* zet alleen over wat al in
+    de Development-omgeving staat, en daar komt een recordtype of veld pas als een Debug-build er een
+    record mee uploadt. Na modelversie 4 en 5 gebeurde dat niet, dus zag de Console "geen wijzigingen" en
+    misten `CD_BoodschappenItem` en `CD_Maaltijd` in Production. Daarom roept een **Debug**-build bij het
+    starten één keer per modelversie `initializeCloudKitSchema(options: [])` aan (`CloudKitSchema`,
+    UserDefaults `cloudkitSchemaGeinitialiseerd-<versie>`; ook als knop in Instellingen › Over Knipsel,
+    alleen in Debug). Dat maakt voorbeeldrecords met élk veld dat Core Data kan schrijven, uploadt en wist
+    ze, voor alle stores met CloudKit (privé en gedeeld; het schema is per container). Het draait ná
+    `loadPersistentStores`, op de achtergrond (het blokkeert), nooit onder tests/previews en nooit in
+    Release: het werkt alleen tegen Development. Stappen na elke modelversie:
+    1. Draai de app vanuit Xcode (Debug, ⌘R) op een toestel met iCloud.
+    2. Wacht op "CloudKit-schema klaar" (Instellingen › Over Knipsel, of het log `CloudKitSchema`).
+    3. Verplaats in dezelfde Debug-run een recept naar Thuis (zet een boodschap en een maaltijd in
+       Thuis), zodat ook de velden die alleen bij delen ontstaan (zoals `CD_moveReceipt`) in Development
+       komen.
+    4. CloudKit Console › container › Schema › *Deploy Schema Changes* — nu met wijzigingen.
+    5. Daarna pas een TestFlight-build testen (die praat met Production).
+  - **Thuis bijwerken.** `ThuisDelen` deelt recepten, boodschappen en het weekmenu in **aparte**
+    aanroepen: faalt één soort, dan gaan de andere door, en de melding zegt welke soort het was. Een
+    soort die faalde, probeert Knipsel die app-start niet vanzelf opnieuw (wel via *Probeer opnieuw*).
+    `DeelFout` zet Core Data-validatiefouten (die als "%{PROPERTY}@ is een vereiste waarde." binnenkomen)
+    om in "bij een boodschap ontbreekt 'veld'" en CloudKit-fouten in gewone taal ("iCloud-schema ontbreekt
+    — Deploy Schema Changes nodig"); het log (`Thuis`) toont domein, code, `userInfo`-sleutels en
+    entiteit.veld, zonder inhoud.
 - **Model (eerste versie):**
   - `Recept`: titel, intro, porties, bereidingstijd, totale tijd, notities, bronNaam, bronDatum, bronPagina,
     beoordeling, laatstGekooktOp, aangemaaktOp, kookboek (Mijn recepten / Thuis); veel-op-veel met `Categorie`.

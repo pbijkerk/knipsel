@@ -27,6 +27,15 @@ struct ThuisDeelnemer: Identifiable, Equatable, Sendable {
     var isEigenaar: Bool
     var isIkZelf: Bool
     var magBewerken: Bool
+
+    /// De naam voor jezelf als CloudKit geen naam meegeeft.
+    static let jij = "Jij"
+
+    /// Zoals in de lijst “Wie doet mee”: “Peter Voorbeeld (jij)”, of alleen “Jij” als je naam ontbreekt.
+    var weergaveNaam: String {
+        guard isIkZelf else { return naam }
+        return naam == Self.jij ? naam : "\(naam) (jij)"
+    }
 }
 
 /// Hoe Thuis op dit toestel gedeeld is.

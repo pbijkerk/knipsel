@@ -49,14 +49,15 @@ final class CloudKitDeelDienst: DeelDienst {
         guard isBeschikbaar, let (share, rol) = try thuisShare() else { return .nietGedeeld }
         let ik = share.currentUserParticipant
         let deelnemers = share.participants.map { deelnemer in
-            ThuisDeelnemer(
+            let isIkZelf = deelnemer == ik
+            return ThuisDeelnemer(
                 id: deelnemer.userIdentity.userRecordID?.recordName ?? UUID().uuidString,
-                naam: Self.naam(van: deelnemer),
+                naam: Self.naam(van: deelnemer, isIkZelf: isIkZelf),
                 contact: deelnemer.userIdentity.lookupInfo?.emailAddress
                     ?? deelnemer.userIdentity.lookupInfo?.phoneNumber,
                 status: Self.status(van: deelnemer.acceptanceStatus),
                 isEigenaar: deelnemer.role == .owner,
-                isIkZelf: deelnemer == ik,
+                isIkZelf: isIkZelf,
                 magBewerken: deelnemer.permission == .readWrite)
         }
         return ThuisStatus(rol: rol, deelnemers: deelnemers.sorted { $0.isEigenaar && !$1.isEigenaar })
@@ -160,13 +161,25 @@ final class CloudKitDeelDienst: DeelDienst {
 
     // MARK: - Omzetten
 
-    private static func naam(van deelnemer: CKShare.Participant) -> String {
-        if let delen = deelnemer.userIdentity.nameComponents {
-            let naam = PersonNameComponentsFormatter.localizedString(from: delen, style: .default)
-            if !naam.isEmpty { return naam }
+    private static func naam(van deelnemer: CKShare.Participant, isIkZelf: Bool) -> String {
+        naam(
+            componenten: deelnemer.userIdentity.nameComponents,
+            email: deelnemer.userIdentity.lookupInfo?.emailAddress,
+            telefoon: deelnemer.userIdentity.lookupInfo?.phoneNumber, isIkZelf: isIkZelf)
+    }
+
+    /// De naam van iemand in de share: zijn naam, anders e-mail of telefoon. Ontbreekt dat allemaal
+    /// (CloudKit geeft je eigen naam vaak niet mee), dan "Jij" voor jezelf en anders "Onbekend".
+    static func naam(componenten: PersonNameComponents?, email: String?, telefoon: String?, isIkZelf: Bool)
+        -> String
+    {
+        if let componenten {
+            let naam = PersonNameComponentsFormatter.localizedString(from: componenten, style: .default)
+            if !naam.trimmingCharacters(in: .whitespaces).isEmpty { return naam }
         }
-        return deelnemer.userIdentity.lookupInfo?.emailAddress ?? deelnemer.userIdentity.lookupInfo?.phoneNumber
-            ?? "Onbekend"
+        if let email, !email.isEmpty { return email }
+        if let telefoon, !telefoon.isEmpty { return telefoon }
+        return isIkZelf ? ThuisDeelnemer.jij : "Onbekend"
     }
 
     private static func status(van status: CKShare.ParticipantAcceptanceStatus) -> ThuisDeelnemer.Status {
