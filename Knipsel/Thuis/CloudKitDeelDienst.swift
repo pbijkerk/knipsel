@@ -69,6 +69,17 @@ final class CloudKitDeelDienst: DeelDienst {
         return objecten.filter { gedeeld[$0] == nil }
     }
 
+    /// `records(for:)` (Swift-overlay van `recordsForManagedObjectIDs:`) leest de `NSCKRecordMetadata`
+    /// die de container bij het exporteren bijhoudt; zonder die metadata geen record. Het werkt per
+    /// object-ID voor elke store met CloudKit, dus ook in de privéstore vóór het delen. Een tijdelijk
+    /// ID (nog niet bewaard) is nooit geëxporteerd.
+    func geexporteerd(_ objecten: [NSManagedObjectID]) -> Set<NSManagedObjectID> {
+        guard isBeschikbaar else { return [] }
+        let permanent = objecten.filter { !$0.isTemporaryID }
+        guard !permanent.isEmpty else { return [] }
+        return Set(container.records(for: permanent).keys)
+    }
+
     func deel(_ objecten: [NSManagedObjectID]) async throws {
         guard isBeschikbaar else { return }
         let context = opslag.context

@@ -44,11 +44,35 @@ enum DeelFout {
 
     /// De melding in Instellingen › Thuis delen voor een fout bij het delen van één soort.
     static func melding(_ fout: any Error, soort: ThuisSoort) -> String {
-        "Thuis bijwerken lukte niet voor \(soort.naam): \(uitleg(fout))"
+        if isOntbrekendeRecordMetadata(fout) { return nogNietInICloud(soort.enkelvoud) }
+        return "Thuis bijwerken lukte niet voor \(soort.naam): \(uitleg(fout))"
+    }
+
+    /// Het veld van `NSCKRecordZoneMoveReceipt` dat leeg blijft als een object de share in gaat
+    /// voordat het naar iCloud is geëxporteerd (zie `ThuisExport`).
+    static let recordMetadataVeld = "recordMetadata"
+
+    /// Fout 1570 op `recordMetadata` (bij `NSCKRecordZoneMoveReceipt`): het object staat nog niet in
+    /// iCloud. Geen echte fout — wachten op de export en het dan opnieuw proberen.
+    static func isOntbrekendeRecordMetadata(_ fout: any Error) -> Bool {
+        if validaties(in: fout).contains(where: {
+            $0.veld == recordMetadataVeld || ($0.entiteit == "NSCKRecordZoneMoveReceipt" && $0.veld == nil)
+        }) {
+            return true
+        }
+        let ns = fout as NSError
+        return ns.domain == NSCocoaErrorDomain && ns.code == NSValidationMissingMandatoryPropertyError
+            && ns.localizedDescription.contains(recordMetadataVeld)
+    }
+
+    /// "Een recept is nog niet in iCloud bewaard. Knipsel probeert het opnieuw zodra dat gebeurd is."
+    static func nogNietInICloud(_ wat: String = ThuisSoort.recepten.enkelvoud) -> String {
+        "Een \(wat) is nog niet in iCloud bewaard. Knipsel probeert het opnieuw zodra dat gebeurd is."
     }
 
     /// Wat er misging, in gewone taal (zonder "Thuis bijwerken lukte niet").
     static func uitleg(_ fout: any Error) -> String {
+        if isOntbrekendeRecordMetadata(fout) { return nogNietInICloud() }
         if let validatie = validaties(in: fout).first {
             return uitleg(validatie)
         }

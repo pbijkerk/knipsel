@@ -73,6 +73,9 @@ protocol DeelDienst: AnyObject {
     func deel(_ objecten: [NSManagedObjectID]) async throws
     /// Welke van deze objecten nog niet in de share staan.
     func nietGedeeld(_ objecten: [NSManagedObjectID]) -> [NSManagedObjectID]
+    /// Welke van deze objecten al minstens één keer naar iCloud zijn geëxporteerd (er is een
+    /// `CKRecord` voor). Alleen die kunnen veilig de share in; zie `ThuisExport`.
+    func geexporteerd(_ objecten: [NSManagedObjectID]) -> Set<NSManagedObjectID>
     /// De share en container voor `UICloudSharingController` (uitnodigen, deelnemers beheren);
     /// `nil` als er nog niets te delen is.
     func uitnodiging() async throws -> (share: CKShare, container: CKContainer)?
@@ -83,6 +86,11 @@ protocol DeelDienst: AnyObject {
     func accepteer(_ metadata: CKShare.Metadata) async throws
 }
 
+extension DeelDienst {
+    /// Is dit object al naar iCloud geëxporteerd?
+    func isGeexporteerd(_ id: NSManagedObjectID) -> Bool { geexporteerd([id]).contains(id) }
+}
+
 /// Geen iCloud (of onder tests zonder nep): Thuis bestaat alleen op dit toestel.
 @MainActor
 final class GeenDeelDienst: DeelDienst {
@@ -90,6 +98,7 @@ final class GeenDeelDienst: DeelDienst {
     func status() async throws -> ThuisStatus { .nietGedeeld }
     func deel(_ objecten: [NSManagedObjectID]) async throws {}
     func nietGedeeld(_ objecten: [NSManagedObjectID]) -> [NSManagedObjectID] { [] }
+    func geexporteerd(_ objecten: [NSManagedObjectID]) -> Set<NSManagedObjectID> { Set(objecten) }
     func uitnodiging() async throws -> (share: CKShare, container: CKContainer)? { nil }
     func stopMetDelen() async throws {}
     func verlaat() async throws {}
