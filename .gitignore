@@ -15,3 +15,7 @@ buildServer.json
 
 # Testfoto's van echte krantenpagina's blijven lokaal (auteursrecht)
 docs/spikes/fotos/
+
+# Xcode Cloud: Xcode maakt deze map aan in de kopie waarin Xcode Cloud is ingesteld. De workflows
+# staan in App Store Connect; xcodegen en de CI hebben de map niet nodig (audit v0.1, #4).
+Knipsel.xcodeproj/xcshareddata/xcodecloud/
