@@ -15,15 +15,13 @@ final class DeelViewController: UIViewController {
 
     private func verwerk() async {
         guard let map = DeelGroep.inboxMap else {
+            DeelLezer.logger.error("Delen: map van de App Group niet beschikbaar")
             toon(.mislukt("Knipsel kan zijn map voor gedeelde items niet openen. Open Knipsel en probeer het opnieuw."))
             return
         }
         let providers = (extensionContext?.inputItems as? [NSExtensionItem] ?? []).flatMap { $0.attachments ?? [] }
-        if let post = await DeelLezer(bus: DeelBus(map: map)).lees(providers) {
-            toon(.toegevoegd(DeelBevestiging.omschrijving(post.bron)))
-        } else {
-            toon(.niets)
-        }
+        let uitkomst = await DeelLezer(bus: DeelBus(map: map)).verwerk(providers)
+        toon(DeelBevestiging.toestand(na: uitkomst))
     }
 
     private func toon(_ toestand: DeelBevestiging.Toestand) {

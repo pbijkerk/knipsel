@@ -18,7 +18,7 @@ import OSLog
 @MainActor
 final class Opslag {
     /// Onder unit-tests start de app (testhost) met een lege opslag in het geheugen, zonder iCloud.
-    static let gedeeld = Opslag(inGeheugen: draaitOnderTests)
+    static let gedeeld = Opslag(inGeheugen: draaitOnderTests, laadfoutVoorTest: debugLaadfout())
 
     static var draaitOnderTests: Bool {
         ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -39,7 +39,17 @@ final class Opslag {
     let container: NSPersistentCloudKitContainer
     /// `true` als deze opslag met iCloud synchroniseert.
     let synchroniseert: Bool
-    private(set) var laadfout: (any Error)?
+    /// Per store waarom hij niet openging (audit v0.1, #1). Faalt de privéstore, dan probeert Knipsel
+    /// de gedeelde niet en toont het herstelscherm; faalt alleen de gedeelde, dan werkt de app en
+    /// staat er een melding in Instellingen › Thuis delen.
+    private(set) var laadfouten: [Kookboeken.StoreSoort: any Error] = [:]
+    /// De eerste fout bij het openen, of `nil` als alles openging.
+    var laadfout: (any Error)? { laadfouten[.prive] ?? laadfouten[.gedeeld] }
+    /// De privéstore is open: de app kan de bibliotheek tonen.
+    var isGeopend: Bool { laadfouten[.prive] == nil && priveStore != nil }
+
+    private let beschrijvingen: [(Kookboeken.StoreSoort, NSPersistentStoreDescription)]
+    private let laadfoutVoorTest: ((Kookboeken.StoreSoort) -> (any Error)?)?
 
     private let logger = Logger(subsystem: "com.peterbijkerk.knipsel", category: "Opslag")
     private var ontdubbelTaak: Task<Void, Never>?
@@ -56,7 +66,12 @@ final class Opslag {
     ///     bestaande `Knipsel.sqlite` al staat). Voor tests met echte bestanden.
     ///   - inGeheugen: voor tests en previews; niets wordt bewaard.
     ///   - cloudKitContainer: identifier van de CloudKit-container, of `nil` voor alleen lokaal.
-    init(map: URL? = nil, inGeheugen: Bool = false, cloudKitContainer: String? = AppConfiguratie.cloudKitContainer) {
+    ///   - laadfoutVoorTest: geeft per store een fout terug om het openen te laten mislukken (tests en
+    ///     de Debug-schakelaar `KNIPSEL_TEST_LAADFOUT`); die store wordt dan niet geopend.
+    init(
+        map: URL? = nil, inGeheugen: Bool = false, cloudKitContainer: String? = AppConfiguratie.cloudKitContainer,
+        laadfoutVoorTest: ((Kookboeken.StoreSoort) -> (any Error)?)? = nil
+    ) {
         container = NSPersistentCloudKitContainer(name: "Knipsel", managedObjectModel: Self.model)
 
         let prive = container.persistentStoreDescriptions.first ?? NSPersistentStoreDescription()
@@ -101,15 +116,9 @@ final class Opslag {
         }
         // De privéstore eerst: objecten zonder expliciete store komen daar (zoals vóór fase 8).
         container.persistentStoreDescriptions = [prive, gedeeld]
-
-        var fout: (any Error)?
-        container.loadPersistentStores { _, error in
-            if let error { fout = fout ?? error }
-        }
-        laadfout = fout
-        if let fout {
-            logger.error("Opslag laden mislukt: \(fout.localizedDescription, privacy: .public)")
-        }
+        beschrijvingen = [(.prive, prive), (.gedeeld, gedeeld)]
+        self.laadfoutVoorTest = laadfoutVoorTest
+        laadStores()
 
         let context = container.viewContext
         context.automaticallyMergesChangesFromParent = true
@@ -139,6 +148,86 @@ final class Opslag {
             }
         }
     }
+
+    // MARK: - Openen
+
+    /// Opent de stores die nog niet open zijn, in de vaste volgorde privé, gedeeld. Eén aanroep van
+    /// `loadPersistentStores`, zoals vóór de audit. Gaat de privéstore niet open, dan gaat een al
+    /// geopende gedeelde store weer dicht: zonder privéstore zou Core Data nieuwe objecten in de
+    /// gedeelde zetten. Er wordt niets gewist of hersteld.
+    private func laadStores() {
+        let coordinator = container.persistentStoreCoordinator
+        var teLaden: [NSPersistentStoreDescription] = []
+        for (soort, beschrijving) in beschrijvingen where Kookboeken.store(soort, in: coordinator) == nil {
+            if let fout = laadfoutVoorTest?(soort) {
+                laadfouten[soort] = fout
+            } else {
+                laadfouten[soort] = nil
+                teLaden.append(beschrijving)
+            }
+        }
+        if !teLaden.isEmpty {
+            var fouten: [Kookboeken.StoreSoort: any Error] = [:]
+            container.persistentStoreDescriptions = teLaden
+            container.loadPersistentStores { beschrijving, error in
+                guard let error else { return }
+                let soort =
+                    (beschrijving.options[Kookboeken.storeOptie] as? String)
+                    .flatMap(Kookboeken.StoreSoort.init(rawValue:)) ?? .prive
+                fouten[soort] = error
+            }
+            laadfouten.merge(fouten) { _, nieuw in nieuw }
+            container.persistentStoreDescriptions = beschrijvingen.map(\.1)
+        }
+        if laadfouten[.prive] != nil, let gedeeld = Kookboeken.store(.gedeeld, in: coordinator) {
+            do {
+                try coordinator.remove(gedeeld)
+            } catch {
+                logger.error("Gedeelde store sluiten mislukt: \(DeelFout.logregel(error), privacy: .public)")
+            }
+        }
+        for (soort, fout) in laadfouten.sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
+            logger.error(
+                "Store \(soort.rawValue, privacy: .public) openen mislukt: \(DeelFout.logregel(fout), privacy: .public) \(fout.localizedDescription, privacy: .public)"
+            )
+        }
+    }
+
+    /// "Probeer opnieuw" op het herstelscherm: de stores die niet open zijn nog eens openen, zonder
+    /// de app te herstarten. Wat al open is blijft open. Geeft `true` als de privéstore nu open is.
+    @discardableResult
+    func probeerOpnieuwTeOpenen() -> Bool {
+        laadStores()
+        if isGeopend { logger.info("Opslag geopend na opnieuw proberen") }
+        return isGeopend
+    }
+
+    #if DEBUG
+        /// Debug-schakelaar om het herstelscherm op een toestel te zien (Xcode › Scheme › Run ›
+        /// Environment): `KNIPSEL_TEST_LAADFOUT=prive` faalt één keer (Probeer opnieuw lukt dan),
+        /// `prive-blijft` blijft falen, `gedeeld` laat alleen Thuis van een ander falen.
+        private static func debugLaadfout() -> ((Kookboeken.StoreSoort) -> (any Error)?)? {
+            guard !draaitOnderTests, let waarde = ProcessInfo.processInfo.environment["KNIPSEL_TEST_LAADFOUT"]
+            else { return nil }
+            let fout = NSError(
+                domain: NSCocoaErrorDomain, code: NSPersistentStoreIncompatibleVersionHashError,
+                userInfo: [NSLocalizedDescriptionKey: "Testfout via KNIPSEL_TEST_LAADFOUT"])
+            var keer = 0
+            return { soort in
+                switch (waarde, soort) {
+                case ("prive", .prive):
+                    keer += 1
+                    return keer == 1 ? fout : nil
+                case ("prive-blijft", .prive), ("gedeeld", .gedeeld): return fout
+                default: return nil
+                }
+            }
+        }
+    #else
+        private static func debugLaadfout() -> ((Kookboeken.StoreSoort) -> (any Error)?)? { nil }
+    #endif
+
+    // MARK: - Inrichten
 
     /// Eerste start: standaardcategorieën en -labels aanmaken (één keer per toestel, alleen in
     /// "Mijn recepten") en ontdubbelen.

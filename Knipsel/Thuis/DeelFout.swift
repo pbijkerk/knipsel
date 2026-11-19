@@ -79,7 +79,8 @@ enum DeelFout {
         if let ck = ckFout(in: fout) {
             return uitleg(ck)
         }
-        return (fout as NSError).localizedDescription
+        // Geen Engelse systeemtekst in beeld: de centrale vertaler (audit v0.1, #6).
+        return Foutmelding.uitleg(fout)
     }
 
     static func uitleg(_ validatie: Validatie) -> String {

@@ -481,7 +481,7 @@ struct PlanInVel: View {
                 recept, op: dag, porties: recept.porties > 0 ? porties : 0, context: context, kalender: kalender)
             dismiss()
         } catch {
-            foutmelding = "Plannen lukte niet: \(error.localizedDescription)"
+            foutmelding = Foutmelding.tekst(error, actie: "Plannen")
         }
     }
 }

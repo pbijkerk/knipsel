@@ -283,7 +283,7 @@ struct CategorieBeheer: View {
             try actie()
         } catch {
             context.rollback()
-            foutmelding = error.localizedDescription
+            foutmelding = Foutmelding.tekst(error)
         }
     }
 }
@@ -401,7 +401,7 @@ struct CategorieBewerken: View {
             dismiss()
         } catch {
             context.rollback()
-            foutmelding = error.localizedDescription
+            foutmelding = Foutmelding.tekst(error)
         }
     }
 }
@@ -508,7 +508,7 @@ struct LabelBeheer: View {
             try actie()
         } catch {
             context.rollback()
-            foutmelding = error.localizedDescription
+            foutmelding = Foutmelding.tekst(error)
         }
     }
 }

@@ -79,6 +79,30 @@ struct DeelBevestiging: View {
         }
     }
 
+    /// Wat de extensie toont na het delen (audit v0.1, #5): bij een mislukte kopie een melding met wat
+    /// je kunt doen, in plaats van "niets om toe te voegen".
+    static func toestand(na uitkomst: DeelUitkomst) -> Toestand {
+        switch uitkomst {
+        case .toegevoegd(let post):
+            return .toegevoegd(omschrijving(post.bron))
+        case .niets:
+            return .niets
+        case .nietOvergenomen(.pdf, _):
+            return .mislukt(
+                "De PDF kon niet worden overgenomen. Probeer het nog eens, of bewaar hem eerst in Bestanden.")
+        case .nietOvergenomen(_, let aantal) where aantal > 1:
+            return .mislukt(
+                "De afbeeldingen konden niet worden overgenomen. Probeer het nog eens, of bewaar ze eerst in Foto's.")
+        case .nietOvergenomen:
+            return .mislukt(
+                "De afbeelding kon niet worden overgenomen. Probeer het nog eens, of bewaar haar eerst in Foto's.")
+        case .nietBewaard:
+            return .mislukt(
+                "Knipsel kon het gedeelde item niet bewaren. Probeer het nog eens; helpt dat niet, open dan Knipsel en deel het daarna opnieuw."
+            )
+        }
+    }
+
     /// Kort, voor de bevestiging.
     static func omschrijving(_ bron: DeelBron) -> String {
         switch bron {

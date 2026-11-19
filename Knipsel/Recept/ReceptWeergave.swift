@@ -185,7 +185,7 @@ struct ReceptWeergave: View {
             thuisUitlegGezien = true
             if nieuw.objectID != id { naVerplaatsen(nieuw.objectID) }
         } catch {
-            foutmelding = "Verplaatsen lukte niet: \(error.localizedDescription)"
+            foutmelding = Foutmelding.tekst(error, actie: "Verplaatsen")
         }
     }
 

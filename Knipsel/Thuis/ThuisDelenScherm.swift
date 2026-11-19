@@ -23,6 +23,11 @@ struct ThuisDelenScherm: View {
                 LabeledContent("Recepten in Thuis", value: "\(delen.aantalThuis)")
             }
 
+            // Alleen de gedeelde store ging niet open (audit v0.1, #1): rustig melden, de app werkt.
+            if let fout = delen.opslag.laadfouten[.gedeeld] {
+                ThuisLaadfoutSectie(fout: fout)
+            }
+
             if !delen.dienst.isBeschikbaar {
                 Section {
                     SwiftUI.Label("iCloud staat uit", systemImage: "icloud.slash")
@@ -179,13 +184,13 @@ struct ThuisDelenScherm: View {
                 Task { await delen.vernieuw() }
             }
         } catch {
-            foutmelding = error.localizedDescription
+            foutmelding = Foutmelding.tekst(error, actie: "Uitnodigen")
         }
     }
 
     private func voerUit(_ actie: @escaping @MainActor () async throws -> Void) {
         Task {
-            do { try await actie() } catch { foutmelding = error.localizedDescription }
+            do { try await actie() } catch { foutmelding = Foutmelding.tekst(error) }
         }
     }
 }

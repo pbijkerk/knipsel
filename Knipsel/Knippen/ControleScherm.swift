@@ -476,7 +476,7 @@ struct ControleScherm: View {
             klaar()
         } catch {
             context.rollback()
-            foutmelding = error.localizedDescription
+            foutmelding = Foutmelding.tekst(error)
         }
     }
 }
