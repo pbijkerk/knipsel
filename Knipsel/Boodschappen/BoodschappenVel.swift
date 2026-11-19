@@ -573,7 +573,7 @@ struct BoodschappenVel: View {
             naSucces()
             Task { await OnbekendeAfdelingen.gedeeld.deelIn(context: context) }
         } catch {
-            foutmelding = "Op de lijst zetten lukte niet: \(error.localizedDescription)"
+            foutmelding = Foutmelding.tekst(error, actie: "Op de lijst zetten")
         }
     }
 
@@ -604,7 +604,7 @@ struct BoodschappenVel: View {
                 naSucces()
             } catch {
                 fase = .kiezen
-                foutmelding = "Op de lijst zetten lukte niet: \(error.localizedDescription)"
+                foutmelding = Foutmelding.tekst(error, actie: "Op de lijst zetten")
             }
         }
     }

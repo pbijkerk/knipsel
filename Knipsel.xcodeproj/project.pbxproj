@@ -18,6 +18,7 @@
 		0F6D1C64CFB543AA0F7315FF /* KnipselApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87F50F041C4CB953D585CFF4 /* KnipselApp.swift */; };
 		0F90ABEB9681DFA057ED0955 /* Knipsel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 505ED222FD53F0E1D9450FE9 /* Knipsel.xcdatamodeld */; };
 		1059F3A9B0F9838D8C5D3CAC /* WeekmenuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A120302CA5D253F1451FFEA0 /* WeekmenuTests.swift */; };
+		11D7DD0BE50D89733F4F313D /* HerstelScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BFE825460C2589B9356CA7 /* HerstelScherm.swift */; };
 		13BB0151D5CBFE5B297611EF /* WatKanIkMaken.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B2094A592A64ED803105FC1 /* WatKanIkMaken.swift */; };
 		16C4657DF374C61D4E114303 /* IngredientParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E25895FFF0EB680702572E /* IngredientParser.swift */; };
 		19AC870914AAC300331B5AB5 /* DeelFout.swift in Sources */ = {isa = PBXBuildFile; fileRef = F05F9F51BCAC1953CBD68BE9 /* DeelFout.swift */; };
@@ -42,6 +43,7 @@
 		2F74FF537884906693105C90 /* KeychainService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8579C78469AD96BD3CD5D529 /* KeychainService.swift */; };
 		34AFD6F178602A420C7F0695 /* StapSplitser.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD32DDA41BF7995385751615 /* StapSplitser.swift */; };
 		35D8B3462A6D3D327A0987E4 /* TijdHerkenner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212AD1B4E678214154D53ECE /* TijdHerkenner.swift */; };
+		35FA11B9ED19BF7AC0435927 /* OpslagHerstelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B668D48D8EE6F92573BB3E9A /* OpslagHerstelTests.swift */; };
 		37D6D60E48B9834D860786AC /* AlarmKitWekker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53D2BE323DF855D97E86346F /* AlarmKitWekker.swift */; };
 		3977A2D213D10C9FE044A063 /* BoodschappenScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180D613C98F30DC5B9B5E66E /* BoodschappenScherm.swift */; };
 		3AE1588F0AE1FB8638591CFD /* InlezenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC59B032309D233A1AD40249 /* InlezenTests.swift */; };
@@ -97,6 +99,7 @@
 		75FB7E829A9C0A22AC5684FA /* KookmodusScherm.swift in Sources */ = {isa = PBXBuildFile; fileRef = F668CB4EF71739D016404873 /* KookmodusScherm.swift */; };
 		7609930B979CD3AD847075DF /* GerechtFotoKiezer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893C0E4CB8D5AACF1A1B5065 /* GerechtFotoKiezer.swift */; };
 		77A48D9F8CB9C117BDE09FCA /* ReceptSelectie.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9A788E92CD0E79634071AA /* ReceptSelectie.swift */; };
+		78C384E5E252464F35764215 /* Foutmelding.swift in Sources */ = {isa = PBXBuildFile; fileRef = A07E1C50237AF3E15E118A97 /* Foutmelding.swift */; };
 		79E7E6006C9A3A696B61F555 /* Spraakweergave.swift in Sources */ = {isa = PBXBuildFile; fileRef = E55DDE6D13AF983174B115EF /* Spraakweergave.swift */; };
 		7AF2DD34C46688BF20834DBF /* BoodschappenIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = EED591E0B8FCE803CE69D35C /* BoodschappenIntent.swift */; };
 		823D48ED35F1AF8C3B56620A /* secties.html in Resources */ = {isa = PBXBuildFile; fileRef = 57A4556C4DD100088C5AED8B /* secties.html */; };
@@ -138,6 +141,7 @@
 		BF4BE3298F8304900A764F50 /* CloudKitDeelDienst.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11E5DD20013E114DFAF230BD /* CloudKitDeelDienst.swift */; };
 		C050E739898FD44A71317FB8 /* SpraakbedieningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A0A091AC7276F0B6291F3A6 /* SpraakbedieningTests.swift */; };
 		C1ED57333173C940378687B8 /* KookActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C72DC648C8B669717C8D9A46 /* KookActivity.swift */; };
+		C219470FAF8B012B1F9339F0 /* FoutmeldingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEE677AEFBDEB6AFC281F994 /* FoutmeldingTests.swift */; };
 		C2645324A4B81281C02E3055 /* ReceptFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2D5F73E4CA132A999C4584E7 /* ReceptFilter.swift */; };
 		C382EE46837EFA43C5AAE002 /* KnipselDelen.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 6A03508E8E1A9A39204AA37B /* KnipselDelen.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		C411FC10E36DBEE66DFEECDC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D27E7F45AE46B4F8472FA56C /* Assets.xcassets */; };
@@ -263,6 +267,7 @@
 		21430A5E8EB0D9FEF0ECF84C /* DeelDienst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeelDienst.swift; sourceTree = "<group>"; };
 		21FEAF2FF5F4627F6A808452 /* MeestalInHuis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeestalInHuis.swift; sourceTree = "<group>"; };
 		228314FC7672C8DD045BC308 /* ThuisExportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ThuisExportTests.swift; sourceTree = "<group>"; };
+		24BFE825460C2589B9356CA7 /* HerstelScherm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HerstelScherm.swift; sourceTree = "<group>"; };
 		273104A8883B9B5AE9FAFE1E /* WatKanIkMakenIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatKanIkMakenIntent.swift; sourceTree = "<group>"; };
 		2A0A091AC7276F0B6291F3A6 /* SpraakbedieningTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpraakbedieningTests.swift; sourceTree = "<group>"; };
 		2A989570D162883BA4071D14 /* Knipsel 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Knipsel 3.xcdatamodel"; sourceTree = "<group>"; };
@@ -346,6 +351,7 @@
 		9AE93C8783545508E21C7C37 /* ClaudeIndeler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeIndeler.swift; sourceTree = "<group>"; };
 		9CDD09785EEFE89D17A7188D /* Opmaak.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opmaak.swift; sourceTree = "<group>"; };
 		9F3E0E386DC84E412E8F73FE /* ReceptEntiteit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptEntiteit.swift; sourceTree = "<group>"; };
+		A07E1C50237AF3E15E118A97 /* Foutmelding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Foutmelding.swift; sourceTree = "<group>"; };
 		A1128C811CF36CB9DCA85B14 /* BoodschappenLijst.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoodschappenLijst.swift; sourceTree = "<group>"; };
 		A120302CA5D253F1451FFEA0 /* WeekmenuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeekmenuTests.swift; sourceTree = "<group>"; };
 		A303A87D05739AA521322CFE /* MeerdereReceptenTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeerdereReceptenTests.swift; sourceTree = "<group>"; };
@@ -353,6 +359,7 @@
 		A875A58DA63CCCD1D49EC53C /* ReceptVerplaatsen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReceptVerplaatsen.swift; sourceTree = "<group>"; };
 		AB79EBDFADD9D84884EA2AA3 /* ModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModelTests.swift; sourceTree = "<group>"; };
 		ABB34EB3A84428D675FD6061 /* microdata.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = microdata.html; sourceTree = "<group>"; };
+		B668D48D8EE6F92573BB3E9A /* OpslagHerstelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpslagHerstelTests.swift; sourceTree = "<group>"; };
 		B6D051E99ED2C3EB3C0DD66D /* Opslag.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Opslag.swift; sourceTree = "<group>"; };
 		BA24908B87C0EA221AED05C8 /* LuisterService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LuisterService.swift; sourceTree = "<group>"; };
 		BD497F957B3582290552826B /* ClaudeIndelerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeIndelerTests.swift; sourceTree = "<group>"; };
@@ -406,6 +413,7 @@
 		F668CB4EF71739D016404873 /* KookmodusScherm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KookmodusScherm.swift; sourceTree = "<group>"; };
 		F6A51EBC0C7071A0E9FB41E1 /* Tijdweergave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tijdweergave.swift; sourceTree = "<group>"; };
 		F7F9DB363FC8119FAFE1321B /* VandaagIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VandaagIntent.swift; sourceTree = "<group>"; };
+		FEE677AEFBDEB6AFC281F994 /* FoutmeldingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoutmeldingTests.swift; sourceTree = "<group>"; };
 		FF5C1CC84520EBEC57921E15 /* kookzender.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = kookzender.html; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -449,6 +457,7 @@
 				C1D035DDD559854D6A4A163C /* AfdelingIndeler.swift */,
 				A1128C811CF36CB9DCA85B14 /* BoodschappenLijst.swift */,
 				9AE93C8783545508E21C7C37 /* ClaudeIndeler.swift */,
+				A07E1C50237AF3E15E118A97 /* Foutmelding.swift */,
 				579E35F670326A740E862739 /* GerechtFoto.swift */,
 				E79401E15A93EE7924E6656C /* HerinneringenDienst.swift */,
 				021F75B011F22D7BDC256846 /* Indeler.swift */,
@@ -551,6 +560,7 @@
 				BD497F957B3582290552826B /* ClaudeIndelerTests.swift */,
 				F34EB83CF845B3C050F02FD9 /* CommandoHerkennerTests.swift */,
 				37F5F605C77AA64048FCAE31 /* DelenTests.swift */,
+				FEE677AEFBDEB6AFC281F994 /* FoutmeldingTests.swift */,
 				D34FC0C7915749A131F9DE78 /* GerechtFotoTests.swift */,
 				C809330EC1D9D40DB9EA0701 /* IndelenTests.swift */,
 				C158ED0975594A23CD77C5AD /* IngredientParserTests.swift */,
@@ -561,6 +571,7 @@
 				DD4A72CEC245DF458099EDC9 /* KookVoortgangTests.swift */,
 				A303A87D05739AA521322CFE /* MeerdereReceptenTests.swift */,
 				AB79EBDFADD9D84884EA2AA3 /* ModelTests.swift */,
+				B668D48D8EE6F92573BB3E9A /* OpslagHerstelTests.swift */,
 				6F13650094C100D28D45EBD5 /* PerenInRodeWijn.swift */,
 				36AD665D6024011409607AEF /* PortieschalingTests.swift */,
 				035E0626CDC05262823C6028 /* ReceptFilterTests.swift */,
@@ -646,6 +657,7 @@
 				D7F049FD6FEEBDD9A5DA3A40 /* Bibliotheekbeheer.swift */,
 				4FF657FFF433116CEB04843A /* Boodschappenlijsten.swift */,
 				8BEFBE117224A5CDE29212DF /* CloudKitSchema.swift */,
+				24BFE825460C2589B9356CA7 /* HerstelScherm.swift */,
 				C9738D6AC28DD8918DF30498 /* Inrichting.swift */,
 				EDFCB054BF3046A81D2ABD7D /* Kookboeken.swift */,
 				6B819CBA06804B17BA932703 /* Modelklassen.swift */,
@@ -943,6 +955,7 @@
 				B23A98F49BCC31DED61DA5C8 /* ClaudeIndelerTests.swift in Sources */,
 				5D97C1A6A1620B7FCEF9727B /* CommandoHerkennerTests.swift in Sources */,
 				6C11B367457D77BFDE47FD60 /* DelenTests.swift in Sources */,
+				C219470FAF8B012B1F9339F0 /* FoutmeldingTests.swift in Sources */,
 				1C5692984B791BD523F0E864 /* GerechtFotoTests.swift in Sources */,
 				E1C576E48FC2F71B05A39B32 /* IndelenTests.swift in Sources */,
 				2D34BE6F79FE645833F62FE7 /* IngredientParserTests.swift in Sources */,
@@ -953,6 +966,7 @@
 				49DC26C2D48E70AFDC2EB33B /* KookVoortgangTests.swift in Sources */,
 				1EE9B440954A7C3FD04FEF4D /* MeerdereReceptenTests.swift in Sources */,
 				56CF8037A5CC90F908E72622 /* ModelTests.swift in Sources */,
+				35FA11B9ED19BF7AC0435927 /* OpslagHerstelTests.swift in Sources */,
 				BCB99531A5CA1B10C7B5A7EA /* PerenInRodeWijn.swift in Sources */,
 				83F01D480927D7557B12E9F0 /* PortieschalingTests.swift in Sources */,
 				92EC088BE4622F64AE5E497A /* ReceptFilterTests.swift in Sources */,
@@ -1008,10 +1022,12 @@
 				19AC870914AAC300331B5AB5 /* DeelFout.swift in Sources */,
 				FDC2E1DC7D16EBCB8D8C5D9B /* DeelLezer.swift in Sources */,
 				EC9BA076A279ADA45768BE84 /* DeelPost.swift in Sources */,
+				78C384E5E252464F35764215 /* Foutmelding.swift in Sources */,
 				DEC6563513861F3B066F3E2D /* GerechtFoto.swift in Sources */,
 				7609930B979CD3AD847075DF /* GerechtFotoKiezer.swift in Sources */,
 				FEE8A464D1C206106FDAE1BA /* HTMLTekst.swift in Sources */,
 				48A2F598004D962180075CA5 /* HerinneringenDienst.swift in Sources */,
+				11D7DD0BE50D89733F4F313D /* HerstelScherm.swift in Sources */,
 				D30E192477AD60342F38D01F /* InboxLijst.swift in Sources */,
 				E482A35DA62B0DA757E8AF89 /* Indeler.swift in Sources */,
 				A0F32CEF60B83914D7664243 /* IngredientMatcher.swift in Sources */,

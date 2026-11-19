@@ -115,7 +115,7 @@ struct BoodschappenItemBewerken: View {
                 afdeling: afdeling, geheugen: &geheugen, defaults: defaults)
             dismiss()
         } catch {
-            foutmelding = "Bewaren lukte niet: \(error.localizedDescription)"
+            foutmelding = Foutmelding.tekst(error, actie: "Bewaren")
         }
     }
 }

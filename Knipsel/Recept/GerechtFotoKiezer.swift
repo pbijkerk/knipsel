@@ -136,7 +136,7 @@ struct GerechtFotoKiezer: ViewModifier {
             let foto = await Task.detached(priority: .userInitiated) { GerechtFoto.maakData(van: data) }.value
             zet(foto)
         } catch {
-            foutmelding = error.localizedDescription
+            foutmelding = Foutmelding.tekst(error)
         }
     }
 
@@ -154,7 +154,7 @@ struct GerechtFotoKiezer: ViewModifier {
             try recept.zetFoto(foto)
         } catch {
             recept.managedObjectContext?.rollback()
-            foutmelding = error.localizedDescription
+            foutmelding = Foutmelding.tekst(error)
             Logger(subsystem: "com.peterbijkerk.knipsel", category: "Recept")
                 .error("Foto bewaren mislukt: \(error.localizedDescription, privacy: .public)")
         }

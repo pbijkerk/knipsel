@@ -1,4 +1,5 @@
 import Foundation
+import OSLog
 import UIKit
 import UniformTypeIdentifiers
 
@@ -74,6 +75,34 @@ enum DeelKeuze {
     }
 }
 
+/// Hoe het delen afliep: wat de extensie daarna toont (audit v0.1, #5).
+enum DeelUitkomst: Equatable {
+    case toegevoegd(DeelPost)
+    /// Er zat niets bruikbaars bij (geen link, tekst, afbeelding of PDF).
+    case niets
+    /// Er zaten afbeeldingen of een PDF bij, maar het kopiëren naar Knipsel lukte niet.
+    case nietOvergenomen(DeelSoort, aantal: Int)
+    /// Wel gelezen, maar het bewaren in de map voor Knipsel lukte niet.
+    case nietBewaard
+
+    var post: DeelPost? {
+        if case .toegevoegd(let post) = self { return post }
+        return nil
+    }
+
+    /// Puur: uit wat er gelezen is en wat erbij zat.
+    static func bepaal(post: DeelPost?, soorten: [DeelSoort?], schrijvenMislukt: Bool) -> DeelUitkomst {
+        if schrijvenMislukt { return .nietBewaard }
+        if let post { return .toegevoegd(post) }
+        let afbeeldingen = soorten.filter { $0 == .afbeelding }.count
+        if afbeeldingen > 0 {
+            return .nietOvergenomen(.afbeelding, aantal: min(afbeeldingen, DeelKeuze.maxAfbeeldingen))
+        }
+        if soorten.contains(.pdf) { return .nietOvergenomen(.pdf, aantal: 1) }
+        return .niets
+    }
+}
+
 /// Leest de `NSItemProvider`s van het deelmenu en zet het resultaat als `DeelPost` in de map. Doet
 /// niets zwaars: geen netwerk, geen tekstherkenning; afbeeldingen en PDF's worden als bestand
 /// gekopieerd (alleen een los aangeleverd beeld wordt als JPEG bewaard).
@@ -81,8 +110,16 @@ enum DeelKeuze {
 struct DeelLezer {
     let bus: DeelBus
 
-    /// Leest, schrijft en geeft het item terug; nil als er niets bruikbaars bij zat.
+    /// Alleen soorten en foutcodes, nooit inhoud, adressen of bestandsnamen.
+    nonisolated static let logger = Logger(subsystem: "com.peterbijkerk.knipsel", category: "Delen")
+
+    /// Leest, schrijft en geeft het item terug; nil als er niets bruikbaars bij zat of iets mislukte.
     func lees(_ providers: [NSItemProvider]) async -> DeelPost? {
+        await verwerk(providers).post
+    }
+
+    /// Leest en schrijft, en zegt hoe het afliep.
+    func verwerk(_ providers: [NSItemProvider]) async -> DeelUitkomst {
         let ingedeeld = providers.map { ($0, DeelKeuze.soort($0.registeredTypeIdentifiers)) }
         let bus = bus
         var links: [URL] = []
@@ -138,11 +175,36 @@ struct DeelLezer {
                 }
             }
         }
-        guard let post else { return nil }
+        guard let post else {
+            let uitkomst = DeelUitkomst.bepaal(post: nil, soorten: ingedeeld.map(\.1), schrijvenMislukt: false)
+            if case .nietOvergenomen(let soort, let aantal) = uitkomst {
+                Self.logger.error("Delen: \(aantal) \(String(describing: soort), privacy: .public) niet overgenomen")
+            }
+            return uitkomst
+        }
         do {
             try bus.schrijf(post)
-            return post
+            return .toegevoegd(post)
         } catch {
+            Self.log(error, bij: "bewaren van het gedeelde item")
+            return .nietBewaard
+        }
+    }
+
+    /// Type, domein en code van een fout; geen inhoud.
+    nonisolated static func log(_ fout: any Error, bij wat: String) {
+        let ns = fout as NSError
+        logger.error(
+            "Delen: \(wat, privacy: .public) mislukt: \(String(describing: type(of: fout)), privacy: .public) \(ns.domain, privacy: .public) \(ns.code)"
+        )
+    }
+
+    /// `try?` met een logregel bij een fout.
+    nonisolated static func probeer<T>(_ wat: String, _ werk: () throws -> T) -> T? {
+        do {
+            return try werk()
+        } catch {
+            log(error, bij: wat)
             return nil
         }
     }
@@ -154,13 +216,15 @@ struct DeelLezer {
         // Een als object geregistreerde URL (de meeste apps) komt via loadObject goed terug; loadItem
         // geeft dan alleen de gecodeerde data.
         guard provider.canLoadObject(ofClass: NSURL.self) else { return klaar(nil) }
-        _ = provider.loadObject(ofClass: NSURL.self) { object, _ in
+        _ = provider.loadObject(ofClass: NSURL.self) { object, fout in
+            if let fout { log(fout, bij: "link laden") }
             klaar(object as? URL)
         }
     }
 
     nonisolated static func laadURLItem(_ provider: NSItemProvider, klaar: @escaping @Sendable (URL?) -> Void) {
-        provider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { item, _ in
+        provider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { item, fout in
+            if let fout { log(fout, bij: "link laden (item)") }
             switch item {
             case let url as URL: klaar(url)
             case let data as Data: klaar(URL(dataRepresentation: data, relativeTo: nil))
@@ -176,12 +240,14 @@ struct DeelLezer {
             ? UTType.plainText.identifier
             : provider.registeredTypeIdentifiers.first { UTType($0)?.conforms(to: .text) == true }
         guard let type else { return klaar(nil) }
-        provider.loadItem(forTypeIdentifier: type, options: nil) { item, _ in
+        provider.loadItem(forTypeIdentifier: type, options: nil) { item, fout in
+            if let fout { log(fout, bij: "tekst laden") }
             switch item {
             case let tekst as String: klaar(tekst)
             case let tekst as NSAttributedString: klaar(tekst.string)
             case let data as Data: klaar(String(data: data, encoding: .utf8))
-            case let url as URL where url.isFileURL: klaar(try? String(contentsOf: url, encoding: .utf8))
+            case let url as URL where url.isFileURL:
+                klaar(probeer("tekstbestand lezen") { try String(contentsOf: url, encoding: .utf8) })
             default: klaar(nil)
             }
         }
@@ -196,15 +262,29 @@ struct DeelLezer {
     nonisolated static func laadAfbeeldingItem(
         _ provider: NSItemProvider, type: UTType, bus: DeelBus, klaar: @escaping @Sendable (String?) -> Void
     ) {
-        provider.loadItem(forTypeIdentifier: type.identifier, options: nil) { item, _ in
+        provider.loadItem(forTypeIdentifier: type.identifier, options: nil) { item, fout in
+            if let fout { log(fout, bij: "afbeelding laden (item)") }
             switch item {
             case let url as URL where url.isFileURL:
-                klaar(try? bus.kopieer(url, extensie: url.pathExtension))
+                klaar(probeer("afbeelding kopiëren") { try bus.kopieer(url, extensie: url.pathExtension) })
             case let data as Data:
-                klaar(try? bus.bewaarBestand(data, extensie: type.preferredFilenameExtension ?? "jpg"))
+                klaar(
+                    probeer("afbeelding bewaren") {
+                        try bus.bewaarBestand(data, extensie: type.preferredFilenameExtension ?? "jpg")
+                    })
             case let beeld as UIImage:
-                klaar(beeld.jpegData(compressionQuality: 0.9).flatMap { try? bus.bewaarBestand($0, extensie: "jpg") })
-            default: klaar(nil)
+                guard let jpeg = beeld.jpegData(compressionQuality: 0.9) else {
+                    logger.error("Delen: afbeelding omzetten naar JPEG mislukt")
+                    return klaar(nil)
+                }
+                klaar(probeer("afbeelding bewaren") { try bus.bewaarBestand(jpeg, extensie: "jpg") })
+            case nil:
+                klaar(nil)
+            case let ander?:
+                logger.error(
+                    "Delen: afbeelding als onbekend type: \(String(describing: Swift.type(of: ander)), privacy: .public)"
+                )
+                klaar(nil)
             }
         }
     }
@@ -214,14 +294,17 @@ struct DeelLezer {
         _ provider: NSItemProvider, type: UTType, bus: DeelBus, klaar: @escaping @Sendable (String?) -> Void
     ) {
         guard provider.hasItemConformingToTypeIdentifier(type.identifier) else { return klaar(nil) }
-        _ = provider.loadFileRepresentation(forTypeIdentifier: type.identifier) { url, _ in
+        _ = provider.loadFileRepresentation(forTypeIdentifier: type.identifier) { url, fout in
+            if let fout { log(fout, bij: "bestand laden (\(type.identifier))") }
             // Het tijdelijke bestand bestaat alleen binnen deze handler.
             klaar(
                 url.flatMap { url in
-                    try? bus.kopieer(
-                        url,
-                        extensie: url.pathExtension.isEmpty
-                            ? (type.preferredFilenameExtension ?? "dat") : url.pathExtension)
+                    probeer("bestand kopiëren (\(type.identifier))") {
+                        try bus.kopieer(
+                            url,
+                            extensie: url.pathExtension.isEmpty
+                                ? (type.preferredFilenameExtension ?? "dat") : url.pathExtension)
+                    }
                 })
         }
     }

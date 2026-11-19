@@ -245,7 +245,7 @@ struct BoodschappenScherm: View {
             invoerActief = true
             Task { await OnbekendeAfdelingen.gedeeld.deelIn(context: context) }
         } catch {
-            melding = "Toevoegen lukte niet: \(error.localizedDescription)"
+            melding = Foutmelding.tekst(error, actie: "Toevoegen")
         }
     }
 
@@ -254,7 +254,7 @@ struct BoodschappenScherm: View {
             do {
                 try Boodschappenlijsten.vink(item, af: !item.afgevinkt)
             } catch {
-                melding = "Afvinken lukte niet: \(error.localizedDescription)"
+                melding = Foutmelding.tekst(error, actie: "Afvinken")
             }
         }
     }
@@ -263,7 +263,7 @@ struct BoodschappenScherm: View {
         do {
             try Boodschappenlijsten.verwijder(item)
         } catch {
-            melding = "Verwijderen lukte niet: \(error.localizedDescription)"
+            melding = Foutmelding.tekst(error, actie: "Verwijderen")
         }
     }
 
@@ -271,7 +271,7 @@ struct BoodschappenScherm: View {
         do {
             try Boodschappenlijsten.wisAfgevinkt(in: kookboek, context: context)
         } catch {
-            melding = "Wissen lukte niet: \(error.localizedDescription)"
+            melding = Foutmelding.tekst(error, actie: "Wissen")
         }
     }
 
@@ -293,7 +293,7 @@ struct BoodschappenScherm: View {
             if resultaat.overgeslagen > 0 { tekst += " \(resultaat.overgeslagen) stonden er al op." }
             melding = tekst
         } catch {
-            melding = "Naar Herinneringen lukte niet: \(error.localizedDescription)"
+            melding = Foutmelding.tekst(error, actie: "Naar Herinneringen")
         }
     }
 }

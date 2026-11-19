@@ -160,7 +160,7 @@ struct ReceptLijst: View {
         ) { recept in
             Button("Verwijder \u{201C}\(recept.titelOfStandaard)\u{201D}", role: .destructive) {
                 context.delete(recept)
-                do { try context.save() } catch { foutmelding = error.localizedDescription }
+                do { try context.save() } catch { foutmelding = Foutmelding.tekst(error, actie: "Verwijderen") }
             }
         } message: { _ in
             Text("Dit kan niet ongedaan worden gemaakt.")

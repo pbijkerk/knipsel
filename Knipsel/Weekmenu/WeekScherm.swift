@@ -421,7 +421,7 @@ struct WeekScherm: View {
         do {
             try withAnimation { try werk() }
         } catch {
-            foutmelding = error.localizedDescription
+            foutmelding = Foutmelding.tekst(error)
         }
     }
 

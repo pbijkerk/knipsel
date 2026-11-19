@@ -188,7 +188,7 @@ struct ReceptBewerken: View {
             dismiss()
         } catch {
             context.rollback()
-            foutmelding = error.localizedDescription
+            foutmelding = Foutmelding.tekst(error)
         }
     }
 }
